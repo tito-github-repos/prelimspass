@@ -1,0 +1,950 @@
+"use client";
+
+import type { ReactNode } from "react";
+import { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  Card,
+  Button,
+  useTheme,
+  Tooltip,
+} from "@mui/material";
+import { useRouter } from "next/navigation";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ScheduleIcon from "@mui/icons-material/Schedule";
+import StarRateIcon from "@mui/icons-material/StarRate";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import EventIcon from "@mui/icons-material/Event";
+import GradeIcon from "@mui/icons-material/Grade";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import AttemptHistoryModal from "@/app/components/AttemptHistoryModal";
+
+const MAIN_BG = "#f5f7fa";
+const CARD_BG = "#ffffff";
+const CARD_BORDER = "#e0e0e0";
+const TEXT_SECONDARY = "#64748b";
+const TEXT_PRIMARY = "#1e293b";
+const PRIMARY_PURPLE = "#2f13c9ff";
+const SUCCESS_GREEN = "#22c55e";
+const WARNING_YELLOW = "#f59e0b";
+const DANGER_RED = "#ef4444";
+const INFO_BLUE = "#2679d9ff";
+const EXAM_META_COLOR = TEXT_SECONDARY;
+
+// Shared action button sizing and styles so all action buttons look identical
+const ACTION_BUTTON_MD_WIDTH = "160px";
+const ACTION_BUTTON_SX = {
+  // horizontal padding kept for visual spacing; height and lineHeight enforce identical vertical size
+  padding: "0 14px",
+  height: "40px",
+  lineHeight: "40px",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  textTransform: "none",
+  backgroundColor: PRIMARY_PURPLE,
+  color: "#fff",
+  borderRadius: 2,
+  fontSize: "15px",
+  fontWeight: 700,
+  boxShadow: "none",
+};
+
+// Interface for exam attempt data from API
+interface ExamAttempt {
+  attemptId: number;
+  examId: number;
+  title: string;
+  subject: string;
+  duration: number;
+  questions: number;
+  points: string;
+  examType: "practice" | "mock" | "live";
+  score: string;
+  completedAt: string;
+  endTime: string; // ISO format date string
+  totalTimeSeconds: number;
+  canRetake: boolean;
+  hasReachedRetakeLimit: boolean;
+  attemptNumber: number;
+  correctAnswers: number;
+  wrongAnswers: number;
+  unanswered: number;
+  result: string;
+}
+
+interface ExamMeta {
+  duration: string | number;
+  questions: string | number;
+  completedAt: string;
+  points: string | number;
+  score: string | number;
+  examType: "practice" | "mock" | "live";
+  attemptNumber?: number;
+}
+
+interface ExamCardProps {
+  title: string;
+  subject: string;
+  meta: ExamMeta;
+  endTime?: string;
+  onViewResults?: () => void;
+  onTakeExam?: (examType: string) => void;
+  canRetake?: boolean;
+  hasReachedRetakeLimit?: boolean;
+  onViewAttemptHistory?: () => void;
+  isRetakeLoading?: boolean;
+}
+
+const ExamCard = ({
+  title,
+  subject,
+  meta,
+  endTime,
+  onViewResults,
+  onTakeExam,
+  canRetake,
+  hasReachedRetakeLimit,
+  onViewAttemptHistory,
+  isRetakeLoading,
+}: ExamCardProps) => {
+  // Check if results are available for live exam
+  const isResultsAvailable = (): boolean => {
+    if (meta.examType !== "live" || !endTime) {
+      return true;
+    }
+    
+    const examEndTime = new Date(endTime);
+    const resultsAvailableTime = new Date(examEndTime.getTime() + 30 * 60 * 1000); // 30 minutes after end time
+    return new Date() >= resultsAvailableTime;
+  };
+  
+  const resultsAvailable = isResultsAvailable();
+  
+  // Format the results available time for tooltip
+  const getResultsAvailableTime = (): string => {
+    if (meta.examType !== "live" || !endTime) {
+      return "";
+    }
+    
+    const examEndTime = new Date(endTime);
+    const resultsAvailableTime = new Date(examEndTime.getTime() + 30 * 60 * 1000); // 30 minutes after end time
+    return resultsAvailableTime.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+  
+  const resultsAvailableTimeString = getResultsAvailableTime();
+  
+  return (
+  <Card
+    sx={{
+      border: `1px solid #e0e0e0`,
+      borderRadius: { xs: 1.5, sm: 2, md: 2.5 },
+      background: CARD_BG,
+      color: TEXT_PRIMARY,
+      boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
+      width: "100%",
+      overflow: "hidden",
+      transition: "all 0.3s ease",
+      "&:hover": {
+        transform: "translateY(-5px)",
+        boxShadow: "0 10px 20px rgba(0, 0, 0, 0.1)",
+      },
+    }}
+  >
+    <Box
+      sx={{
+        p: { xs: 1.25, sm: 1.5, md: 1.875 },
+        background: "#f8f9fa",
+        borderBottom: "1px solid #e0e0e0",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
+      <Box>
+        <Typography
+          sx={{
+            fontSize: { xs: 16, sm: 17, md: 18 },
+            fontWeight: 600,
+            mb: { xs: 0.25, sm: 0.5, md: 0.625 },
+            color: "#2c3e50",
+            lineHeight: 1.2,
+          }}
+        >
+          {title}
+        </Typography>
+        <Typography
+          sx={{
+            color: "#7f8c8d",
+            fontSize: { xs: 13, sm: 14 },
+          }}
+        >
+          {subject}
+        </Typography>
+      </Box>
+      <Typography
+        sx={{
+          backgroundColor:
+            meta.examType === "practice"
+              ? "#3b82f6"
+              : meta.examType === "mock"
+                ? "#f59e0b"
+                : "#ef4444",
+          color: "#fff",
+          borderRadius: "12px",
+          padding: "4px 10px",
+          fontSize: 12,
+          fontWeight: 700,
+          textTransform: "uppercase",
+        }}
+      >
+        {meta.examType}
+      </Typography>
+    </Box>
+    <Box sx={{ p: { xs: 1.25, sm: 1.5, md: 1.875 } }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          mb: { xs: 1.25, sm: 1.5, md: 1.875 },
+          gap: { xs: 0.5, sm: 0.75 },
+        }}
+      >
+        <Box
+          sx={{
+            flex: { xs: "1 0 100%", sm: "1 0 50%" },
+            mb: { xs: 0.75, sm: 1, md: 1.25 },
+            display: "flex",
+            alignItems: "center",
+            gap: { xs: 0.5, sm: 0.625 },
+          }}
+        >
+          <AccessTimeIcon fontSize="small" sx={{ color: "#6a11cb" }} />
+          <Typography
+            variant="body2"
+            sx={{
+              color: TEXT_PRIMARY,
+              fontSize: { xs: 13, sm: 14 },
+            }}
+          >
+            {meta.duration} min
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            flex: { xs: "1 0 100%", sm: "1 0 50%" },
+            mb: { xs: 0.75, sm: 1, md: 1.25 },
+            display: "flex",
+            alignItems: "center",
+            gap: { xs: 0.5, sm: 0.625 },
+          }}
+        >
+          <HelpOutlineIcon fontSize="small" sx={{ color: "#6a11cb" }} />
+          <Typography
+            variant="body2"
+            sx={{
+              color: TEXT_PRIMARY,
+              fontSize: { xs: 13, sm: 14 },
+            }}
+          >
+            {meta.questions} questions
+          </Typography>
+        </Box>
+
+        <Box
+          sx={{
+            flex: { xs: "1 0 100%", sm: "1 0 50%" },
+            mb: { xs: 0.75, sm: 1, md: 1.25 },
+            display: "flex",
+            alignItems: "center",
+            gap: { xs: 0.5, sm: 0.625 },
+          }}
+        >
+          <CalendarTodayIcon fontSize="small" sx={{ color: "#6a11cb" }} />
+          <Typography
+            variant="body2"
+            sx={{
+              color: TEXT_PRIMARY,
+              fontSize: { xs: 13, sm: 14 },
+            }}
+          >
+            Completed: {meta.completedAt}
+          </Typography>
+        </Box>
+        <Tooltip
+          title={!resultsAvailable ? `Score will be available at ${resultsAvailableTimeString}` : ""}
+          placement="top"
+          disableInteractive={false}
+        >
+          <Box
+            sx={{
+              flex: { xs: "1 0 100%", sm: "1 0 50%" },
+              mb: { xs: 0.75, sm: 1, md: 1.25 },
+              display: "flex",
+              alignItems: "center",
+              gap: { xs: 0.5, sm: 0.625 },
+            }}
+          >
+            <GradeIcon fontSize="small" sx={{ color: "#6a11cb" }} />
+            <Typography
+              variant="body2"
+              sx={{
+                color: TEXT_PRIMARY,
+                fontSize: { xs: 13, sm: 14 },
+              }}
+            >
+              Score: {resultsAvailable ? `${meta.score}/${meta.points}` : "-"}
+            </Typography>
+          </Box>
+        </Tooltip>
+        <Box
+          sx={{
+            flex: { xs: "1 0 100%", sm: "1 0 50%" },
+            mb: { xs: 0.75, sm: 1, md: 1.25 },
+            display: "flex",
+            alignItems: "center",
+            gap: { xs: 0.5, sm: 0.625 },
+          }}
+        >
+          <StarRateIcon fontSize="small" sx={{ color: "#6a11cb" }} />
+          <Typography
+            variant="body2"
+            sx={{
+              color: TEXT_PRIMARY,
+              fontSize: { xs: 13, sm: 14 },
+            }}
+          >
+            Attempt: {meta.attemptNumber}
+          </Typography>
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: { xs: 1, sm: 2 },
+          flexDirection: { xs: "column", sm: "row" },
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            width: { xs: "100%", sm: "auto" },
+            justifyContent: { xs: "center", sm: "flex-start" },
+          }}
+        >
+          <Typography
+            sx={{
+              background: "#e6f4ea",
+              color: "#137333",
+              borderRadius: "20px",
+              padding: { xs: "4px 8px", sm: "5px 10px" },
+              fontSize: { xs: 11, sm: 12 },
+              fontWeight: 600,
+            }}
+          >
+            Completed
+          </Typography>
+        </Box>
+
+        <Box
+          sx={{
+            width: { xs: "100%", sm: "auto" },
+            display: "flex",
+            gap: 1,
+            flexDirection: { xs: "column", sm: "row" },
+            minWidth: { xs: "100%", sm: "320px" },
+          }}
+        >
+          {(canRetake ||
+            (hasReachedRetakeLimit && meta.examType === "mock")) && (
+            <Tooltip
+              title={
+                hasReachedRetakeLimit && meta.examType === "mock"
+                  ? "You have reached the retake limit. Mock exams can only be retaken 2 times."
+                  : ""
+              }
+              placement="top"
+              disableInteractive={false}
+            >
+              <span>
+                <Button
+                  variant="outlined"
+                  disabled={hasReachedRetakeLimit || isRetakeLoading}
+                  sx={{
+                    flex: 1,
+                    padding: { xs: "8px 12px", sm: "10px 16px" },
+                    height: { xs: "40px", sm: "44px" },
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textTransform: "none",
+                    borderColor: hasReachedRetakeLimit ? "#ccc" : isRetakeLoading ? "#ccc" : "#6a11cb",
+                    color: hasReachedRetakeLimit ? "#ccc" : isRetakeLoading ? "#ccc" : "#6a11cb",
+                    backgroundColor: hasReachedRetakeLimit || isRetakeLoading
+                      ? "#f5f5f5"
+                      : "transparent",
+                    borderRadius: 2,
+                    fontSize: { xs: "12px", sm: "13px" },
+                    fontWeight: 600,
+                    "&:hover": !hasReachedRetakeLimit && !isRetakeLoading
+                      ? {
+                          backgroundColor: "#6a11cb",
+                          color: "#fff",
+                          transform: "translateY(-2px)",
+                        }
+                      : {},
+                    "&.Mui-disabled": {
+                      borderColor: "#ccc",
+                      color: "#ccc",
+                      backgroundColor: "#f5f5f5",
+                    },
+                  }}
+                  onClick={() => onTakeExam && onTakeExam(meta.examType)}
+                >
+                  {isRetakeLoading ? (
+                    <>
+                      <span className="fa fa-spinner fa-spin" style={{ marginRight: 8 }}></span>
+                      Loading...
+                    </>
+                  ) : (
+                    "Retake"
+                  )}
+                </Button>
+              </span>
+            </Tooltip>
+          )}
+          <Tooltip
+            title={!resultsAvailable ? `Results will be available at ${resultsAvailableTimeString}` : ""}
+            placement="top"
+            disableInteractive={false}
+          >
+            <span>
+              <Button
+                variant="contained"
+                disabled={!resultsAvailable}
+                sx={{
+                  flex: canRetake || onViewAttemptHistory ? 1 : "none",
+                  width: !canRetake && !onViewAttemptHistory ? "100%" : "auto",
+                  padding: { xs: "8px 12px", sm: "10px 16px" },
+                  height: { xs: "40px", sm: "44px" },
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textTransform: "none",
+                  background: !resultsAvailable ? "#ccc" : "linear-gradient(to right, #6a11cb, #2575fc)",
+                  color: "#fff",
+                  borderRadius: 2,
+                  fontSize: { xs: "12px", sm: "13px" },
+                  fontWeight: 600,
+                  boxShadow: "none",
+                  "&:hover": !resultsAvailable 
+                    ? {} 
+                    : { transform: "translateY(-2px)" },
+                  "&.Mui-disabled": {
+                    backgroundColor: "#ccc",
+                    color: "#666",
+                    cursor: "not-allowed",
+                  },
+                }}
+                onClick={onViewResults}
+              >
+                View Results
+              </Button>
+            </span>
+          </Tooltip>
+          {/* Attempt History Button */}
+          {onViewAttemptHistory && (
+            <Button
+              variant="outlined"
+              sx={{
+                flex: 1,
+                padding: { xs: "8px 12px", sm: "10px 16px" },
+                height: { xs: "40px", sm: "44px" },
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textTransform: "none",
+                borderColor: "#6a11cb",
+                color: "#6a11cb",
+                borderRadius: 2,
+                fontSize: { xs: "12px", sm: "13px" },
+                fontWeight: 600,
+                "&:hover": {
+                  backgroundColor: "#6a11cb",
+                  color: "#fff",
+                  transform: "translateY(-2px)",
+                },
+              }}
+              onClick={onViewAttemptHistory}
+            >
+              Attempt History
+            </Button>
+          )}
+        </Box>
+      </Box>
+    </Box>
+  </Card>
+  );
+}
+
+export default function ExamHistoryPage() {
+  const router = useRouter();
+  const theme = useTheme();
+  const [completedExams, setCompletedExams] = useState<ExamAttempt[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedExam, setSelectedExam] = useState<any>(null);
+  const [attemptHistoryOpen, setAttemptHistoryOpen] = useState(false);
+  const [retakeLoadingExamId, setRetakeLoadingExamId] = useState<number | null>(null);
+
+  useEffect(() => {
+    // Check if user is logged in and is student
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
+    const role = localStorage.getItem("role") || sessionStorage.getItem("role");
+
+    if (!token || role !== "student") {
+      router.push("/");
+      return;
+    }
+
+    const fetchAttempts = async () => {
+      try {
+        const response = await fetch("/api/students/attempts", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        console.log(data,"datain examhistory");
+        if (data.success) {
+          setCompletedExams(data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch attempts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAttempts();
+  }, [router]);
+
+  const viewResults = (attemptId: number) => {
+    router.push(`/student-pages/exam_res_rev?attemptId=${attemptId}`);
+  };
+
+  const takeExam = async (
+    attemptId: number,
+    examId: number,
+    examType: string,
+  ) => {
+    setRetakeLoadingExamId(examId);
+    try {
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+      const response = await fetch("/api/students/retake", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ attemptId }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        // Clear any existing violation flags for this exam before starting new attempt
+        sessionStorage.removeItem(`violation_${examId}`);
+        sessionStorage.removeItem("autoSubmit");
+        // Remove any saved answers or question times for previous attempts
+        sessionStorage.removeItem(`exam_${examId}_userAnswers`);
+        sessionStorage.removeItem(`exam_${examId}_questionTimes`);
+
+        // For mock exams (live exams don't allow retake), enter fullscreen before navigating
+        if (examType === "mock") {
+          const enterFullscreen = async () => {
+            try {
+              const elem = document.documentElement;
+              if (elem.requestFullscreen) {
+                await elem.requestFullscreen();
+              } else if ((elem as any).webkitRequestFullscreen) {
+                await (elem as any).webkitRequestFullscreen();
+              } else if ((elem as any).mozRequestFullScreen) {
+                await (elem as any).mozRequestFullScreen();
+              } else if ((elem as any).msRequestFullscreen) {
+                await (elem as any).msRequestFullscreen();
+              }
+            } catch (error) {
+              console.error("Fullscreen error:", error);
+              // Continue without fullscreen if request fails
+            }
+          };
+
+          await enterFullscreen();
+        }
+
+        router.push(
+          `/student-pages/exam_taking?examId=${examId}&attemptId=${data.attemptId}`,
+        );
+      } else {
+        alert(data.message || "Failed to create retake");
+      }
+    } catch (error) {
+      console.error("Failed to retake exam:", error);
+      alert("Failed to retake exam");
+    } finally {
+      setRetakeLoadingExamId(null);
+    }
+  };
+
+  const openAttemptHistory = (exam: any) => {
+    setSelectedExam(exam);
+    setAttemptHistoryOpen(true);
+  };
+
+  const closeAttemptHistory = () => {
+    setAttemptHistoryOpen(false);
+    setSelectedExam(null);
+  };
+
+  // Group attempts by exam id
+  const examsByExamId = completedExams.reduce(
+    (groups, attempt) => {
+      const { examId } = attempt;
+      if (!groups[examId]) {
+        groups[examId] = [];
+      }
+      groups[examId].push(attempt);
+      return groups;
+    },
+    {} as Record<number, ExamAttempt[]>,
+  );
+
+  // For each exam, keep only the latest attempt
+  const latestAttempts = Object.values(examsByExamId).map((examAttempts) => {
+    return examAttempts.reduce((latest, current) => {
+      return current.attemptNumber > latest.attemptNumber ? current : latest;
+    });
+  });
+
+  // Separate exams by type
+  const practiceExams = latestAttempts.filter(
+    (exam) => exam.examType === "practice",
+  );
+  const mockExams = latestAttempts.filter((exam) => exam.examType === "mock");
+  const liveExams = latestAttempts.filter((exam) => exam.examType === "live");
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: { xs: 1.5, sm: 2, md: 2.5 },
+        color: TEXT_PRIMARY,
+        background: MAIN_BG,
+        minHeight: "100vh",
+        p: { xs: 1.5, sm: 2.5, md: 3.75 },
+      }}
+    >
+      {/* Live Exams */}
+      {liveExams.length > 0 && (
+        <Box sx={{ mb: { xs: 2, sm: 3, md: 3.75 } }}>
+          <Card
+            sx={{
+              background: CARD_BG,
+              borderRadius: { xs: 1.5, sm: 2, md: 2.5 },
+              boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
+              p: { xs: 2, sm: 2.5, md: 3.125 },
+              transition: "all 0.3s ease",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: { xs: 1.5, sm: 2, md: 2.5 },
+                pb: { xs: 1, sm: 1.5, md: 1.875 },
+                borderBottom: `2px solid #f0f0f0`,
+                flexDirection: { xs: "column", sm: "row" },
+                gap: { xs: 1, sm: 0 },
+              }}
+            >
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  color: "#2c3e50",
+                  fontSize: { xs: 18, sm: 19, md: 20 },
+                  textAlign: { xs: "center", sm: "left" },
+                }}
+              >
+                Live Exams
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: { xs: 1.5, sm: 2, md: 2.5 },
+                alignItems: "start",
+              }}
+            >
+              {loading ? (
+                <Typography>Loading live exams...</Typography>
+              ) : liveExams.length > 0 ? (
+                liveExams.map((exam) => (
+                  <Box
+                    key={exam.examId}
+                    sx={{
+                      flex: { xs: "1 1 100%", sm: "1 1 360px", md: "1 1 400px" },
+                    }}
+                  >
+                    <ExamCard
+                      title={exam.title}
+                      subject={exam.subject}
+                      meta={{
+                        duration: exam.duration.toString(),
+                        questions: exam.questions.toString(),
+                        completedAt: exam.completedAt,
+                        points: exam.points,
+                        score: exam.score,
+                        examType: exam.examType,
+                        attemptNumber: exam.attemptNumber,
+                      }}
+                      endTime={exam.endTime}
+                      onViewResults={() => viewResults(exam.attemptId)}
+                      onTakeExam={(examType) =>
+                        takeExam(exam.attemptId, exam.examId, examType)
+                      }
+                      canRetake={exam.canRetake}
+                      hasReachedRetakeLimit={exam.hasReachedRetakeLimit}
+                      onViewAttemptHistory={
+                        exam.examType !== "live" ? () => openAttemptHistory(exam) : undefined
+                      }
+                      isRetakeLoading={retakeLoadingExamId === exam.examId}
+                    />
+                  </Box>
+                ))
+              ) : (
+                <Typography>No live exams completed yet.</Typography>
+              )}
+            </Box>
+          </Card>
+        </Box>
+      )}
+
+      {/* Mock Exams */}
+      {mockExams.length > 0 && (
+        <Box sx={{ mb: { xs: 2, sm: 3, md: 3.75 } }}>
+          <Card
+            sx={{
+              background: CARD_BG,
+              borderRadius: { xs: 1.5, sm: 2, md: 2.5 },
+              boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
+              p: { xs: 2, sm: 2.5, md: 3.125 },
+              transition: "all 0.3s ease",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: { xs: 1.5, sm: 2, md: 2.5 },
+                pb: { xs: 1, sm: 1.5, md: 1.875 },
+                borderBottom: `2px solid #f0f0f0`,
+                flexDirection: { xs: "column", sm: "row" },
+                gap: { xs: 1, sm: 0 },
+              }}
+            >
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  color: "#2c3e50",
+                  fontSize: { xs: 18, sm: 19, md: 20 },
+                  textAlign: { xs: "center", sm: "left" },
+                }}
+              >
+                Mock Exams
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: { xs: 1.5, sm: 2, md: 2.5 },
+                alignItems: "start",
+              }}
+            >
+              {loading ? (
+                <Typography>Loading mock exams...</Typography>
+              ) : mockExams.length > 0 ? (
+                mockExams.map((exam) => (
+                  <Box
+                    key={exam.examId}
+                    sx={{
+                      flex: { xs: "1 1 100%", sm: "1 1 360px", md: "1 1 400px" },
+                    }}
+                  >
+                    <ExamCard
+                      title={exam.title}
+                      subject={exam.subject}
+                      meta={{
+                        duration: exam.duration.toString(),
+                        questions: exam.questions.toString(),
+                        completedAt: exam.completedAt,
+                        points: exam.points,
+                        score: exam.score,
+                        examType: exam.examType,
+                        attemptNumber: exam.attemptNumber,
+                      }}
+                      endTime={exam.endTime}
+                      onViewResults={() => viewResults(exam.attemptId)}
+                      onTakeExam={(examType) =>
+                        takeExam(exam.attemptId, exam.examId, examType)
+                      }
+                      canRetake={exam.canRetake}
+                      hasReachedRetakeLimit={exam.hasReachedRetakeLimit}
+                      onViewAttemptHistory={
+                        exam.examType !== "live" ? () => openAttemptHistory(exam) : undefined
+                      }
+                      isRetakeLoading={retakeLoadingExamId === exam.examId}
+                    />
+                  </Box>
+                ))
+              ) : (
+                <Typography>No mock exams completed yet.</Typography>
+              )}
+            </Box>
+          </Card>
+        </Box>
+      )}
+
+      {/* Practice Exams */}
+      {practiceExams.length > 0 && (
+        <Box sx={{ mb: { xs: 2, sm: 3, md: 3.75 } }}>
+          <Card
+            sx={{
+              background: CARD_BG,
+              borderRadius: { xs: 1.5, sm: 2, md: 2.5 },
+              boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
+              p: { xs: 2, sm: 2.5, md: 3.125 },
+              transition: "all 0.3s ease",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: { xs: 1.5, sm: 2, md: 2.5 },
+                pb: { xs: 1, sm: 1.5, md: 1.875 },
+                borderBottom: `2px solid #f0f0f0`,
+                flexDirection: { xs: "column", sm: "row" },
+                gap: { xs: 1, sm: 0 },
+              }}
+            >
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  color: "#2c3e50",
+                  fontSize: { xs: 18, sm: 19, md: 20 },
+                  textAlign: { xs: "center", sm: "left" },
+                }}
+              >
+                Practice Exams
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: { xs: 1.5, sm: 2, md: 2.5 },
+                alignItems: "start",
+              }}
+            >
+              {loading ? (
+                <Typography>Loading practice exams...</Typography>
+              ) : practiceExams.length > 0 ? (
+                practiceExams.map((exam) => (
+                  <Box
+                    key={exam.examId}
+                    sx={{
+                      flex: { xs: "1 1 100%", sm: "1 1 360px", md: "1 1 400px" },
+                    }}
+                  >
+                    <ExamCard
+                      title={exam.title}
+                      subject={exam.subject}
+                      meta={{
+                        duration: exam.duration.toString(),
+                        questions: exam.questions.toString(),
+                        completedAt: exam.completedAt,
+                        points: exam.points,
+                        score: exam.score,
+                        examType: exam.examType,
+                        attemptNumber: exam.attemptNumber,
+                      }}
+                      endTime={exam.endTime}
+                      onViewResults={() => viewResults(exam.attemptId)}
+                      onTakeExam={(examType) =>
+                        takeExam(exam.attemptId, exam.examId, examType)
+                      }
+                      canRetake={exam.canRetake}
+                      hasReachedRetakeLimit={exam.hasReachedRetakeLimit}
+                      onViewAttemptHistory={
+                        exam.examType !== "live" ? () => openAttemptHistory(exam) : undefined
+                      }
+                      isRetakeLoading={retakeLoadingExamId === exam.examId}
+                    />
+                  </Box>
+                ))
+              ) : (
+                <Typography>No practice exams completed yet.</Typography>
+              )}
+            </Box>
+          </Card>
+        </Box>
+      )}
+
+      {/* No Exams Message */}
+      {!loading && latestAttempts.length === 0 && (
+        <Box sx={{ mb: { xs: 2, sm: 3, md: 3.75 } }}>
+          <Card
+            sx={{
+              background: CARD_BG,
+              borderRadius: { xs: 1.5, sm: 2, md: 2.5 },
+              boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
+              p: { xs: 2, sm: 2.5, md: 3.125 },
+              transition: "all 0.3s ease",
+            }}
+          >
+            <Typography>No completed exams yet.</Typography>
+          </Card>
+        </Box>
+      )}
+
+      {/* Attempt History Modal */}
+      <AttemptHistoryModal
+        open={attemptHistoryOpen}
+        examName={selectedExam?.title || ""}
+        examId={selectedExam?.examId || 0}
+        onClose={closeAttemptHistory}
+      />
+    </Box>
+  );
+}

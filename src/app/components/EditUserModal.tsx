@@ -1,0 +1,421 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+  Snackbar,
+  Alert,
+  Typography,
+  FormHelperText,
+  IconButton,
+  CircularProgress,
+  InputAdornment,
+} from "@mui/material";
+import { Close } from "@mui/icons-material";
+import * as yup from "yup";
+
+interface EditUserModalProps {
+  open: boolean;
+  onClose: () => void;
+  user: any | null;
+  onUserUpdated: (updatedUser: any) => void;
+}
+
+interface User {
+  user_id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role: string;
+  status: string;
+  mobile?: string;
+  dob?: string;
+  gender?: string;
+}
+
+const EditUserModal: React.FC<EditUserModalProps> = ({
+  open,
+  onClose,
+  user,
+  onUserUpdated,
+}) => {
+  const [editUser, setEditUser] = useState<User | null>(null);
+  const [successOpen, setSuccessOpen] = useState(false);
+  const [errorOpen, setErrorOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [saving, setSaving] = useState(false);
+
+  const studentSchema = yup.object().shape({
+    first_name: yup.string().required("First Name is required"),
+    last_name: yup.string().required("Last Name is required"),
+    email: yup
+      .string()
+      .trim()
+      .matches(
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        "Enter a valid email address",
+      )
+      .required("Email is required"),
+    dob: yup.string().required("Date of Birth is required"),
+    mobile: yup
+      .string()
+      .required("Mobile number is required")
+      .matches(/^[6-9]\d{9}$/, {
+        message: "Enter a valid 10-digit mobile number",
+        excludeEmptyString: true,
+      }),
+    gender: yup.string().required("Gender is required"),
+  });
+
+  const teacherAdminSchema = yup.object().shape({
+    first_name: yup.string().required("First Name is required"),
+    last_name: yup.string().required("Last Name is required"),
+    email: yup.string().email("Invalid email").required("Email is required"),
+  });
+
+  const handleChange = async (field: string, value: string) => {
+    if (!editUser) return;
+    setEditUser({ ...editUser, [field]: value });
+
+    const schema =
+      editUser.role === "student" ? studentSchema : teacherAdminSchema;
+
+    try {
+      await schema.validateAt(field, { ...editUser, [field]: value });
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    } catch (err: any) {
+      setErrors((prev) => ({ ...prev, [field]: err.message }));
+    }
+  };
+
+  // --------------------------------------------
+  // LOAD USER DETAILS INTO MODAL (FORMAT DOB)
+  // --------------------------------------------
+  useEffect(() => {
+    if (user && open) {
+      // Handle both nested and flattened data structure
+      const userData = {
+        ...user,
+        // Handle flattened data (from UserManagement page)
+        mobile: user.mobile || user.mobile_number || "",
+        dob: user.dob || user.student_details?.dob || "",
+        gender: user.gender || user.student_details?.gender || "",
+      };
+
+      // Fix DOB formatting for HTML date input (YYYY-MM-DD)
+      if (
+        userData.dob &&
+        typeof userData.dob === "string" &&
+        userData.dob.includes("T")
+      ) {
+        userData.dob = userData.dob.split("T")[0];
+      }
+
+      setEditUser(userData);
+      setErrors({});
+    }
+  }, [user, open]);
+
+  if (!editUser) return null;
+
+  // --------------------------------------------
+  // SAVE CHANGES
+  // --------------------------------------------
+  const handleSave = async () => {
+    if (!editUser || saving) return;
+
+    setSaving(true);
+
+    const schema =
+      editUser.role === "student" ? studentSchema : teacherAdminSchema;
+
+    try {
+      // Validate
+      await schema.validate(editUser, { abortEarly: false });
+      setErrors({});
+
+      // Prepare data for API
+      const updateData: any = {
+        user_id: editUser.user_id,
+        username: editUser.username,
+        first_name: editUser.first_name,
+        last_name: editUser.last_name,
+        email: editUser.email,
+        role: editUser.role,
+        status: editUser.status,
+        mobile_number: editUser.mobile,
+      };
+
+      if (editUser.role === "student") {
+        updateData.gender = editUser.gender || null;
+        updateData.dob = editUser.dob
+          ? new Date(editUser.dob + "T00:00:00").toISOString()
+          : null;
+      }
+
+      // Call API
+      const res = await fetch("/api/users?id=" + editUser.user_id, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateData),
+      });
+
+      const data = await res.json();
+
+      if (data.success && data.data) {
+        setSuccessOpen(true);
+        onUserUpdated(data.data);
+
+        setTimeout(() => {
+          onClose();
+        }, 2000);
+      } else {
+        setErrorMessage(data.error || "Failed to update user");
+        setErrorOpen(true);
+      }
+    } catch (err: any) {
+      if (err.inner) {
+        const formErrors: any = {};
+        err.inner.forEach((e: any) => {
+          formErrors[e.path] = e.message;
+        });
+        setErrors(formErrors);
+      } else {
+        console.error(err);
+        setErrorMessage("Something went wrong while updating the user!");
+        setErrorOpen(true);
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setEditUser(user);
+    setErrors({});
+    onClose();
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onClose={(event, reason) => {
+        if (reason === "backdropClick") return;
+        onClose();
+      }}
+      maxWidth="sm"
+      fullWidth
+    >
+      <DialogTitle
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          fontWeight: "bold",
+        }}
+      >
+        Edit User
+        <IconButton onClick={onClose}>
+          <Close />
+        </IconButton>
+      </DialogTitle>
+
+      <DialogContent dividers>
+        <>
+          {/* Username - disabled */}
+          <TextField
+            label="Username"
+            value={editUser.username}
+            disabled
+            fullWidth
+            sx={{ backgroundColor: "#f9f9f9", borderRadius: 1, mb: 2 }}
+          />
+
+          <TextField
+            label="First Name"
+            value={editUser.first_name}
+            onChange={(e) => handleChange("first_name", e.target.value)}
+            error={!!errors.first_name}
+            helperText={errors.first_name}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+
+          <TextField
+            label="Last Name"
+            value={editUser.last_name}
+            onChange={(e) => handleChange("last_name", e.target.value)}
+            error={!!errors.last_name}
+            helperText={errors.last_name}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+
+          <TextField
+            label="Email"
+            type="email"
+            value={editUser.email}
+            fullWidth
+            disabled
+            sx={{ backgroundColor: "#f9f9f9", mb: 2 }}
+          />
+
+          <TextField
+            label="Mobile Number"
+            value={editUser.mobile || ""}
+            onChange={(e) =>
+              handleChange("mobile", e.target.value.replace(/\D/g, ""))
+            }
+            error={!!errors.mobile}
+            helperText={errors.mobile}
+            fullWidth
+            sx={{ mb: 2 }}
+            inputProps={{
+              inputMode: "numeric",
+              maxLength: 10,
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">+91</InputAdornment>
+              ),
+            }}
+          />
+
+          <FormControl fullWidth>
+            <InputLabel>Role</InputLabel>
+            <Select value={editUser.role} label="Role" disabled sx={{ mb: 2 }}>
+              <MenuItem value="student">Student</MenuItem>
+              <MenuItem value="teacher">Teacher</MenuItem>
+              <MenuItem value="admin">Admin</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* STUDENT FIELDS */}
+          {editUser.role === "student" && (
+            <>
+              <TextField
+                label="Date of Birth"
+                type="date"
+                value={editUser.dob || ""}
+                onChange={(e) => handleChange("dob", e.target.value)}
+                error={!!errors.dob}
+                helperText={errors.dob}
+                fullWidth
+                slotProps={{ inputLabel: { shrink: true } }}
+                sx={{ mb: 2 }}
+                inputProps={{ max: "9999-12-31" }}
+              />
+
+              <FormControl fullWidth>
+                <InputLabel>Gender</InputLabel>
+                <Select
+                  value={editUser.gender || ""}
+                  label="Gender"
+                  onChange={(e) => handleChange("gender", e.target.value)}
+                  error={!!errors.gender}
+                  sx={{ mb: 2 }}
+                >
+                  <MenuItem value="">Select</MenuItem>
+                  <MenuItem value="male">Male</MenuItem>
+                  <MenuItem value="female">Female</MenuItem>
+                  <MenuItem value="other">Other</MenuItem>
+                </Select>
+                {errors.gender && (
+                  <Typography variant="caption" color="error">
+                    {errors.gender}
+                  </Typography>
+                )}
+              </FormControl>
+            </>
+          )}
+
+          {/* STATUS */}
+          <FormControl fullWidth>
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={editUser.status}
+              label="Status"
+              onChange={(e) =>
+                setEditUser({ ...editUser, status: e.target.value })
+              }
+              disabled={editUser.role === "admin"}
+            >
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="inactive">Inactive</MenuItem>
+            </Select>
+          </FormControl>
+        </>
+      </DialogContent>
+
+      <DialogActions sx={{ pb: 2, pr: 2 }}>
+        <Button variant="outlined" onClick={handleCancel}>
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleSave}
+          disabled={saving}
+          startIcon={
+            saving ? <CircularProgress size={18} color="inherit" /> : null
+          }
+          sx={{
+            "&.Mui-disabled": {
+              opacity: 1,
+              color: "white",
+              backgroundColor: "primary.main",
+            },
+          }}
+        >
+          {saving ? "Updating..." : "Save Changes"}
+        </Button>
+      </DialogActions>
+
+      {/* Success Snackbar */}
+      <Snackbar
+        open={successOpen}
+        autoHideDuration={6000}
+        onClose={() => setSuccessOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSuccessOpen(false)}
+          severity="success"
+          sx={{ width: "100%" }}
+          variant="filled"
+        >
+          User updated successfully!
+        </Alert>
+      </Snackbar>
+
+      {/* Error Snackbar */}
+      <Snackbar
+        open={errorOpen}
+        autoHideDuration={6000}
+        onClose={() => setErrorOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setErrorOpen(false)}
+          severity="error"
+          sx={{ width: "100%" }}
+          variant="filled"
+        >
+          {errorMessage}
+        </Alert>
+      </Snackbar>
+    </Dialog>
+  );
+};
+
+export default EditUserModal;

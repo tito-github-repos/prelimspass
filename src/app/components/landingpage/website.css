@@ -1,0 +1,196 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+
+/* =========================
+   WEBSITE VARIABLES
+========================= */
+
+:root {
+  --website-primary: #16a34a;
+  --website-primary-dark: #15803d;
+
+  --website-text-primary: #111827;
+  --website-text-secondary: #6b7280;
+  --website-text-light: #9ca3af;
+
+  --website-border-light: #e5e7eb;
+
+  --website-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.10);
+
+  --website-font:
+    "Inter", sans-serif;
+}
+
+/* =========================
+   RESET
+========================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* =========================
+   WEBSITE BASE
+========================= */
+
+.website-page {
+  width: 100%;
+  overflow-x: hidden;
+  background: #ffffff;
+  font-family: var(--website-font);
+}
+
+/* =========================
+   WEBSITE CONTAINER
+========================= */
+
+.homepage-container {
+  width: 100%;
+  max-width: 1240px;
+
+  margin-inline: auto;
+
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+@media (max-width: 768px) {
+  .homepage-container {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .homepage-container {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+
+/* =========================
+   TYPOGRAPHY
+========================= */
+
+.homepage-heading {
+  font-family: var(--website-font) !important;
+}
+
+.homepage-heading,
+.homepage-heading * {
+  font-family: var(--website-font) !important;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.homepage-primary-btn {
+  background: var(--website-primary) !important;
+
+  color: #ffffff !important;
+
+  font-family: var(--website-font) !important;
+
+  transition:
+    all 0.25s ease !important;
+}
+
+.homepage-primary-btn:hover {
+  background:
+    var(--website-primary-dark) !important;
+
+  transform: translateY(-2px);
+}
+
+.homepage-secondary-btn {
+  border: 1px solid
+    var(--website-border-light) !important;
+
+  color:
+    var(--website-text-primary) !important;
+
+  background: #ffffff !important;
+
+  font-family: var(--website-font) !important;
+
+  transition:
+    all 0.25s ease !important;
+}
+
+.homepage-secondary-btn:hover {
+  border-color:
+    var(--website-primary) !important;
+
+  color:
+    var(--website-primary) !important;
+
+  background:
+    rgba(22, 163, 74, 0.04) !important;
+}
+
+/* =========================
+   IMAGE OPTIMIZATION
+========================= */
+
+.website-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* =========================
+   SECTION SPACING
+========================= */
+
+.website-section {
+  padding-top: 90px;
+  padding-bottom: 90px;
+}
+
+@media (max-width: 768px) {
+  .website-section {
+    padding-top: 70px;
+    padding-bottom: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .website-section {
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+}
+
+/* =========================
+   MUI TYPOGRAPHY FIX
+========================= */
+
+.MuiTypography-root {
+  font-family: var(--website-font) !important;
+}
+
+.MuiButton-root {
+  font-family: var(--website-font) !important;
+}
+
+/* =========================
+   HERO SUBJECTS BAR
+========================= */
+
+/* ensures subjects bar never causes horizontal overflow on mobile */
+.hero-subjects-bar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hero-subjects-bar::-webkit-scrollbar {
+  display: none;
+}

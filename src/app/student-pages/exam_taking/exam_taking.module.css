@@ -1,0 +1,642 @@
+/* ============================================================
+   EXAM TAKING — clean single-pass layout stylesheet
+   Fixed header | full-bleed sidebar | gap-free question area
+   ============================================================ */
+
+/* ---------- Layout shell ---------- */
+.examContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #f5f7fa;
+  box-sizing: border-box;
+  transition: width 0.3s ease;
+}
+
+.examContainer.containerFull,
+.examContainer.containerShifted {
+  width: 100vw;
+}
+
+/* ---------- Fixed header (always visible) ---------- */
+.examHeader {
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  color: white;
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.examInfo h1 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.examInfo p {
+  font-size: 11px;
+  margin: 0;
+  line-height: 1.3;
+  opacity: 0.85;
+}
+
+.examInfo {
+  min-width: 0;
+  flex: 1;
+}
+
+/* tall-enough container keeps Navbar from collapsing */
+.examInfo p::after {
+  display: inline;
+  content: attr(data-fill);
+  font-size: 11px;
+  /* just ensures the row is tall enough */
+}
+
+/* ---------- Content wrapper (starts below fixed header) ---------- */
+.examContent {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background: white;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  padding-top: 48px; /* .examHeader min-height reserve */
+}
+
+/* ---------- Question Navigator Sidebar ---------- */
+.questionSidebar {
+  width: 260px;
+  background: #f8f9fa;
+  border-right: 1px solid #e0e0e0;
+  padding: 14px;
+  overflow-y: auto;
+  height: calc(100vh - 48px);
+  flex-shrink: 0;
+}
+
+.questionSidebarDesktop {
+  border-right: 2px solid #e0e0e0;
+}
+
+.questionSidebar.top70 { top: 70px; }
+.questionSidebar.width280 { width: 280px; }
+.questionSidebar.width300 { width: 300px; }
+.questionSidebar.width100 { width: 100%; }
+.questionSidebar.widthAuto { width: auto; }
+
+.questionSidebar.compact {
+  width: auto;
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 14px;
+}
+
+.sidebarTitle {
+  font-size: 15px;
+  margin-bottom: 12px;
+  color: #2c3e50;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e0e0e0;
+  text-align: left;
+}
+
+.questionSidebar.compact .sidebarTitle {
+  font-size: 15px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  text-align: left;
+}
+
+.sidebarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.btnClose {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+}
+.btnClose:hover { background: #c82333; }
+
+.questionGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+  margin-bottom: 14px;
+}
+.questionSidebar.compact .questionGrid {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+  margin-bottom: 14px;
+}
+
+.questionNumber {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 12px;
+  color: #333;
+}
+.questionSidebar.compact .questionNumber {
+  width: 36px; height: 36px; font-size: 12px;
+  border-radius: 5px; background: white; border: 2px solid #ddd; color: #333;
+}
+.questionNumber:hover { border-color: #6a11cb; color: #6a11cb; }
+.questionNumber.current:hover { border: none; color: #000000; background: #8B5CF6; }
+.questionNumber.current { background: #6a11cb; border-color: #6a11cb; color: white; }
+.questionNumber.answered { background: #28a745; border-color: #28a745; color: #000000; }
+.questionNumber.flagged  { background: #ffc107; border-color: #ffc107; color: #000000; }
+.questionNumber.unanswered { background: white; border-color: #ddd; color: #333; }
+
+.questionStatus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.questionSidebar.compact .questionStatus { gap: 8px; margin-bottom: 16px; }
+
+.statusItem { display: flex; align-items: center; font-size: 13px; }
+.statusColor { width: 13px; height: 13px; border-radius: 3px; margin-right: 4px; }
+.statusCurrent   { background: #6a11cb; }
+.statusAnswered  { background: #28a745; }
+.statusFlagged   { background: #ffc107; }
+.statusUnanswered{ background: #ddd; }
+
+.examNotes { font-size: 13px; color: #7f8c8d; margin-top: 16px; }
+.questionSidebar.compact .examNotes { font-size: 13px; color: #7f8c8d; margin-top: 14px; }
+.examNotes p { margin-bottom: 8px; font-weight: bold; }
+.examNotes ul { padding-left: 18px; }
+.examNotes li { margin-bottom: 4px; font-size: 13px; }
+.instructionsList { padding-left: 18px; margin-top: 8px; }
+
+/* ---------- Main Question Area ---------- */
+.questionMain {
+  flex: 1;
+  padding: 24px 32px;
+  overflow-y: auto;
+  height: calc(100vh - 48px);
+}
+
+/* ---------- Question card — gap-free ---------- */
+.questionContainer {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.questionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+/* large title on the left, action buttons flow right — both in one flexible row */
+.questionHeader h2 {
+  /* let the title eat all spare space so buttons always fit */
+  flex: 1 1 0;
+  min-width: 0;
+  font-size: 20px;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.questionActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btnOutline {
+  background: white;
+  border: 1px solid #2575fc;
+  color: #000000;
+}
+.btnOutline:hover { background: #f0f5ff; }
+
+.btnPrimary {
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+  color: white;
+}
+.btnPrimary:hover { opacity: 0.9; transform: translateY(-2px); }
+
+.btnFlag {
+  background: #ffc107;
+  color: #000000;
+}
+.btnFlag:hover { background: #e0a800; }
+.btnFlag.flagged { background: #dc3545; }
+
+/* horizontal compact inline-cutoff bar */
+.cutoffContainer {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid #2575fc;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2575fc;
+  cursor: default;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+.cutoffContainer i { font-size: 11px; }
+.cutoffLabel { color: #555; font-weight: 500; }
+.cutoffValue { color: #2575fc; font-weight: 700; }
+
+.btnClear {
+  background: #6c757d;
+  color: white;
+}
+.btnClear:hover { background: #5a6268; }
+.btnClear:disabled { background: #e9ecef; color: #6c757d; cursor: not-allowed; opacity: 0.65; transform: none; }
+
+.btnOutline:disabled,
+.btnPrimary:disabled,
+.btnFlag:disabled,
+.btnDanger:disabled {
+  background: #e9ecef; color: #6c757d; cursor: not-allowed; opacity: 0.65; transform: none;
+}
+.btnOutline:disabled:hover,
+.btnPrimary:disabled:hover,
+.btnFlag:disabled:hover,
+.btnDanger:disabled:hover {
+  background: #e9ecef; color: #6c757d; cursor: not-allowed; opacity: 0.65; transform: none;
+}
+
+.btnClear:hover:not(:disabled) { background: #5a6268; transform: scale(1.05); }
+.btnClear:active:not(:disabled) { animation: shake 0.3s ease-in-out; }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.btnDanger {
+  background: #dc3545;
+  color: white;
+}
+.btnDanger:hover { background: #c82333; }
+
+.btnLarge { padding: 10px 22px; font-size: 15px; }
+
+/* ---------- Question body ---------- */
+.questionContent {
+  background: white;
+  border-radius: 10px;
+  padding: 22px 26px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  margin-bottom: 24px;
+}
+.questionText { font-size: 17px; margin-bottom: 22px; line-height: 1.6; }
+
+.optionsList { list-style: none; padding: 0; margin: 0; }
+
+.optionItem {
+  padding: 14px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+}
+.optionItem:hover { border-color: #6a11cb; background: #f8f7ff; }
+.optionItem.selected { border-color: #2575fc; background: #e8f0fe; }
+
+.optionMarker {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  display: flex; align-items: center; justify-content: center;
+  margin-right: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.optionText { flex: 1; }
+
+/* ---------- Exam footer ---------- */
+.examFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 24px;
+}
+
+.navButtons { display: flex; gap: 12px; }
+
+.progressText { color: #7f8c8d; font-size: 14px; }
+
+/* ======================================================
+   RESPONSIVE — 5 breakpoints covering all real devices
+   ====================================================== */
+
+/* ---- ≥ 1200 px (large desktop) ---- no change to base rules */
+
+/* ---- ≤ 1200 px ---- */
+@media (max-width: 1200px) {
+  .questionGrid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .questionNumber {
+    width: 36px; height: 36px; font-size: 12px;
+    background: white; border: 2px solid #ddd; color: #333; border-radius: 5px;
+  }
+}
+
+/* ---- ≤ 1024 px (tablet landscape / small desktop) ---- */
+@media (max-width: 1024px) {
+  .questionContainer { max-width: 100%; }
+}
+
+/* ---- ≤ 992 px (tablet portrait) ---- */
+@media (max-width: 992px) {
+  .examContent {
+    flex-direction: column;
+    min-height: auto;
+    overflow: visible;
+    height: auto;
+  }
+  .questionSidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+    overflow: visible;
+    padding: 0 16px 16px;
+    margin-top: 14px;
+  }
+  .questionMain {
+    height: auto;
+    padding: 20px 16px;
+  }
+  .questionHeader h2 { flex: 1 1 100%; }
+  .questionActions { flex: 1 1 100%; margin-top: 8px; }
+}
+
+/* ---- ≤ 768 px (mobile) ---- */
+@media (max-width: 768px) {
+  .examContent {
+    min-height: auto;
+    overflow: visible;
+    height: auto;
+  }
+
+  .examHeader { padding: 6px 12px; gap: 8px; }
+
+  .examInfo h1 { font-size: 15px; }
+  .examInfo p  { font-size: 11px; }
+
+  .questionSidebar {
+    max-height: none;
+    padding: 0 14px 14px;
+    border-bottom: 2px solid #e0e0e0;
+    overflow: visible;
+    margin-top: 14px;
+  }
+  .sidebarTitle       { font-size: 14px; }
+  .questionGrid       { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .questionNumber     { width: 34px; height: 34px; font-size: 12px; }
+
+  .questionMain { padding: 16px 14px; }
+
+  .questionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .questionHeader h2    { flex: 1 1 100%; font-size: 17px; }
+  .questionActions      { margin-top: 0; flex-wrap: wrap; }
+
+  .questionContent { padding: 0 16px 16px; }
+  .questionText    { font-size: 15px; margin-bottom: 18px; }
+
+  .optionItem {
+    padding: 14px 16px;
+    font-size: 15px;
+    width: 100%;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+  }
+  .optionMarker { font-weight: bold; margin-right: 10px; }
+
+  .examFooter {
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 0;
+  }
+  .navButtons       { width: 100%; justify-content: space-between; }
+  .btnLarge         { padding: 10px 20px; font-size: 14px; }
+  .progressText     { text-align: center; margin: 8px 0; }
+}
+
+/* ---- ≤ 600 px ---- */
+@media (max-width: 600px) {
+  .examHeader { padding: 5px 10px; gap: 6px; }
+  .examInfo h1 { font-size: 14px; }
+  .examInfo p  { font-size: 10px; }
+  .questionGrid { grid-template-columns: repeat(4, 1fr); gap: 5px; }
+  .questionNumber { width: 32px; height: 32px; font-size: 11px; }
+  .btn { padding: 5px 9px; font-size: 12px; }
+}
+
+/* ---- ≤ 480 px (small phone) ---- */
+@media (max-width: 480px) {
+  .examContent { height: auto; overflow: visible; }
+  .examHeader  { padding: 4px 8px; gap: 6px; }
+  .examInfo h1 { font-size: 13px; }
+  .examInfo p  { font-size: 9.5px; }
+
+  .questionSidebar {
+    padding: 0 10px 10px;
+    margin-top: 12px;
+  }
+  .sidebarTitle    { font-size: 13px; }
+  .questionGrid    { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  .questionNumber  { width: 30px; height: 30px; font-size: 11px; }
+
+  .questionMain  { padding: 12px 10px; }
+  .questionHeader h2 { font-size: 15px; }
+  .btn           { padding: 4px 8px; font-size: 11.5px; }
+  .btnLarge      { padding: 8px 14px; font-size: 12px; }
+}
+
+/* ---- ≤ 375 px ---- */
+@media (max-width: 375px) {
+  .examInfo p { display: none; }
+  .examInfo h1 { font-size: 13px; }
+  .questionGrid  { grid-template-columns: repeat(3, 1fr); }
+  .questionNumber { width: 28px; height: 28px; font-size: 10px; }
+}
+
+/* ---- ≤ 767px single-row device bridge (old rule placeholder) ---- */
+@media (max-width: 767px) {
+  .examContent { margin-top: 0; }
+  .examHeader  { position: fixed; margin-top: 0; }
+  .questionSidebar { margin-top: 14px; }
+  .questionMain {
+    min-height: calc(100vh - 48px);
+    padding: 0 14px 0;
+    margin-top: 8px;
+  }
+}
+
+/* ---- Galaxy Z Fold 5 ---- */
+@media (min-width: 900px) and (max-width: 910px) {
+  /* no offset needed — fixed header covers all widths */
+}
+
+/* ---------- Modals (unchanged) ---------- */
+.modal {
+  display: none;
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  align-items: center; justify-content: center;
+}
+.modal.show { display: flex; }
+.modalContent {
+  background: white; border-radius: 10px; padding: 28px;
+  max-width: 480px; width: 92%; text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.modalTitle { font-size: 22px; margin-bottom: 12px; color: #2c3e50; }
+.modalText  { margin-bottom: 22px; color: #7f8c8d; }
+.modalButtons { display: flex; gap: 12px; justify-content: center; }
+
+.overlay {
+  display: none;
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+  z-index: 2000;
+  align-items: center; justify-content: center;
+}
+.overlay.show { display: flex; }
+.overlayContent {
+  background: white; border-radius: 10px; padding: 36px;
+  text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.overlayContent i  { font-size: 44px; color: #6a11cb; margin-bottom: 16px; animation: spin 1s infinite linear; }
+.overlayContent p  { font-size: 17px; color: #2c3e50; margin: 0; }
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+@media (max-width: 768px) {
+  .modalButtons { flex-direction: column; }
+}
+
+/* =========================================================
+   TIMER CARD  — horizontal row, right side of nav bar
+   ========================================================= */
+.timerCard {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 12px;
+  min-width: 200px;
+  border-radius: 6px;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  flex-shrink: 0;
+}
+.timerMain {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  white-space: nowrap;
+  line-height: 1;
+}
+.timerMain .fas { font-size: 1.1rem; opacity: 0.85; }
+.timerRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+  font-size: 0.68rem;
+  opacity: 0.85;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+.timerStatusTop    { font-weight: 600; }
+.timerStatusBottom { opacity: 0.8; }
+
+.timerGood    { background: linear-gradient(135deg,#16a34a,#22c55e); }
+.timerWarning { background: linear-gradient(135deg,#ea580c,#f97316); }
+.timerDanger  { background: linear-gradient(135deg,#dc2626,#ef4444); }

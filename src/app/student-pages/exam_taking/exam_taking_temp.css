@@ -1,0 +1,11 @@
+.questionMain {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  height: calc(100vh - 44px);
+}
+
+.questionMain-inner {
+  max-width: 800px;
+  margin: 0 auto;
+}

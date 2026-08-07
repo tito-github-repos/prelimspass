@@ -1,0 +1,438 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { shuffleArray } from "@/utils/shuffle";
+import jwt from "jsonwebtoken";
+
+/* ===========================
+   GET: Fetch exams list
+=========================== */
+export async function GET() {
+  try {
+    const exams = await prisma.exams.findMany({
+      orderBy: { created_at: "desc" },
+      include: {
+        exam_subject_configs: {
+          include: {
+            subject: true,
+            topic: true,
+          },
+        },
+        _count: {
+          select: {
+            exam_assignments: true,
+          },
+        },
+        exam_assignments: {
+          include: {
+            students: true,
+          },
+        },
+      },
+    });
+
+    const transformedExams = exams.map((exam) => {
+      // Check if any students are assigned
+      const hasAssignedStudents = exam.exam_assignments.some(
+        (assignment) => assignment.students.length > 0,
+      );
+
+      let status = exam.is_active ? "active" : "inactive";
+      if (
+        exam.exam_type === "live" &&
+        exam.scheduled_start &&
+        exam.scheduled_end
+      ) {
+        const now = new Date();
+        const end = new Date(exam.scheduled_end);
+        if (now > end) status = "inactive";
+        else status = "active";
+      }
+
+      return {
+        id: exam.exam_id,
+        exam_name: exam.exam_title,
+        exam_type: exam.exam_type,
+        selection_mode: exam.selection_mode || "auto",
+        status,
+        questions_count: exam.question_count,
+        total_marks: Number(exam.total_marks),
+        duration_minutes: exam.time_limit_minutes,
+        created_at: exam.created_at.toISOString(),
+        scheduled_start: exam.scheduled_start?.toISOString() || null,
+        scheduled_end: exam.scheduled_end?.toISOString() || null,
+
+        canEdit: !hasAssignedStudents,
+        canDelete: !hasAssignedStudents,
+
+        subjects: exam.exam_subject_configs.map((cfg) => ({
+          subject_id: cfg.subject_id,
+          subject_name: cfg.subject.subject_name,
+          topic_id: cfg.topic_id,
+          topic_name: cfg.topic ? cfg.topic.topic_name : null,
+          question_count: cfg.question_count,
+        })),
+      };
+    });
+
+    return NextResponse.json(transformedExams);
+  } catch (error) {
+    console.error("Error fetching exams:", error);
+    return NextResponse.json(
+      { success: false, message: "Failed to fetch exams" },
+      { status: 500 },
+    );
+  }
+}
+
+/* ===========================
+   POST: Create exam
+=========================== */
+export async function POST(req: Request) {
+  try {
+    const authHeader = req.headers.get("Authorization");
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    let decoded: any;
+
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    } catch {
+      return NextResponse.json(
+        { success: false, message: "Invalid token" },
+        { status: 401 },
+      );
+    }
+
+    const userId = decoded.userId;
+
+    const body = await req.json();
+
+    const {
+      examTitle,
+      description,
+      examType,
+      duration,
+      startTime,
+      endTime,
+      topicCounts = {},
+      selectedQuestions = [],
+      selectionMode = "auto",
+    }: {
+      examTitle: string;
+      description?: string;
+      examType: "practice" | "mock" | "live";
+      duration: number;
+      startTime?: string;
+      endTime?: string;
+      topicCounts: Record<number, number>;
+      selectedQuestions?: number[];
+      selectionMode: "auto" | "manual";
+    } = body;
+
+    if (!examTitle || !examType) {
+      return NextResponse.json(
+        { success: false, message: "Missing required fields" },
+        { status: 400 },
+      );
+    }
+
+    // ⏱ Duration is REQUIRED only for ALL exam types (practice, mock, live)
+    if (!duration || duration <= 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Duration is required for all exam types",
+        },
+        { status: 400 },
+      );
+    }
+
+    if (selectionMode === "manual" && selectedQuestions.length === 0) {
+      return NextResponse.json(
+        { success: false, message: "Please select at least one question" },
+        { status: 400 },
+      );
+    }
+
+    if (selectionMode === "auto" && Object.keys(topicCounts).length === 0) {
+      return NextResponse.json(
+        { success: false, message: "Please configure topics" },
+        { status: 400 },
+      );
+    }
+
+    // -----------------------------
+    // Calculate total questions
+    // -----------------------------
+
+    const isManual = selectionMode === "manual";
+
+    const totalQuestions = isManual
+      ? selectedQuestions.length
+      : Object.values(topicCounts).reduce(
+          (sum: number, v) => sum + Number(v),
+          0,
+        );
+
+    // -----------------------------
+    // TRANSACTION START
+    // -----------------------------
+
+    // For PYQ exams, validate and prepare metadata BEFORE transaction
+    let pyqMetaData: {
+      subject: string;
+      categoryType: string;
+      category: string;
+      set_number: number | null;
+    } | null = null;
+
+    if (examTitle.startsWith("[PYQ]")) {
+      const parts = examTitle.split("|").map((p) => p.trim());
+
+      if (parts.length < 4) {
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              "Invalid PYQ format. Expected: [PYQ]|<subject>|<type>|<category>|[Set-N]",
+          },
+          { status: 400 },
+        );
+      }
+
+      const [, subject, rawType, category, setPart] = parts;
+
+      const typeMap: any = {
+        topic: "topic",
+        "topic-wise": "topic",
+        difficulty: "difficulty",
+        "difficulty-wise": "difficulty",
+        "answer-type": "answer_type",
+        answer_type: "answer_type",
+      };
+
+      const normalizedType = typeMap[rawType?.toLowerCase()?.trim()];
+
+      if (!normalizedType) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Invalid PYQ type: ${rawType}. Use: topic, difficulty, or answer-type`,
+          },
+          { status: 400 },
+        );
+      }
+
+      let set_number: number | null = null;
+      if (setPart) {
+        const match = setPart.match(/Set-(\d+)/i);
+        if (match) {
+          set_number = Number(match[1]);
+        }
+      }
+
+      pyqMetaData = {
+        subject: subject.trim(),
+        categoryType: normalizedType,
+        category: category.trim(),
+        set_number,
+      };
+    }
+
+    const createdExam = await prisma.$transaction(
+      async (tx) => {
+        let totalMarks = 0;
+
+        /* ---- Create Exam ---- */
+        const exam = await tx.exams.create({
+          data: {
+            exam_title: examTitle,
+            description,
+            exam_type: examType,
+            selection_mode: selectionMode,
+            time_limit_minutes: duration || null,
+            scheduled_start:
+              examType === "live" && startTime ? new Date(startTime) : null,
+            scheduled_end:
+              examType === "live" && endTime ? new Date(endTime) : null,
+            question_count: totalQuestions,
+            total_marks: 0, // will update later
+            is_active: true,
+            created_by: userId,
+          },
+        });
+
+        // Insert PYQ metadata if applicable
+        if (pyqMetaData) {
+          await tx.pyq_exam_meta.create({
+            data: {
+              exam_id: exam.exam_id,
+              ...pyqMetaData,
+            },
+          });
+        }
+
+        // -----------------------------
+        // INSERT exam_subject_configs (AUTO + MANUAL)
+        // -----------------------------
+        if (isManual) {
+          const questionRecords = await tx.questions.findMany({
+            where: { question_id: { in: selectedQuestions } },
+            select: {
+              question_id: true,
+              topic_id: true,
+              topic: { select: { subject_id: true } },
+            },
+          });
+
+          const topicMap: Record<number, number> = {};
+          questionRecords.forEach((q) => {
+            topicMap[q.topic_id] = (topicMap[q.topic_id] || 0) + 1;
+          });
+
+          await tx.exam_subject_configs.createMany({
+            data: Object.entries(topicMap).map(([topicId, count]) => {
+              const subjectId = questionRecords.find(
+                (q) => q.topic_id === Number(topicId),
+              )?.topic.subject_id;
+
+              if (!subjectId) {
+                throw new Error("Invalid subject mapping");
+              }
+
+              return {
+                exam_id: exam.exam_id,
+                subject_id: subjectId,
+                topic_id: Number(topicId),
+                question_count: count,
+              };
+            }),
+          });
+        } else {
+          const topicIds = Object.keys(topicCounts).map(Number);
+
+          const topics = await tx.topics.findMany({
+            where: { topic_id: { in: topicIds } },
+            select: { topic_id: true, subject_id: true },
+          });
+
+          await tx.exam_subject_configs.createMany({
+            data: topics.map((t) => ({
+              exam_id: exam.exam_id,
+              subject_id: t.subject_id,
+              topic_id: t.topic_id,
+              question_count: topicCounts[t.topic_id],
+            })),
+          });
+        }
+
+        // -----------------------------
+        // PREPARE exam_questions
+        // -----------------------------
+        let questionOrder = 1;
+        const examQuestionsData: any[] = [];
+
+        if (isManual) {
+          const questions = await tx.questions.findMany({
+            where: { question_id: { in: selectedQuestions } },
+            select: { question_id: true, marks: true, negative_marks: true },
+          });
+
+          // Maintain user selected order
+          const orderedQuestions = selectedQuestions
+            .map((id: number) => questions.find((q) => q.question_id === id))
+            .filter(Boolean);
+
+          for (const q of orderedQuestions as any[]) {
+            examQuestionsData.push({
+              exam_id: exam.exam_id,
+              question_id: q.question_id,
+              question_order: questionOrder++,
+              assigned_marks: q.marks,
+              assigned_negative: q.negative_marks,
+            });
+
+            totalMarks += Number(q.marks);
+          }
+        } else {
+          for (const [topicIdStr, count] of Object.entries(topicCounts) as [
+            string,
+            number,
+          ][]) {
+            const topicId = Number(topicIdStr);
+            if (count <= 0) continue;
+
+            const allQuestions = await tx.questions.findMany({
+              where: { topic_id: topicId },
+              select: { question_id: true, marks: true, negative_marks: true },
+            });
+
+            if (allQuestions.length < count) {
+              throw new Error(`Not enough questions for topic ID ${topicId}`);
+            }
+
+            const selected = shuffleArray(allQuestions).slice(0, count);
+
+            for (const q of selected) {
+              examQuestionsData.push({
+                exam_id: exam.exam_id,
+                question_id: q.question_id,
+                question_order: questionOrder++,
+                assigned_marks: q.marks,
+                assigned_negative: q.negative_marks,
+              });
+
+              totalMarks += Number(q.marks);
+            }
+          }
+        }
+
+        // ---- Insert exam_questions ----
+        await tx.exam_questions.createMany({
+          data: examQuestionsData,
+        });
+
+        // ---- Update total_marks in exams table ----
+        await tx.exams.update({
+          where: { exam_id: exam.exam_id },
+          data: { total_marks: totalMarks },
+        });
+
+        return exam;
+      },
+      {
+        timeout: 50000,
+      },
+    );
+
+    // -----------------------------
+    // SUCCESS RESPONSE
+    // -----------------------------
+    return NextResponse.json({
+      success: true,
+      message:
+        selectionMode === "manual"
+          ? "Exam created with selected questions"
+          : "Exam created with random questions",
+      examId: createdExam.exam_id,
+    });
+  } catch (error: any) {
+    console.error("Error creating exam:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: error.message || "Failed to create exam",
+      },
+      { status: 500 },
+    );
+  }
+}
