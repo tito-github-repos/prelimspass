@@ -2,16 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Box,
+  Card,
   Button,
-  Container,
   Step,
   StepLabel,
   Stepper,
   TextField,
   Typography,
-  Paper,
   Select,
   MenuItem,
   Checkbox,
@@ -19,18 +19,24 @@ import {
   IconButton,
   InputAdornment,
   FormControl,
-  InputLabel,
   Snackbar,
   Alert,
+  CircularProgress,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Visibility, VisibilityOff, CheckCircle } from "@mui/icons-material";
 import * as yup from "yup";
-import styles from "./page.module.css";
-import { CircularProgress } from "@mui/material";
+
+/* =========================
+   THEME COLOR
+========================= */
+const PRIMARY = "#16a34a";
+const PRIMARY_DARK = "#128a3e";
 
 const steps = ["Account", "Personal"];
 
-// Step-wise validation schemas
+/* =========================
+   VALIDATION SCHEMAS
+========================= */
 const accountSchema = yup.object({
   email: yup
     .string()
@@ -128,8 +134,6 @@ export default function Register() {
     }
   };
 
-  // Inside Register.tsx
-
   // Submit handler
   const handleSubmit = async () => {
     if (loading) return; // prevent multiple submissions
@@ -151,7 +155,7 @@ export default function Register() {
           severity: "success",
         });
         console.log("Saved user:", data);
-        globalThis.location.href = "/"; // redirect to login/dashboard
+        globalThis.location.href = "/login"; // redirect to login/dashboard
       } else if (res.status === 409) {
         setAlert({
           open: true,
@@ -204,330 +208,573 @@ export default function Register() {
 
   const handleBack = () => setActiveStep((prev) => prev - 1);
 
+  const highlights = [
+    "Access to hundreds of practice exams",
+    "Detailed performance analytics",
+    "Progress tracking and certificates",
+    "24/7 availability from any device",
+    "Expert-curated question bank",
+  ];
+
+  const textFieldSx = {
+    "& .MuiOutlinedInput-root": { borderRadius: 1.5, fontSize: 13 },
+  };
+
+  const fieldLabelSx = {
+    fontSize: 12.5,
+    fontWeight: 600,
+    color: "#333",
+    mb: 0.5,
+    mt: 1.2,
+  };
+
   return (
     <Box
       sx={{
         minHeight: "100vh",
         display: "flex",
-        alignItems: "center",
         justifyContent: "center",
-        p: 2,
+        alignItems: "center",
+        p: { xs: 1, sm: 2 },
       }}
     >
-      <Container maxWidth="lg">
-        <Paper
-          elevation={6}
+      <Card
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          width: "100%",
+          maxWidth: 900,
+          borderRadius: 2.5,
+          overflow: "hidden",
+          boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+        }}
+      >
+        {/* Left Panel */}
+        <Box
           sx={{
-            borderRadius: 3,
-            overflow: "hidden",
+            flex: 1,
+            position: "relative",
+            backgroundImage: 'url("/Images/login/bg-img.png")',
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            px: { xs: 2.5, sm: 3, md: 4 },
+            py: { xs: 3, sm: 4, md: 4 },
             display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            minHeight: { xs: "auto", md: 600 },
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "space-between", // <-- spreads blocks across full height
+            textAlign: "center",
+            minHeight: { xs: 320, md: "100%" }, // <-- prevents squashing on mobile
+            gap: { xs: 2, md: 0 },
           }}
         >
-          {/* Left Banner with Gradient */}
+          {/* Top block: logo + heading + description */}
           <Box
-            className={styles.bannerGradient}
             sx={{
-              flex: "none",
-              width: { xs: "100%", md: "50%" },
-              // height: { xs: 500, md: 600 },
-              color: "white",
-              p: 4,
               display: "flex",
               flexDirection: "column",
-              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
             }}
           >
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
+            <Image
+              src="/Images/login/logo-img.png"
+              alt="Prelims Pass"
+              width={100}
+              height={100}
+              style={{ objectFit: "contain" }}
+            />
+
+            <Typography
+              sx={{
+                fontWeight: 800,
+                mt: 2,
+                fontSize: { xs: 18, sm: 20, md: 22 },
+                lineHeight: 1.25,
+              }}
+            >
               Join Our Learning Community
             </Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              Register now to access our comprehensive MCQ exam portal designed
-              to enhance your learning experience.
+
+            <Typography
+              sx={{
+                color: "#374151",
+                fontSize: { xs: 12.5, md: 13.5 },
+                mt: 1.2,
+                lineHeight: 1.6,
+                maxWidth: 320,
+              }}
+            >
+              Register now to access our comprehensive Prelims Pass exam portal
+              designed to enhance your learning experience.
             </Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>
+
+            <Typography
+              sx={{
+                color: "#374151",
+                fontSize: { xs: 12.5, md: 13.5 },
+                mt: 1,
+                lineHeight: 1.6,
+                maxWidth: 320,
+              }}
+            >
               Take exams, track your progress, and improve your knowledge with
               our interactive platform.
             </Typography>
-            <ol className={styles.featureList}>
-              {[
-                "Access to hundreds of practice exams",
-                "Detailed performance analytics",
-                "Progress tracking and certificates",
-                "24/7 availability from any device",
-                "Expert-curated question bank",
-              ].map((item) => (
-                <li key={item} className={styles.featureListItem}>
-                  <span className={styles.featureIcon}>✔</span>
-                  {item}
-                </li>
-              ))}
-            </ol>
           </Box>
 
-          {/* Form Side */}
-          <Box sx={{ flex: 1, p: 4, width: { xs: "100%", md: "50%" } }}>
-            <Box textAlign="center" mb={3}>
-              <Typography variant="h4" color="primary">
-                MCQ <span className={styles.portalTitle}>Exam Portal</span>
-              </Typography>
-              <Typography variant="subtitle1">Student Registration</Typography>
-            </Box>
-
-            <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 3 }}>
-              {steps.map((label) => (
-                <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-
-            {/* Step 1: Account */}
-            {activeStep === 0 && (
-              <Box>
-                {/* Email */}
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  label="Email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleChange("email", e.target.value)}
-                  error={!!errors.email}
-                  helperText={errors.email}
-                />
-
-                {/* Username */}
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  label="Username"
-                  type="text"
-                  value={formData.username}
-                  onChange={(e) => handleChange("username", e.target.value)}
-                  error={!!errors.username}
-                  helperText={errors.username}
-                />
-
-                {/* Password */}
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  label="Password"
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={(e) => handleChange("password", e.target.value)}
-                  error={!!errors.password}
-                  helperText={errors.password}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowPassword(!showPassword)}
-                          edge="end"
-                          aria-label="toggle password visibility"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-
-                {/* Confirm Password */}
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  label="Confirm Password"
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={formData.confirmPassword}
-                  onChange={(e) =>
-                    handleChange("confirmPassword", e.target.value)
-                  }
-                  error={!!errors.confirmPassword}
-                  helperText={errors.confirmPassword}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() =>
-                            setShowConfirmPassword(!showConfirmPassword)
-                          }
-                          edge="end"
-                          aria-label="toggle confirm password visibility"
-                        >
-                          {showConfirmPassword ? (
-                            <VisibilityOff />
-                          ) : (
-                            <Visibility />
-                          )}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Box>
-            )}
-
-            {/* Step 2: Personal */}
-            {activeStep === 1 && (
-              <Box>
-                <Box
+          {/* Middle block: highlights - now vertically centered and given room to breathe */}
+          <Box
+            sx={{
+              width: "100%",
+              maxWidth: 300,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              flexGrow: 1,
+              py: { xs: 2, md: 3 },
+            }}
+          >
+            {highlights.map((item, i) => (
+              <Box
+                key={i}
+                sx={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 1.2,
+                  mb: 1.6,
+                  textAlign: "left",
+                  "&:last-of-type": { mb: 0 },
+                }}
+              >
+                <CheckCircle
                   sx={{
-                    display: "flex",
-                    flexDirection: { xs: "column", sm: "row" },
-                    gap: 2,
-                    mb: 2,
+                    color: PRIMARY,
+                    fontSize: 18,
+                    mt: "1px",
+                    flexShrink: 0,
+                  }}
+                />
+                <Typography
+                  sx={{
+                    fontSize: { xs: 12.5, md: 13.5 },
+                    color: "#1f2d24",
+                    lineHeight: 1.5,
                   }}
                 >
-                  <Box sx={{ flex: 1 }}>
-                    <TextField
-                      fullWidth
-                      label="First Name"
-                      value={formData.firstName}
-                      onChange={(e) =>
-                        handleChange("firstName", e.target.value)
-                      }
-                      error={!!errors.firstName}
-                      helperText={errors.firstName}
-                    />
-                  </Box>
-                  <Box sx={{ flex: 1 }}>
-                    <TextField
-                      fullWidth
-                      label="Last Name"
-                      value={formData.lastName}
-                      onChange={(e) => handleChange("lastName", e.target.value)}
-                      error={!!errors.lastName}
-                      helperText={errors.lastName}
-                    />
-                  </Box>
-                </Box>
-                <TextField
-                  fullWidth
-                  type="text"
-                  margin="normal"
-                  label="Mobile Number"
-                  value={formData.mobile}
-                  onChange={(e) =>
-                    handleChange("mobile", e.target.value.replace(/\D/g, ""))
-                  }
-                  error={!!errors.mobile}
-                  helperText={errors.mobile}
-                  inputProps={{
-                    inputMode: "numeric",
-                    maxLength: 10,
-                  }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">+91</InputAdornment>
-                    ),
-                  }}
-                />
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  label="Date of Birth"
-                  type="date"
-                  value={formData.dob}
-                  onChange={(e) => handleChange("dob", e.target.value)}
-                  error={!!errors.dob}
-                  helperText={errors.dob}
-                  slotProps={{
-                    inputLabel: {
-                      shrink: true,
-                    },
-                  }}
-                  inputProps={{ max: "9999-12-31" }}
-                />
-                <FormControl fullWidth error={!!errors.gender} margin="normal">
-                  <InputLabel>Gender</InputLabel>
-                  <Select
-                    label="Gender"
-                    value={formData.gender}
-                    onChange={(e) => handleChange("gender", e.target.value)}
-                    error={!!errors.gender}
-                  >
-                    <MenuItem value="">Select Gender</MenuItem>
-                    <MenuItem value="male">Male</MenuItem>
-                    <MenuItem value="female">Female</MenuItem>
-                    <MenuItem value="other">Other</MenuItem>
-                  </Select>
-                  {errors.gender && (
-                    <Typography color="error" variant="caption">
-                      {errors.gender}
-                    </Typography>
-                  )}
-                </FormControl>
+                  {item}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
 
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={formData.agree}
-                      onChange={(e) => handleChange("agree", e.target.checked)}
-                    />
-                  }
-                  label={
-                    <Typography variant="body2">
-                      I agree to the <Link href="#">Terms of Service</Link> and{" "}
-                      <Link href="#">Privacy Policy</Link>
+          {/* Optional bottom spacer/footer block for balance */}
+          <Box sx={{ width: "100%", height: { xs: 0, md: 8 } }} />
+        </Box>
+
+        {/* Form Section */}
+        <Box
+          sx={{
+            flex: 1.15,
+            px: { xs: 2.5, sm: 3.5 },
+            py: { xs: 2.5, md: 3 },
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-start",
+          }}
+        >
+          {/* Heading block */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
+            <Typography
+              sx={{
+                fontWeight: 800,
+                fontSize: { xs: 20, sm: 26 },
+                lineHeight: 1.2,
+              }}
+            >
+              <Box component="span" sx={{ color: "#1f2d24" }}>
+                Prelims{" "}
+              </Box>
+              <Box component="span" sx={{ color: PRIMARY }}>
+                Pass
+              </Box>
+            </Typography>
+
+            <Box
+              sx={{
+                width: 44,
+                height: 2,
+                backgroundColor: PRIMARY,
+                borderRadius: 2,
+                my: 0.7,
+              }}
+            />
+
+            <Typography
+              sx={{ color: "#666", fontSize: 12.5, textAlign: "center" }}
+            >
+              Sign up to start your learning journey
+            </Typography>
+          </Box>
+
+          <Stepper
+            activeStep={activeStep}
+            alternativeLabel
+            sx={{
+              mb: 1.8,
+              "& .MuiStepLabel-label": { fontSize: 12 },
+              "& .MuiStepIcon-root.Mui-active": { color: PRIMARY },
+              "& .MuiStepIcon-root.Mui-completed": { color: PRIMARY },
+            }}
+          >
+            {steps.map((label) => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+
+          {/* Step 1: Account */}
+          {activeStep === 0 && (
+            <Box>
+              <Typography sx={{ ...fieldLabelSx, mt: 0 }}>Email</Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="none"
+                placeholder="Enter your email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                error={!!errors.email}
+                helperText={errors.email}
+                sx={textFieldSx}
+              />
+
+              <Typography sx={fieldLabelSx}>Username</Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="none"
+                placeholder="Choose a username"
+                type="text"
+                value={formData.username}
+                onChange={(e) => handleChange("username", e.target.value)}
+                error={!!errors.username}
+                helperText={errors.username}
+                sx={textFieldSx}
+              />
+
+              <Typography sx={fieldLabelSx}>Password</Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="none"
+                placeholder="Create a password"
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={(e) => handleChange("password", e.target.value)}
+                error={!!errors.password}
+                helperText={errors.password}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        size="small"
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                        aria-label="toggle password visibility"
+                      >
+                        {showPassword ? (
+                          <VisibilityOff sx={{ fontSize: 18 }} />
+                        ) : (
+                          <Visibility sx={{ fontSize: 18 }} />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                sx={textFieldSx}
+              />
+
+              <Typography sx={fieldLabelSx}>Confirm Password</Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="none"
+                placeholder="Re-enter your password"
+                type={showConfirmPassword ? "text" : "password"}
+                value={formData.confirmPassword}
+                onChange={(e) =>
+                  handleChange("confirmPassword", e.target.value)
+                }
+                error={!!errors.confirmPassword}
+                helperText={errors.confirmPassword}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        edge="end"
+                        aria-label="toggle confirm password visibility"
+                      >
+                        {showConfirmPassword ? (
+                          <VisibilityOff sx={{ fontSize: 18 }} />
+                        ) : (
+                          <Visibility sx={{ fontSize: 18 }} />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                sx={textFieldSx}
+              />
+            </Box>
+          )}
+
+          {/* Step 2: Personal */}
+          {activeStep === 1 && (
+            <Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: 2,
+                }}
+              >
+                <Box sx={{ flex: 1 }}>
+                  <Typography sx={{ ...fieldLabelSx, mt: 0 }}>
+                    First Name
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    margin="none"
+                    placeholder="First name"
+                    value={formData.firstName}
+                    onChange={(e) => handleChange("firstName", e.target.value)}
+                    error={!!errors.firstName}
+                    helperText={errors.firstName}
+                    sx={textFieldSx}
+                  />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography sx={{ ...fieldLabelSx, mt: { xs: 1.2, sm: 0 } }}>
+                    Last Name
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    margin="none"
+                    placeholder="Last name"
+                    value={formData.lastName}
+                    onChange={(e) => handleChange("lastName", e.target.value)}
+                    error={!!errors.lastName}
+                    helperText={errors.lastName}
+                    sx={textFieldSx}
+                  />
+                </Box>
+              </Box>
+
+              <Typography sx={fieldLabelSx}>Mobile Number</Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="none"
+                type="text"
+                placeholder="10-digit mobile number"
+                value={formData.mobile}
+                onChange={(e) =>
+                  handleChange("mobile", e.target.value.replace(/\D/g, ""))
+                }
+                error={!!errors.mobile}
+                helperText={errors.mobile}
+                inputProps={{
+                  inputMode: "numeric",
+                  maxLength: 10,
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Typography sx={{ fontSize: 13, color: "#666" }}>
+                        +91
+                      </Typography>
+                    </InputAdornment>
+                  ),
+                }}
+                sx={textFieldSx}
+              />
+
+              <Typography sx={fieldLabelSx}>Date of Birth</Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="none"
+                type="date"
+                value={formData.dob}
+                onChange={(e) => handleChange("dob", e.target.value)}
+                error={!!errors.dob}
+                helperText={errors.dob}
+                slotProps={{
+                  inputLabel: {
+                    shrink: true,
+                  },
+                }}
+                inputProps={{ max: "9999-12-31" }}
+                sx={textFieldSx}
+              />
+
+              <Typography sx={fieldLabelSx}>Gender</Typography>
+              <FormControl
+                fullWidth
+                size="small"
+                error={!!errors.gender}
+                sx={textFieldSx}
+              >
+                <Select
+                  displayEmpty
+                  value={formData.gender}
+                  onChange={(e) => handleChange("gender", e.target.value)}
+                  error={!!errors.gender}
+                >
+                  <MenuItem value="">
+                    <Typography sx={{ fontSize: 13, color: "#8a8a8a" }}>
+                      Select Gender
                     </Typography>
-                  }
-                />
-                {errors.agree && (
-                  <Typography color="error" variant="caption">
-                    {errors.agree}
+                  </MenuItem>
+                  <MenuItem value="male">Male</MenuItem>
+                  <MenuItem value="female">Female</MenuItem>
+                  <MenuItem value="other">Other</MenuItem>
+                </Select>
+                {errors.gender && (
+                  <Typography
+                    color="error"
+                    variant="caption"
+                    sx={{ mt: 0.3, ml: 0.5 }}
+                  >
+                    {errors.gender}
                   </Typography>
                 )}
-              </Box>
-            )}
+              </FormControl>
 
-            {/* Navigation Buttons */}
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}
+              <FormControlLabel
+                sx={{ mt: 1.4 }}
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={formData.agree}
+                    onChange={(e) => handleChange("agree", e.target.checked)}
+                    sx={{
+                      color: "#8a8a8a",
+                      "&.Mui-checked": { color: PRIMARY },
+                    }}
+                  />
+                }
+                label={
+                  <Typography sx={{ fontSize: 12.5, color: "#444" }}>
+                    I agree to the{" "}
+                    <Link href="#" style={{ color: PRIMARY, fontWeight: 600 }}>
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link href="#" style={{ color: PRIMARY, fontWeight: 600 }}>
+                      Privacy Policy
+                    </Link>
+                  </Typography>
+                }
+              />
+              {errors.agree && (
+                <Typography
+                  color="error"
+                  variant="caption"
+                  display="block"
+                  sx={{ ml: 0.5 }}
+                >
+                  {errors.agree}
+                </Typography>
+              )}
+            </Box>
+          )}
+
+          {/* Navigation Buttons */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: 1.5,
+              mt: 2,
+            }}
+          >
+            <Button
+              disabled={activeStep === 0}
+              onClick={handleBack}
+              variant="outlined"
+              sx={{
+                borderRadius: 1.5,
+                fontSize: 13,
+                fontWeight: 600,
+                textTransform: "none",
+                borderColor: PRIMARY,
+                color: PRIMARY,
+                "&:hover": {
+                  borderColor: PRIMARY_DARK,
+                  backgroundColor: "rgba(22,163,74,0.06)",
+                },
+              }}
             >
-              <Button
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                variant="outlined"
-                color="secondary"
-              >
-                Back
-              </Button>
-              <Button
-                variant="contained"
-                onClick={handleNext}
-                className={styles.gradientButton}
-              >
-                {loading ? (
-                  <>
-                    <CircularProgress
-                      size={18}
-                      sx={{ mr: 1, color: "white" }}
-                    />
-                    Submitting...
-                  </>
-                ) : activeStep === steps.length - 1 ? (
-                  "Complete Registration"
-                ) : (
-                  "Next"
-                )}
-              </Button>
-            </Box>
-
-            {/* Login Link */}
-            <Box sx={{ textAlign: "center", mt: 3 }}>
-              <Typography variant="body2">
-                Already have an account?{" "}
-                <Link href="/" className={styles.loginLink}>
-                  Log in here
-                </Link>
-              </Typography>
-            </Box>
+              Back
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleNext}
+              disabled={loading}
+              sx={{
+                borderRadius: 1.5,
+                fontSize: 13,
+                fontWeight: 700,
+                textTransform: "none",
+                px: 3,
+                backgroundColor: PRIMARY,
+                "&:hover": { backgroundColor: PRIMARY_DARK },
+              }}
+            >
+              {loading ? (
+                <>
+                  <CircularProgress size={16} sx={{ mr: 1, color: "white" }} />
+                  Submitting...
+                </>
+              ) : activeStep === steps.length - 1 ? (
+                "Complete Registration"
+              ) : (
+                "Next"
+              )}
+            </Button>
           </Box>
-        </Paper>
-      </Container>
+
+          {/* Login Link */}
+          <Typography
+            variant="body2"
+            align="center"
+            sx={{ color: "#666", fontSize: 12.5, mt: 1.6 }}
+          >
+            Already have an account?{" "}
+            <Link href="/login" style={{ color: PRIMARY, fontWeight: 700 }}>
+              Log in here
+            </Link>
+          </Typography>
+        </Box>
+      </Card>
 
       <Snackbar
         open={alert.open}

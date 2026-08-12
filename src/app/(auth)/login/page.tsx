@@ -3,27 +3,36 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import * as Yup from "yup";
 import {
   Box,
   Card,
   TextField,
   Button,
-  Checkbox,
-  FormControlLabel,
   Typography,
-  Divider,
   useMediaQuery,
   IconButton,
   InputAdornment,
   Alert,
   Snackbar,
+  CircularProgress,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { CircularProgress } from "@mui/material";
-import GoogleIcon from "@mui/icons-material/Google";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import TwitterIcon from "@mui/icons-material/Twitter";
+import {
+  Visibility,
+  VisibilityOff,
+  MailOutline,
+  LockOutlined,
+  MenuBookOutlined,
+  TrendingUpOutlined,
+  VerifiedUserOutlined,
+} from "@mui/icons-material";
+
+/* =========================
+   THEME COLOR
+========================= */
+const PRIMARY = "#16a34a";
+const PRIMARY_DARK = "#128a3e";
 
 /* =========================
    YUP VALIDATION SCHEMA
@@ -164,6 +173,24 @@ export default function Login() {
     }
   };
 
+  const features = [
+    {
+      icon: <MenuBookOutlined sx={{ color: "#fff", fontSize: 15 }} />,
+      title: "Practice Unlimited MCQs",
+      subtitle: "Topic-wise & Subject-wise Tests",
+    },
+    {
+      icon: <TrendingUpOutlined sx={{ color: "#fff", fontSize: 15 }} />,
+      title: "Track Your Progress",
+      subtitle: "Detailed Performance Analytics",
+    },
+    {
+      icon: <VerifiedUserOutlined sx={{ color: "#fff", fontSize: 15 }} />,
+      title: "Secure & Reliable",
+      subtitle: "Your Data, Our Priority",
+    },
+  ];
+
   return (
     <Box
       sx={{
@@ -178,56 +205,189 @@ export default function Login() {
         sx={{
           display: "flex",
           flexDirection: mounted && isMobile ? "column" : "row",
-          width: mounted && isMobile ? "100%" : 850,
-          borderRadius: 3,
+          width: mounted && isMobile ? "100%" : 720,
+          borderRadius: 2.5,
           overflow: "hidden",
-          boxShadow: "0 15px 30px rgba(0,0,0,0.2)",
+          boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
         }}
       >
-        {/* Banner Section */}
+        {/* Left Panel - fills full height using space-between, anchored from top */}
         <Box
           sx={{
             flex: 1,
-            background:
-              "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='500' height='500' viewBox='0 0 500 500'><rect fill='%236a11cb' width='500' height='500'/><path fill='%232575fc' d='M250,0 L500,250 L250,500 L0,250 Z'/></svg>\")",
+            position: "relative",
+            backgroundImage: 'url("/Images/login/bg-img.png")',
             backgroundSize: "cover",
-            color: "white",
-            p: 4,
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            px: 3,
+            py: 3.5,
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center",
+            justifyContent: "space-between",
+            alignItems: "center",
+            textAlign: "center",
+            minHeight: mounted && isMobile ? "auto" : 460,
           }}
         >
-          <Typography variant="h4" gutterBottom>
-            MCQ Exam Portal
-          </Typography>
-          <Typography sx={{ mb: 2 }}>
-            Welcome to the student assessment system designed for educational
-            institutions.
-          </Typography>
-          <Typography sx={{ mb: 2 }}>
-            Take exams, review your results, and track your progress all in one
-            place.
-          </Typography>
-          <Typography>Secure, reliable, and easy to use.</Typography>
+          {/* Top: logo, heading, tagline */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            {/* <Image
+              src="/Images/login/logo-img.png"
+              alt="Prelims Pass"
+              width={84}
+              height={84}
+              style={{ objectFit: "contain" }}
+            /> */}
+
+            <Typography
+              sx={{ fontWeight: 800, mt: 4, fontSize: 22, lineHeight: 1.2 }}
+            >
+              <Box component="span" sx={{ color: "#1f2d24" }}>
+                Welcome{" "}
+              </Box>
+              <Box component="span" sx={{ color: PRIMARY }}>
+                Back !!!
+              </Box>
+            </Typography>
+
+            <Box
+              sx={{
+                width: 44,
+                height: 2,
+                backgroundColor: PRIMARY,
+                borderRadius: 2,
+                my: 0.9,
+              }}
+            />
+
+            <Typography
+              sx={{
+                color: "#374151",
+                fontSize: 13,
+                whiteSpace: "nowrap",
+              }}
+            >
+              Your Path to Success in{" "}
+              <Box component="span" sx={{ color: PRIMARY, fontWeight: 700 }}>
+                Competitive Exams
+              </Box>
+            </Typography>
+          </Box>
+
+          {/* Middle: feature list */}
+          <Box sx={{ width: "100%", maxWidth: 240 }}>
+            {features.map((f, i) => (
+              <Box
+                key={i}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.2,
+                  mb: 2.4,
+                  textAlign: "left",
+                  "&:last-of-type": { mb: 0 },
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 25,
+                    height: 25,
+                    minWidth: 25,
+                    borderRadius: "50%",
+                    backgroundColor: PRIMARY,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {f.icon}
+                </Box>
+                <Box>
+                  <Typography
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: 12,
+                      color: "#1f2d24",
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {f.title}
+                  </Typography>
+                  <Typography
+                    sx={{ fontSize: 10.5, color: "#4a5a4f", lineHeight: 1.3 }}
+                  >
+                    {f.subtitle}
+                  </Typography>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+
+          {/* Bottom: book illustration */}
+          <Box sx={{ width: "100%", maxWidth: 140 }}>
+            <Image
+              src="/Images/login/book-image.png"
+              alt="Books"
+              width={160}
+              height={120}
+              style={{ objectFit: "contain", width: "100%", height: "auto" }}
+            />
+          </Box>
         </Box>
 
-        {/* Form Section */}
+        {/* Form Section - anchored from top with SAME py as left so logos align */}
         <Box
           sx={{
             flex: 1,
-            p: 4,
+            px: 3.5,
+            py: 3.5,
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center",
+            justifyContent: "flex-start",
           }}
         >
-          <Box sx={{ textAlign: "center", mb: 3 }}>
-            <Typography variant="h4" sx={{ color: "#2575fc", fontWeight: 700 }}>
-              MCQ{" "}
-              <Box component="span" sx={{ color: "#6a11cb" }}>
-                Exam Portal
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              src="/Images/login/logo-img.png"
+              alt="Prelims Pass"
+              width={100}
+              height={100}
+              style={{ objectFit: "contain" }}
+            />
+            <Typography
+              sx={{ fontWeight: 900, mt: 1, fontSize: 26, lineHeight: 1.2 }}
+            >
+              <Box component="span" sx={{ color: "#1f2d24" }}>
+                Prelims{" "}
               </Box>
+              <Box component="span" sx={{ color: PRIMARY }}>
+                Pass
+              </Box>
+            </Typography>
+            <Box
+              sx={{
+                width: 44,
+                height: 2,
+                backgroundColor: PRIMARY,
+                borderRadius: 2,
+                my: 0.9,
+              }}
+            />
+            <Typography sx={{ color: "#666", mt: 0.3, mb: 2, fontSize: 12.5 }}>
+              Login to continue your learning journey
             </Typography>
           </Box>
 
@@ -238,10 +398,17 @@ export default function Login() {
               handleLogin();
             }}
           >
+            {/* Email field - label on its own line above the box */}
+            <Typography
+              sx={{ fontSize: 12.5, fontWeight: 600, color: "#333", mb: 0.5 }}
+            >
+              Email ID
+            </Typography>
             <TextField
-              margin="normal"
+              margin="none"
               fullWidth
-              label="Enter Email Id"
+              size="small"
+              placeholder="Enter Email ID"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -249,12 +416,30 @@ export default function Login() {
               }}
               error={!!errors.email}
               helperText={errors.email}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <MailOutline sx={{ color: "#8a8a8a", fontSize: 18 }} />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                mb: 1.6,
+                "& .MuiOutlinedInput-root": { borderRadius: 1.5, fontSize: 13 },
+              }}
             />
 
+            {/* Password field - label on its own line above the box */}
+            <Typography
+              sx={{ fontSize: 12.5, fontWeight: 600, color: "#333", mb: 0.5 }}
+            >
+              Password
+            </Typography>
             <TextField
-              margin="normal"
+              margin="none"
               fullWidth
-              label="Password"
+              size="small"
+              placeholder="Password"
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => {
@@ -264,16 +449,29 @@ export default function Login() {
               error={!!errors.password}
               helperText={errors.password}
               InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockOutlined sx={{ color: "#8a8a8a", fontSize: 18 }} />
+                  </InputAdornment>
+                ),
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
+                      size="small"
                       onClick={() => setShowPassword(!showPassword)}
                       edge="end"
                     >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                      {showPassword ? (
+                        <VisibilityOff sx={{ fontSize: 18 }} />
+                      ) : (
+                        <Visibility sx={{ fontSize: 18 }} />
+                      )}
                     </IconButton>
                   </InputAdornment>
                 ),
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": { borderRadius: 1.5, fontSize: 13 },
               }}
             />
 
@@ -282,21 +480,18 @@ export default function Login() {
                 display: "flex",
                 justifyContent: "flex-end",
                 alignItems: "center",
-                my: 1,
+                mt: 0.6,
+                mb: 1.2,
               }}
             >
-              {/* <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                  />
-                }
-                label="Remember me"
-              /> */}
               <Link
                 href="/forgot-password"
-                style={{ textDecoration: "none", color: "#2575fc" }}
+                style={{
+                  textDecoration: "none",
+                  color: PRIMARY,
+                  fontWeight: 500,
+                  fontSize: 12.5,
+                }}
               >
                 Forgot Password?
               </Link>
@@ -308,11 +503,13 @@ export default function Login() {
               variant="contained"
               disabled={loading}
               sx={{
-                mt: 2,
-                mb: 2,
-                py: 1.5,
-                fontWeight: 600,
-                background: "linear-gradient(to right, #6a11cb, #2575fc)",
+                mb: 1.8,
+                py: 1,
+                fontWeight: 700,
+                fontSize: 13.5,
+                borderRadius: 1.5,
+                backgroundColor: PRIMARY,
+                "&:hover": { backgroundColor: PRIMARY_DARK },
               }}
             >
               {loading ? (
@@ -324,59 +521,23 @@ export default function Login() {
                     justifyContent: "center",
                   }}
                 >
-                  <CircularProgress size={20} sx={{ mr: 1, color: "white" }} />
+                  <CircularProgress size={16} sx={{ mr: 1, color: "white" }} />
                   Logging in...
                 </span>
               ) : (
-                "Login"
+                "LOGIN"
               )}
             </Button>
 
-            <Divider sx={{ my: 3 }}>Or login with</Divider>
-
-            {/* ✅ SOCIAL MEDIA ICONS (RESTORED) */}
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                gap: 2,
-                mb: 2,
-                flexWrap: "wrap",
-              }}
+            <Typography
+              variant="body2"
+              align="center"
+              sx={{ color: "#666", fontSize: 12.5 }}
             >
-              <Button
-                sx={{ minWidth: 0, width: 50, height: 50, borderRadius: "50%" }}
-                onClick={() =>
-                  (globalThis.location.href = "https://accounts.google.com")
-                }
-              >
-                <GoogleIcon sx={{ color: "#DB4437" }} />
-              </Button>
-
-              <Button
-                sx={{ minWidth: 0, width: 50, height: 50, borderRadius: "50%" }}
-                onClick={() =>
-                  (globalThis.location.href = "https://www.facebook.com/")
-                }
-              >
-                <FacebookIcon sx={{ color: "#1877F2" }} />
-              </Button>
-
-              <Button
-                sx={{ minWidth: 0, width: 50, height: 50, borderRadius: "50%" }}
-                onClick={() =>
-                  (globalThis.location.href = "https://twitter.com/")
-                }
-              >
-                <TwitterIcon sx={{ color: "#1DA1F2" }} />
-              </Button>
-            </Box>
-
-            <Typography variant="body2" align="center" sx={{ color: "#666" }}>
               Don't have an account?{" "}
               <Link
                 href="/register"
-                style={{ color: "#2575fc", fontWeight: 600 }}
+                style={{ color: PRIMARY, fontWeight: 700 }}
               >
                 Register here
               </Link>
