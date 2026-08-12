@@ -11,7 +11,7 @@ export function logout() {
   sessionStorage.removeItem("username");
 
   // Redirect to login page
-  globalThis.location.href = "/";
+  globalThis.location.href = "/login";
 }
 
 export function verifyToken(token: string) {

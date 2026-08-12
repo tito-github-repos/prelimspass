@@ -4,7 +4,7 @@ import "./globals.css";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "MCQ Exam Portal",
+  title: "Prelims Pass App.",
   description:
     "Secure platform for students to take exams, analyze performance, and track progress efficiently.",
 };

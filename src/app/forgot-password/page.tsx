@@ -8,15 +8,20 @@ import {
   Button,
   Typography,
   CircularProgress,
-  useMediaQuery,
   Divider,
   Snackbar,
   Alert,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import * as Yup from "yup";
 
-// Yup Validation Schema
+/* =========================
+   THEME COLOR (same as Register)
+========================= */
+const PRIMARY = "#16a34a";
+const PRIMARY_DARK = "#128a3e";
+
 const forgotPasswordSchema = Yup.object({
   email: Yup.string()
     .required("Email is required")
@@ -40,29 +45,21 @@ export default function ForgotPassword() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
   const router = useRouter();
-  const isMobile = useMediaQuery("(max-width:768px)");
 
   const formatTime = (t: number) => {
     const minutes = Math.floor(t / 60);
     const seconds = t % 60;
-
     return `${minutes.toString().padStart(2, "0")}:${seconds
       .toString()
       .padStart(2, "0")}`;
   };
 
-  // ========================
-  // AUTO FOCUS FIRST BOX
-  // ========================
   useEffect(() => {
     if (step === 2) {
       inputsRef.current[0]?.focus();
     }
   }, [step]);
 
-  // ========================
-  // SEND OTP
-  // ========================
   const sendOtp = async () => {
     setError("");
     setOpenSnackbar(false);
@@ -93,7 +90,7 @@ export default function ForgotPassword() {
       }
 
       setStep(2);
-      setTimer(120); // ✅ 5 minutes
+      setTimer(120);
 
       if (timerRef.current) clearInterval(timerRef.current);
 
@@ -114,9 +111,6 @@ export default function ForgotPassword() {
     }
   };
 
-  // ========================
-  // VERIFY OTP
-  // ========================
   const verifyOtp = async () => {
     if (loading) return;
     setLoading(true);
@@ -145,7 +139,7 @@ export default function ForgotPassword() {
 
       let data: any = {};
       try {
-        data = await res.json(); // ✅ safe parse
+        data = await res.json();
       } catch {
         data = {};
       }
@@ -154,7 +148,6 @@ export default function ForgotPassword() {
         setError(data.error || "Invalid OTP");
         setOpenSnackbar(true);
         setOtp(["", "", "", ""]);
-        // inputsRef.current[0]?.focus();
         requestAnimationFrame(() => {
           inputsRef.current[0]?.focus();
         });
@@ -175,9 +168,6 @@ export default function ForgotPassword() {
     }
   };
 
-  // ========================
-  // OTP CHANGE
-  // ========================
   const handleOtpChange = (value: string, index: number) => {
     if (error) setError("");
     const digit = value.replace(/[^0-9]/g, "").slice(-1);
@@ -191,21 +181,14 @@ export default function ForgotPassword() {
     }
   };
 
-  // ========================
-  // BACKSPACE SUPPORT
-  // ========================
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputsRef.current[index - 1]?.focus();
     }
   };
 
-  // ========================
-  // PASTE SUPPORT
-  // ========================
   const handlePaste = (e: React.ClipboardEvent) => {
     const pasted = e.clipboardData.getData("text").replace(/\D/g, "");
-
     if (pasted.length === 4) {
       const newOtp = pasted.split("");
       setOtp(newOtp);
@@ -213,89 +196,229 @@ export default function ForgotPassword() {
     }
   };
 
+  const textFieldSx = {
+    "& .MuiOutlinedInput-root": { borderRadius: 1.5, fontSize: 13 },
+  };
+
+  const fieldLabelSx = {
+    fontSize: 12.5,
+    fontWeight: 600,
+    color: "#333",
+    mb: 0.5,
+    mt: 1.2,
+  };
+
+  const infoPoints = [
+    "We'll email a 4-digit OTP to verify it's you",
+    "The code expires in 2 minutes for your security",
+    "You can resend it if it doesn't arrive in time",
+    "Set a new password once verification is complete",
+  ];
+
   return (
-    <>
-      <Box
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        p: { xs: 1, sm: 2 },
+      }}
+    >
+      <Card
         sx={{
-          minHeight: "100vh",
           display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          p: 2,
-          background: "linear-gradient(to right, #eef2ff, #f8fafc)",
+          flexDirection: { xs: "column", md: "row" },
+          width: "100%",
+          maxWidth: 820,
+          borderRadius: 2.5,
+          overflow: "hidden",
+          boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
         }}
       >
-        <Card
+        {/* Left Panel - no logo, text + info points only */}
+        <Box
           sx={{
-            width: isMobile ? "100%" : 450,
-            borderRadius: 3,
-            p: 4,
-            boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+            flex: 1,
+            position: "relative",
+            backgroundImage: 'url("/Images/login/bg-img.png")',
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            px: { xs: 2.5, sm: 3, md: 4 },
+            py: { xs: 3, sm: 4, md: 5 },
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "space-between",
+            textAlign: "center",
+            minHeight: { xs: 280, md: "100%" },
+            gap: { xs: 2, md: 0 },
           }}
         >
-          <Box sx={{ textAlign: "center", mb: 2 }}>
-            <Typography variant="h4" sx={{ fontWeight: 600, color: "#2575fc" }}>
-              {step === 1 ? "Forgot Password" : "Verify OTP"}
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+            <Typography sx={{ fontWeight: 800, mt: { xs: 0, md: 1 }, fontSize: { xs: 17, sm: 19, md: 20 }, lineHeight: 1.25 }}>
+              Account Recovery
+            </Typography>
+
+            <Typography sx={{ color: "#374151", fontSize: { xs: 12, md: 12.5 }, mt: 1.2, lineHeight: 1.6, maxWidth: 300 }}>
+              Forgot your password? No worries — verify your email and
+              you&apos;ll be back into your exam portal in a couple of steps.
             </Typography>
           </Box>
-          {/* {error && <Alert severity="error">{error}</Alert>} */}
+
+          <Box
+            sx={{
+              width: "100%",
+              maxWidth: 280,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              flexGrow: 1,
+              py: { xs: 1.5, md: 2.5 },
+            }}
+          >
+            {infoPoints.map((item, i) => (
+              <Box
+                key={i}
+                sx={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 1.2,
+                  mb: 1.5,
+                  textAlign: "left",
+                  "&:last-of-type": { mb: 0 },
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 18,
+                    height: 18,
+                    borderRadius: "50%",
+                    backgroundColor: PRIMARY,
+                    color: "#fff",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                    mt: "1px",
+                  }}
+                >
+                  {i + 1}
+                </Box>
+                <Typography sx={{ fontSize: 12, color: "#1f2d24", lineHeight: 1.4 }}>
+                  {item}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+
+        {/* Form Section - logo now sits above "Prelims Pass" */}
+        <Box
+          sx={{
+            flex: 1.15,
+            px: { xs: 2.5, sm: 3.5 },
+            py: { xs: 2.5, md: 3 },
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 2 }}>
+            <Image
+              src="/Images/login/logo-img.png"
+              alt="Prelims Pass"
+              width={100}
+              height={100}
+              style={{ objectFit: "contain" }}
+            />
+
+            <Typography sx={{ fontWeight: 800, mt: 1, fontSize: { xs: 20, sm: 24 }, lineHeight: 1.2 }}>
+              <Box component="span" sx={{ color: "#1f2d24" }}>
+                Prelims{" "}
+              </Box>
+              <Box component="span" sx={{ color: PRIMARY }}>
+                Pass
+              </Box>
+            </Typography>
+
+            <Box sx={{ width: 44, height: 2, backgroundColor: PRIMARY, borderRadius: 2, my: 0.7 }} />
+
+            <Typography sx={{ fontWeight: 700, fontSize: { xs: 16, sm: 17 }, mt: 0.8 }}>
+              {step === 1 ? "Forgot Password" : "Verify OTP"}
+            </Typography>
+
+            <Typography sx={{ color: "#666", fontSize: 12.5, textAlign: "center", mt: 0.4 }}>
+              {step === 1
+                ? "Enter your registered email to receive a code"
+                : "Enter the 4-digit code we sent you"}
+            </Typography>
+          </Box>
 
           {/* STEP 1 */}
           {step === 1 && (
             <>
-              <>
-                <Typography sx={{ textAlign: "center", color: "#555", mb: 3 }}>
-                  Enter your registered email
-                </Typography>
+              <Typography sx={{ ...fieldLabelSx, mt: 0 }}>Email</Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="none"
+                placeholder="Enter your registered email"
+                type="email"
+                value={email}
+                onChange={async (e) => {
+                  const value = e.target.value;
+                  setEmail(value);
+                  try {
+                    await forgotPasswordSchema.validate({ email: value });
+                    setEmailError("");
+                  } catch (err: any) {
+                    setEmailError(err.message);
+                  }
+                }}
+                error={!!emailError}
+                helperText={emailError}
+                sx={textFieldSx}
+              />
 
-                <TextField
-                  fullWidth
-                  label="Email"
-                  value={email}
-                  onChange={async (e) => {
-                    const value = e.target.value;
-                    setEmail(value);
-                    try {
-                      await forgotPasswordSchema.validate({ email: value });
-                      setEmailError("");
-                    } catch (err: any) {
-                      setEmailError(err.message);
-                    }
-                  }}
-                  error={!!emailError}
-                  helperText={emailError}
-                  sx={{ mb: 2 }}
-                />
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={sendOtp}
+                disabled={loading}
+                sx={{
+                  mt: 2.5,
+                  py: 1.1,
+                  borderRadius: 1.5,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  textTransform: "none",
+                  backgroundColor: PRIMARY,
+                  "&:hover": { backgroundColor: PRIMARY_DARK },
+                }}
+              >
+                {loading ? <CircularProgress size={18} sx={{ color: "white" }} /> : "Send OTP"}
+              </Button>
 
-                <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={sendOtp}
-                  disabled={loading}
-                  sx={{
-                    mt: 2,
-                    py: 1.5,
-                    fontWeight: 600,
-                  }}
-                >
-                  {loading ? <CircularProgress size={24} /> : "Send OTP"}
-                </Button>
-              </>
+              <Divider sx={{ my: 2.5 }} />
 
-              <Divider sx={{ my: 3 }} />
-
-              {/* Back to login */}
               <Box sx={{ textAlign: "center" }}>
-                <Typography>
+                <Typography sx={{ fontSize: 12.5, color: "#666" }}>
                   Remember your password?{" "}
                   <Button
-                    href="/"
+                    href="/login"
                     sx={{
-                      color: "#2575fc",
+                      color: PRIMARY,
                       textTransform: "none",
-                      fontWeight: 600,
+                      fontWeight: 700,
                       padding: 0,
                       minWidth: 0,
+                      fontSize: 12.5,
+                      verticalAlign: "baseline",
+                      "&:hover": { backgroundColor: "transparent", color: PRIMARY_DARK },
                     }}
                   >
                     Back to Login
@@ -308,25 +431,35 @@ export default function ForgotPassword() {
           {/* STEP 2 */}
           {step === 2 && (
             <>
-              <Typography textAlign="center" mb={1}>
+              <Typography sx={{ textAlign: "center", fontSize: 12.5, color: "#444", mb: 0.6 }}>
                 OTP sent to <b>{email}</b>
               </Typography>
 
               <Typography
-                textAlign="center"
-                mb={2}
-                color={
-                  timer === 0
-                    ? "error.main"
-                    : timer < 30
-                      ? "warning.main"
-                      : "success.main"
-                }
+                sx={{
+                  textAlign: "center",
+                  fontSize: 12.5,
+                  mb: 2,
+                  color:
+                    timer === 0
+                      ? "error.main"
+                      : timer < 30
+                        ? "warning.main"
+                        : "text.secondary",
+                }}
               >
                 {timer > 0 ? `Expires in ${formatTime(timer)}` : "OTP expired"}
               </Typography>
 
-              <Box display="flex" justifyContent="center" gap={2} mb={2}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: { xs: 1, sm: 1.5 },
+                  mb: 1,
+                  flexWrap: "wrap",
+                }}
+              >
                 {otp.map((digit, i) => (
                   <TextField
                     key={i}
@@ -336,16 +469,23 @@ export default function ForgotPassword() {
                     onKeyDown={(e) => handleKeyDown(e, i)}
                     onPaste={handlePaste}
                     error={!!error}
-                    helperText=""
                     inputProps={{
                       maxLength: 1,
+                      inputMode: "numeric",
                       style: {
                         textAlign: "center",
-                        fontSize: "22px",
-                        fontWeight: "bold",
+                        fontSize: 20,
+                        fontWeight: 700,
+                        padding: "10px 0",
                       },
                     }}
-                    sx={{ width: 60, mb: 2 }}
+                    sx={{
+                      width: { xs: 48, sm: 56 },
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: 1.5,
+                        "&.Mui-focused fieldset": { borderColor: PRIMARY },
+                      },
+                    }}
                   />
                 ))}
               </Box>
@@ -357,44 +497,60 @@ export default function ForgotPassword() {
                 disabled={loading || otp.includes("") || timer === 0}
                 sx={{
                   mt: 2,
-                  py: 1.5,
-                  fontWeight: 600,
+                  py: 1.1,
+                  borderRadius: 1.5,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  textTransform: "none",
+                  backgroundColor: PRIMARY,
+                  "&:hover": { backgroundColor: PRIMARY_DARK },
                 }}
               >
-                {loading ? <CircularProgress size={24} /> : "Verify OTP"}
+                {loading ? <CircularProgress size={18} sx={{ color: "white" }} /> : "Verify OTP"}
               </Button>
 
               {timer === 0 && (
-                <Button fullWidth onClick={sendOtp} sx={{ mt: 1 }}>
+                <Button
+                  fullWidth
+                  onClick={sendOtp}
+                  sx={{
+                    mt: 1,
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    textTransform: "none",
+                    color: PRIMARY,
+                    "&:hover": { backgroundColor: "rgba(22,163,74,0.06)" },
+                  }}
+                >
                   Resend OTP
                 </Button>
               )}
             </>
           )}
-        </Card>
+        </Box>
+      </Card>
 
-        <Snackbar
-          open={openSnackbar && !!error}
-          autoHideDuration={3000}
+      <Snackbar
+        open={openSnackbar && !!error}
+        autoHideDuration={3000}
+        onClose={() => {
+          setOpenSnackbar(false);
+          setError("");
+        }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          variant="filled"
+          severity="error"
           onClose={() => {
             setOpenSnackbar(false);
             setError("");
           }}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          sx={{ width: "100%" }}
         >
-          <Alert
-            variant="filled"
-            severity="error"
-            onClose={() => {
-              setOpenSnackbar(false);
-              setError("");
-            }}
-            sx={{ width: "100%" }}
-          >
-            {error}
-          </Alert>
-        </Snackbar>
-      </Box>
-    </>
+          {error}
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 }
