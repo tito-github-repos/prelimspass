@@ -11,50 +11,27 @@ import {
   Avatar,
   Chip,
 } from "@mui/material";
-// use CSS grid with Box for consistent layout and spacing
 import { useRouter } from "next/navigation";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ScheduleIcon from "@mui/icons-material/Schedule";
-import StarRateIcon from "@mui/icons-material/StarRate";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import EventIcon from "@mui/icons-material/Event";
-import GradeIcon from "@mui/icons-material/Grade";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import { FaHistory } from "react-icons/fa";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
+import SignalCellularAltOutlinedIcon from "@mui/icons-material/SignalCellularAltOutlined";
+import FormatListBulletedOutlinedIcon from "@mui/icons-material/FormatListBulletedOutlined";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
-const MAIN_BG = "#f5f7fa";
 const CARD_BG = "#ffffff";
-const CARD_BORDER = "#e0e0e0";
 const TEXT_SECONDARY = "#64748b";
 const TEXT_PRIMARY = "#1e293b";
 const PRIMARY_PURPLE = "#2f13c9ff";
-const SUCCESS_GREEN = "#22c55e";
-const WARNING_YELLOW = "#f59e0b";
-const DANGER_RED = "#ef4444";
-const INFO_BLUE = "#2679d9ff";
-const EXAM_META_COLOR = TEXT_SECONDARY;
+const SUCCESS_GREEN = "var(--primary)";
 
-// Shared action button sizing and styles so all action buttons look identical
-const ACTION_BUTTON_MD_WIDTH = "160px";
-const ACTION_BUTTON_SX = {
-  // horizontal padding kept for visual spacing; height and lineHeight enforce identical vertical size
-  padding: "0 14px",
-  height: "40px",
-  lineHeight: "40px",
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  textTransform: "none",
-  backgroundColor: PRIMARY_PURPLE,
-  color: "#fff",
-  borderRadius: 2,
-  fontSize: "15px",
-  fontWeight: 700,
-  boxShadow: "none",
+const EXAM_TYPE_COLORS: Record<string, string> = {
+  practice: "#3b82f6",
+  mock: "#f59e0b",
+  live: "#ef4444",
 };
 
 interface StatCardProps {
@@ -68,25 +45,31 @@ interface StatCardProps {
 const StatCard = ({ icon, label, value, color, iconColor }: StatCardProps) => (
   <Card
     sx={{
-      p: 2.5,
-      borderRadius: 2.5,
+      p: { xs: 1.75, sm: 2, md: 2.5 },
+      borderRadius: 0.5,
       background: CARD_BG,
       color: TEXT_PRIMARY,
       boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
-      flex: { xs: "1 1 100%", sm: "1 1 50%", md: "1 1 240px" },
+      flex: { xs: "1 1 100%", sm: "1 1 calc(50% - 8px)", md: "1 1 240px" },
       display: "flex",
       alignItems: "center",
       transition: "all 0.3s ease",
     }}
   >
-    <Box sx={{ display: "flex", alignItems: "flex-end", gap: 1.875 }}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: { xs: 1.25, sm: 1.5, md: 1.875 },
+      }}
+    >
       <Avatar
         sx={{
-          width: 60,
-          height: 60,
+          width: { xs: 46, sm: 52, md: 60 },
+          height: { xs: 46, sm: 52, md: 60 },
           bgcolor: color,
           color: iconColor || "#fff",
-          fontSize: "24px",
+          fontSize: { xs: "18px", sm: "20px", md: "24px" },
         }}
       >
         {icon}
@@ -94,48 +77,86 @@ const StatCard = ({ icon, label, value, color, iconColor }: StatCardProps) => (
       <Box>
         <Typography
           sx={{
-            fontSize: 24,
+            fontSize: { xs: 18, sm: 20, md: 24 },
             fontWeight: 600,
             lineHeight: 1,
-            mb: 0.625,
+            mb: 0.5,
             color: TEXT_PRIMARY,
           }}
         >
           {value}
         </Typography>
-        <Typography sx={{ color: "#7f8c8d", fontSize: 14 }}>{label}</Typography>
+        <Typography
+          sx={{ color: "#7f8c8d", fontSize: { xs: 12, sm: 13, md: 14 } }}
+        >
+          {label}
+        </Typography>
       </Box>
     </Box>
   </Card>
 );
 
-interface ExamMeta {
-  duration: string | number;
-  questions: string | number;
-  due: string;
-  points: string | number;
-  examType: "practice" | "mock" | "live";
+interface QuickAccessItem {
+  icon: ReactNode;
+  label: string;
+  description: string;
+  color: string;
+  iconColor: string;
 }
 
-interface ExamCardProps {
-  title: string;
-  subject: string;
-  meta: ExamMeta;
-  onStart?: () => void;
-}
+const QuickAccessCard = ({
+  icon,
+  label,
+  description,
+  color,
+  iconColor,
+}: QuickAccessItem) => (
+  <Card
+    sx={{
+      p: { xs: 1.75, sm: 2, md: 2.5 },
+      borderRadius: 0.5,
+      background: CARD_BG,
+      boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
+      flex: { xs: "1 1 100%", sm: "1 1 calc(50% - 8px)", md: "1 1 220px" },
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: { xs: 1.25, md: 1.5 },
+      transition: "all 0.3s ease",
+    }}
+  >
+    <Avatar
+      sx={{
+        width: { xs: 38, sm: 40, md: 44 },
+        height: { xs: 38, sm: 40, md: 44 },
+        bgcolor: color,
+        color: iconColor,
+        flexShrink: 0,
+      }}
+    >
+      {icon}
+    </Avatar>
+    <Box
+      sx={{ display: "flex", flexDirection: "column", gap: 0.4, minWidth: 0 }}
+    >
+      <Typography
+        sx={{
+          fontWeight: 700,
+          fontSize: { xs: 14, sm: 15 },
+          color: TEXT_PRIMARY,
+        }}
+      >
+        {label}
+      </Typography>
+      <Typography
+        sx={{ fontSize: { xs: 12, sm: 13 }, color: "#7f8c8d", lineHeight: 1.4 }}
+      >
+        {description}
+      </Typography>
+    </Box>
+  </Card>
+);
 
-interface CompletedExam {
-  title: string;
-  subject: string;
-  scorePercentage: number;
-  completionDate: string;
-  duration: string;
-  questions: string;
-  scoreFraction: string;
-  examType: string;
-}
-
-// Helper to format date and time
 const formatDateTime = (dateString: string) => {
   if (!dateString) return "";
   const date = new Date(dateString);
@@ -149,453 +170,244 @@ const formatDateTime = (dateString: string) => {
   });
 };
 
-const ExamCard = ({ title, subject, meta, timeRemaining, startDate, endDate }: ExamCardProps & { timeRemaining?: string; startDate?: string; endDate?: string }) => (
-  <Card
-    sx={{
-      border: `1px solid #e0e0e0`,
-      borderRadius: { xs: 1.5, sm: 2, md: 2.5 },
-      background: CARD_BG,
-      color: TEXT_PRIMARY,
-      boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
-      width: "100%",
-      overflow: "hidden",
-      transition: "all 0.3s ease",
-      "&:hover": {
-        transform: "translateY(-5px)",
-        boxShadow: "0 10px 20px rgba(0, 0, 0, 0.1)",
-      },
-    }}
-  >
+interface ExamListRowProps {
+  title: string;
+  questions: string | number;
+  duration: string | number;
+  examType: "practice" | "mock" | "live";
+  isPremium?: boolean;
+  onStart?: () => void;
+}
+
+const ExamListRow = ({
+  title,
+  questions,
+  duration,
+  examType,
+  isPremium,
+  onStart,
+}: ExamListRowProps) => {
+  const typeColor = EXAM_TYPE_COLORS[examType] || PRIMARY_PURPLE;
+
+  return (
     <Box
       sx={{
-        p: { xs: 1.25, sm: 1.5, md: 1.875 },
-        background: "#f8f9fa",
-        borderBottom: "1px solid #e0e0e0",
         display: "flex",
+        alignItems: { xs: "flex-start", sm: "center" },
         justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
-      <Box>
-        <Typography
-          sx={{
-            fontSize: { xs: 16, sm: 17, md: 18 },
-            fontWeight: 600,
-            mb: { xs: 0.25, sm: 0.5, md: 0.625 },
-            color: "#2c3e50",
-            lineHeight: 1.2,
-          }}
-        >
-          {title}
-        </Typography>
-        <Typography
-          sx={{
-            color: "#7f8c8d",
-            fontSize: { xs: 13, sm: 14 },
-          }}
-        >
-          {subject}
-        </Typography>
-      </Box>
-      <Typography
-        sx={{
-          backgroundColor:
-            meta.examType === "practice"
-              ? "#3b82f6"
-              : meta.examType === "mock"
-                ? "#f59e0b"
-                : "#ef4444",
-          color: "#fff",
-          borderRadius: "12px",
-          padding: "4px 10px",
-          fontSize: 12,
-          fontWeight: 700,
-          textTransform: "uppercase",
-        }}
-      >
-        {meta.examType}
-      </Typography>
-    </Box>
-    <Box sx={{ p: { xs: 1.25, sm: 1.5, md: 1.875 } }}>
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          mb: { xs: 1.25, sm: 1.5, md: 1.875 },
-          gap: { xs: 0.5, sm: 0.75 },
-        }}
-      >
-        <Box
-          sx={{
-            flex: { xs: "1 0 100%", sm: "1 0 50%" },
-            mb: { xs: 0.75, sm: 1, md: 1.25 },
-            display: "flex",
-            alignItems: "center",
-            gap: { xs: 0.5, sm: 0.625 },
-          }}
-        >
-          <AccessTimeIcon fontSize="small" sx={{ color: "#6a11cb" }} />
-          <Typography
-            variant="body2"
-            sx={{ color: TEXT_PRIMARY, fontSize: { xs: 13, sm: 14 } }}
-          >
-            {meta.duration} min
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            flex: { xs: "1 0 100%", sm: "1 0 50%" },
-            mb: { xs: 0.75, sm: 1, md: 1.25 },
-            display: "flex",
-            alignItems: "center",
-            gap: { xs: 0.5, sm: 0.625 },
-          }}
-        >
-          <HelpOutlineIcon fontSize="small" sx={{ color: "#6a11cb" }} />
-          <Typography
-            variant="body2"
-            sx={{
-              color: TEXT_PRIMARY,
-              fontSize: { xs: 13, sm: 14 },
-            }}
-          >
-            {meta.questions} questions
-          </Typography>
-        </Box>
-
-        {meta.examType === "live" && startDate && endDate && (
-          <>
-            <Box
-              sx={{
-                flex: { xs: "1 0 100%", sm: "1 0 50%" },
-                mb: { xs: 0.75, sm: 1, md: 1.25 },
-                display: "flex",
-                alignItems: "center",
-                gap: { xs: 0.5, sm: 0.625 },
-              }}
-            >
-              <EventIcon fontSize="small" sx={{ color: "#6a11cb" }} />
-              <Typography
-                variant="body2"
-                sx={{
-                  color: TEXT_PRIMARY,
-                  fontSize: { xs: 13, sm: 14 },
-                }}
-              >
-                Start: {formatDateTime(startDate)}
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                flex: { xs: "1 0 100%", sm: "1 0 50%" },
-                mb: { xs: 0.75, sm: 1, md: 1.25 },
-                display: "flex",
-                alignItems: "center",
-                gap: { xs: 0.5, sm: 0.625 },
-              }}
-            >
-              <EventIcon fontSize="small" sx={{ color: "#6a11cb" }} />
-              <Typography
-                variant="body2"
-                sx={{
-                  color: TEXT_PRIMARY,
-                  fontSize: { xs: 13, sm: 14 },
-                }}
-              >
-                End: {formatDateTime(endDate)}
-              </Typography>
-            </Box>
-          </>
-        )}
-
-        <Box
-          sx={{
-            flex: { xs: "1 0 100%", sm: "1 0 50%" },
-            mb: { xs: 0.75, sm: 1, md: 1.25 },
-            display: "flex",
-            alignItems: "center",
-            gap: { xs: 0.5, sm: 0.625 },
-          }}
-        >
-          <GradeIcon fontSize="small" sx={{ color: "#6a11cb" }} />
-          <Typography
-            variant="body2"
-            sx={{
-              color: TEXT_PRIMARY,
-              fontSize: { xs: 13, sm: 14 },
-            }}
-          >
-            {meta.points} points
-          </Typography>
-        </Box>
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "flex-start",
-        }}
-      >
-        <Chip
-          sx={{
-            background: timeRemaining ? "#fef3c7" : "#e6f4ea",
-            color: timeRemaining ? "#d97706" : "#137333",
-            borderRadius: "20px",
-            padding: { xs: "4px 8px", sm: "5px 10px" },
-            fontSize: { xs: 11, sm: 12 },
-            fontWeight: 600,
-          }}
-          label={timeRemaining || "Available"}
-          size="small"
-        />
-      </Box>
-    </Box>
-  </Card>
-);
-
-const CompletedExamCard = ({
-  exam,
-  onView,
-}: {
-  exam: CompletedExam;
-  onView?: () => void;
-}) => {
-  const getScoreColor = (score: number): string => {
-    if (score >= 90) return "#28a745";
-    if (score >= 70) return "#ffc107";
-    return "#dc3545";
-  };
-
-  const scoreColor = getScoreColor(exam.scorePercentage);
-  return (
-    <Card
-      sx={{
-        border: "1px solid #e0e0e0",
-        borderRadius: { xs: 1.5, sm: 2, md: 2.5 },
-        background: "#ffffff",
-        color: TEXT_PRIMARY,
-        boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
-        width: "100%",
-        overflow: "hidden",
-        transition: "all 0.3s ease",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
+        gap: { xs: 1, sm: 1.5, md: 2 },
+        p: { xs: 1.25, sm: 1.75, md: 2 },
+        borderRadius: 0.5,
+        border: `1px solid #eef0f2`,
+        background: "#fff",
+        flexDirection: { xs: "column", sm: "row" },
+        transition: "all 0.2s ease",
         "&:hover": {
-          transform: "translateY(-5px)",
-          boxShadow: "0 10px 20px rgba(0, 0, 0, 0.1)",
+          borderColor: "#dfe3e8",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
         },
       }}
     >
       <Box
         sx={{
-          p: { xs: 1.25, sm: 1.5, md: 1.875 },
-          background: "#f8f9fa",
-          borderBottom: "1px solid #e0e0e0",
-          borderTopLeftRadius: { xs: "6px", sm: "8px", md: "10px" },
-          borderTopRightRadius: { xs: "6px", sm: "8px", md: "10px" },
           display: "flex",
-          justifyContent: "space-between",
           alignItems: "center",
+          gap: { xs: 1.25, md: 1.5 },
+          minWidth: 0,
+          flex: 1,
+          width: "100%",
         }}
       >
-        <Box>
+        <Avatar
+          variant="rounded"
+          sx={{
+            width: { xs: 36, sm: 40, md: 42 },
+            height: { xs: 36, sm: 40, md: 42 },
+            bgcolor: `${typeColor}1a`,
+            color: typeColor,
+            borderRadius: 1.5,
+            flexShrink: 0,
+          }}
+        >
+          <AssignmentIcon fontSize="small" />
+        </Avatar>
+        <Box sx={{ minWidth: 0 }}>
           <Typography
             sx={{
-              fontSize: { xs: 16, sm: 17, md: 18 },
-              fontWeight: 600,
-              mb: { xs: 0.25, sm: 0.5, md: 0.625 },
-              color: "#2c3e50",
-              lineHeight: 1.2,
+              fontWeight: 700,
+              fontSize: { xs: 14, sm: 15 },
+              color: TEXT_PRIMARY,
             }}
+            noWrap
           >
-            {exam.title}
+            {title}
           </Typography>
           <Typography
-            sx={{
-              color: "#7f8c8d",
-              fontSize: { xs: 13, sm: 14 },
-            }}
+            sx={{ fontSize: { xs: 12, sm: 13 }, color: TEXT_SECONDARY }}
           >
-            {exam.subject}
+            {questions} Questions • {duration} min
           </Typography>
         </Box>
-        <Typography
-          sx={{
-            backgroundColor:
-              exam.examType === "practice"
-                ? "#3b82f6"
-                : exam.examType === "mock"
-                  ? "#f59e0b"
-                  : "#ef4444",
-            color: "#fff",
-            borderRadius: "12px",
-            padding: "4px 10px",
-            fontSize: 12,
-            fontWeight: 700,
-            textTransform: "uppercase",
-          }}
-        >
-          {exam.examType}
-        </Typography>
       </Box>
-      <Box sx={{ p: { xs: 1, sm: 1.25, md: 1.5 } }}>
-        <Typography
-          sx={{
-            fontSize: { xs: 16, sm: 17, md: 18 },
-            fontWeight: 600,
-            textAlign: "center",
-            mb: { xs: 0.75, sm: 1 },
-            color: scoreColor,
-          }}
-        >
-          {parseInt(exam.scoreFraction.split("/")[0])}
-        </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            mb: { xs: 0.75, sm: 1 },
-            gap: { xs: 0.25, sm: 0.5 },
-          }}
-        >
-          <Box
-            sx={{
-              flex: { xs: "1 0 100%", sm: "1 0 50%" },
-              mb: { xs: 0.5, sm: 0.75 },
-              display: "flex",
-              alignItems: "center",
-              gap: 0.25,
-            }}
-          >
-            <CalendarTodayIcon fontSize="small" sx={{ color: "#6a11cb" }} />
-            <Typography
-              variant="body2"
-              sx={{
-                color: TEXT_PRIMARY,
-                fontSize: { xs: 13, sm: 14 },
-              }}
-            >
-              Completed: {exam.completionDate}
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              flex: { xs: "1 0 100%", sm: "1 0 50%" },
-              mb: { xs: 0.5, sm: 0.6 },
-              display: "flex",
-              alignItems: "center",
-              gap: 0.25,
-            }}
-          >
-            <AccessTimeIcon fontSize="small" sx={{ color: "#6a11cb" }} />
-            Duration: {exam.duration} min
-          </Box>
-          <Box
-            sx={{
-              flex: { xs: "1 0 100%", sm: "1 0 50%" },
-              mb: { xs: 0.5, sm: 0.6 },
-              display: "flex",
-              alignItems: "center",
-              gap: 0.25,
-            }}
-          >
-            <HelpOutlineIcon fontSize="small" sx={{ color: "#6a11cb" }} />
-            <Typography
-              variant="body2"
-              sx={{
-                color: TEXT_PRIMARY,
-                fontSize: { xs: 13, sm: 14 },
-              }}
-            >
-              Questions: {exam.questions}
-            </Typography>
-          </Box>
-        </Box>
-      </Box>
-      <Box sx={{ p: { xs: 1, sm: 1.25, md: 1.5 }, mt: "auto" }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: { xs: 1, sm: 2 },
-            flexDirection: { xs: "column", sm: "row" },
-          }}
-        >
-          <Chip
-            label="Completed"
-            sx={{
-              background: "#e8f0ff",
-              color: "#2b6cb0",
-              borderRadius: "16px",
-              padding: { xs: "3px 6px", sm: "4px 8px" },
-              fontSize: { xs: 11, sm: 12 },
-              alignSelf: { xs: "stretch", sm: "auto" },
-              textAlign: "center",
-            }}
-            size="small"
-          />
 
-          <Box
-            sx={{
-              width: { xs: "100%", sm: ACTION_BUTTON_MD_WIDTH },
-              display: "flex",
-            }}
-          >
-            <Button
-              variant="contained"
-              fullWidth
-              sx={{
-                padding: { xs: "6px 12px", sm: "8px 15px" },
-                height: { xs: "36px", sm: "40px" },
-                lineHeight: { xs: "36px", sm: "40px" },
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                textTransform: "none",
-                background: "#28a745",
-                color: "#fff",
-                borderRadius: 2,
-                fontSize: { xs: "13px", sm: "14px" },
-                fontWeight: 600,
-                boxShadow: "none",
-                "&:hover": { transform: "translateY(-2px)" },
-              }}
-              onClick={onView}
-            >
-              View Results
-            </Button>
-          </Box>
-        </Box>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: { xs: 1, sm: 1.25 },
+          flexShrink: 0,
+          width: { xs: "100%", sm: "auto" },
+          justifyContent: { xs: "space-between", sm: "flex-end" },
+        }}
+      >
+        <Chip
+          label={isPremium ? "PREMIUM" : examType.toUpperCase()}
+          size="small"
+          sx={{
+            backgroundColor: isPremium ? "#fef3c7" : `${typeColor}1a`,
+            color: isPremium ? "#d97706" : typeColor,
+            fontWeight: 700,
+            fontSize: { xs: 10, sm: 11 },
+          }}
+        />
+        <Button
+          variant="contained"
+          onClick={onStart}
+          sx={{
+            textTransform: "none",
+            background: isPremium ? PRIMARY_PURPLE : SUCCESS_GREEN,
+            color: "#fff",
+            borderRadius: 2,
+            fontWeight: 700,
+            fontSize: { xs: 12, sm: 13 },
+            px: { xs: 1.5, sm: 2 },
+            py: { xs: 0.6, sm: 0.75 },
+            boxShadow: "none",
+            whiteSpace: "nowrap",
+            "&:hover": {
+              background: isPremium ? PRIMARY_PURPLE : SUCCESS_GREEN,
+              opacity: 0.9,
+            },
+          }}
+        >
+          {isPremium ? "Enroll Now" : "Start Now"}
+        </Button>
       </Box>
-    </Card>
+    </Box>
   );
 };
 
-const ActionCard = ({ button }: { button: ReactNode }) => (
-  <Card
+interface ActivityListRowProps {
+  title: string;
+  questions: string | number;
+  startDate?: string;
+  timeRemaining?: string;
+}
+
+const ActivityListRow = ({
+  title,
+  questions,
+  startDate,
+  timeRemaining,
+}: ActivityListRowProps) => (
+  <Box
     sx={{
-      border: `1px solid ${CARD_BORDER}`,
-      borderRadius: 2,
-      background: CARD_BG,
-      color: TEXT_PRIMARY,
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-      width: "100%",
-      overflow: "hidden",
-      transition: "transform 0.3s, box-shadow 0.3s",
-      "&:hover": {
-        transform: "translateY(-3px)",
-        boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
-      },
       display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      p: 2,
+      alignItems: { xs: "flex-start", sm: "center" },
+      justifyContent: "space-between",
+      gap: { xs: 1, sm: 1.5, md: 2 },
+      p: { xs: 1.25, sm: 1.75, md: 2 },
+      borderRadius: 0.5,
+      border: `1px solid #eef0f2`,
+      background: "#fff",
+      flexDirection: { xs: "column", sm: "row" },
+      transition: "all 0.2s ease",
+      "&:hover": {
+        borderColor: "#dfe3e8",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+      },
     }}
   >
-    {button}
-  </Card>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: { xs: 1.25, md: 1.5 },
+        minWidth: 0,
+        flex: 1,
+        width: "100%",
+      }}
+    >
+      <Avatar
+        variant="rounded"
+        sx={{
+          width: { xs: 36, sm: 40, md: 42 },
+          height: { xs: 36, sm: 40, md: 42 },
+          bgcolor: "#fef3c7",
+          color: "#d97706",
+          borderRadius: 1.5,
+          flexShrink: 0,
+        }}
+      >
+        <ScheduleIcon fontSize="small" />
+      </Avatar>
+      <Box sx={{ minWidth: 0 }}>
+        <Typography
+          sx={{
+            fontWeight: 700,
+            fontSize: { xs: 14, sm: 15 },
+            color: TEXT_PRIMARY,
+          }}
+          noWrap
+        >
+          {title}
+        </Typography>
+        <Typography
+          sx={{ fontSize: { xs: 12, sm: 13 }, color: TEXT_SECONDARY }}
+          noWrap
+        >
+          {questions} Questions
+          {startDate ? ` • Starts ${formatDateTime(startDate)}` : ""}
+        </Typography>
+      </Box>
+    </Box>
+
+    <Chip
+      label={timeRemaining || "Available soon"}
+      size="small"
+      sx={{
+        backgroundColor: "#fef3c7",
+        color: "#d97706",
+        fontWeight: 600,
+        fontSize: { xs: 11, sm: 12 },
+        flexShrink: 0,
+        alignSelf: { xs: "flex-start", sm: "center" },
+      }}
+    />
+  </Box>
+);
+
+const ViewAllLink = ({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick?: () => void;
+}) => (
+  <Box sx={{ display: "flex", justifyContent: "center", pt: 0.5 }}>
+    <Button
+      onClick={onClick}
+      endIcon={<ArrowForwardIcon sx={{ fontSize: 16 }} />}
+      sx={{
+        textTransform: "none",
+        color: "#16a34a",
+        fontWeight: 600,
+        fontSize: { xs: 13, sm: 14 },
+      }}
+    >
+      {label}
+    </Button>
+  </Box>
 );
 
 export default function StudentDashboard() {
@@ -607,7 +419,6 @@ export default function StudentDashboard() {
   const [completedExams, setCompletedExams] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Helper to format date
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -618,33 +429,25 @@ export default function StudentDashboard() {
     });
   };
 
-  // Helper to calculate time remaining
   const getTimeRemaining = (startDateString: string) => {
     if (!startDateString) return "Available soon";
-    
     const now = new Date();
     const startDate = new Date(startDateString);
     const timeRemaining = startDate.getTime() - now.getTime();
-
-    if (timeRemaining <= 0) {
-      return "Exam starting now";
-    }
-
+    if (timeRemaining <= 0) return "Exam starting now";
     const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-
-    if (days > 0) {
-      return `${days}d ${hours}h remaining`;
-    } else if (hours > 0) {
-      return `${hours}h ${minutes}m remaining`;
-    } else {
-      return `${minutes}m remaining`;
-    }
+    const hours = Math.floor(
+      (timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+    );
+    const minutes = Math.floor(
+      (timeRemaining % (1000 * 60 * 60)) / (1000 * 60),
+    );
+    if (days > 0) return `${days}d ${hours}h remaining`;
+    if (hours > 0) return `${hours}h ${minutes}m remaining`;
+    return `${minutes}m remaining`;
   };
 
   useEffect(() => {
-    // Check if user is logged in and is student
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
     const role = localStorage.getItem("role") || sessionStorage.getItem("role");
@@ -656,38 +459,33 @@ export default function StudentDashboard() {
 
     const fetchExams = async () => {
       try {
-        // Fetch available exams
         const availableResponse = await fetch("/api/students/exams", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         const availableData = await availableResponse.json();
-         if (availableData.success) {
-          // Filter to show practice, mock, and currently live exams (available now)
+        if (availableData.success) {
           const practiceMockLiveExams = availableData.data.filter(
-            (exam: any) => 
-              exam.examType === "practice" || 
-              exam.examType === "mock" || 
+            (exam: any) =>
+              exam.examType === "practice" ||
+              exam.examType === "mock" ||
               (exam.examType === "live" && exam.state === "available"),
           );
           setAvailableExams(practiceMockLiveExams);
 
-          // Filter to show only upcoming live exams
           const upcomingLive = availableData.data.filter(
-            (exam: any) => exam.examType === "live" && exam.state === "upcoming",
+            (exam: any) =>
+              exam.examType === "live" && exam.state === "upcoming",
           );
           setUpcomingLiveExams(upcomingLive);
         }
 
-        // Fetch completed exams
-        const completedResponse = await fetch("/api/students/attempts?latest=true", {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const completedResponse = await fetch(
+          "/api/students/attempts?latest=true",
+          {
+            headers: { Authorization: `Bearer ${token}` },
           },
-        });
+        );
         const completedData = await completedResponse.json();
-        console.log(completedData,"completedData");
         if (completedData.success) {
           setCompletedExams(completedData.data);
         }
@@ -702,58 +500,79 @@ export default function StudentDashboard() {
 
     const mediaQuery = globalThis.matchMedia(theme.breakpoints.down("md"));
     setIsMobile(mediaQuery.matches);
-
     const handleChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     mediaQuery.addEventListener("change", handleChange);
-
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, [theme.breakpoints, router]);
 
-  // Calculate overall accuracy
   const calculateOverallAccuracy = () => {
     let totalCorrect = 0;
     let totalQuestions = 0;
-
-    completedExams.forEach(exam => {
+    completedExams.forEach((exam) => {
       const correct = Number(exam.correctAnswers || 0);
       const wrong = Number(exam.wrongAnswers || 0);
       const unanswered = Number(exam.unanswered || 0);
-      
       totalCorrect += correct;
       totalQuestions += correct + wrong + unanswered;
     });
-
     if (totalQuestions === 0) return "0%";
-    
-    const accuracy = Math.round((totalCorrect / totalQuestions) * 100);
-    return `${accuracy}%`;
+    return `${Math.round((totalCorrect / totalQuestions) * 100)}%`;
   };
 
-  return (
+  const [username, setUsername] = useState<string>("Student");
 
-    
+  useEffect(() => {
+    const storedUsername =
+      localStorage.getItem("username") || sessionStorage.getItem("username");
+    if (storedUsername) setUsername(storedUsername);
+  }, []);
+
+  return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
         gap: { xs: 1.5, sm: 2, md: 2.5 },
         color: TEXT_PRIMARY,
-        background: MAIN_BG,
         minHeight: "100vh",
-        p: { xs: 1.5, sm: 2.5, md: 3.75 },
+        p: { xs: 1, sm: 1.25, md: 1.5 },
       }}
     >
+      {/* Welcome Header */}
+      <Box sx={{ mb: { xs: 0.5, sm: 1 } }}>
+        <Typography
+          sx={{
+            fontWeight: 800,
+            fontSize: { xs: 20, sm: 24, md: 28 },
+            color: "#1e293b",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          Welcome back, {username}!
+          <span style={{ display: "inline-block" }}>👋</span>
+        </Typography>
+        <Typography
+          sx={{
+            color: TEXT_SECONDARY,
+            fontSize: { xs: 13, sm: 14, md: 15 },
+            mt: 0.5,
+          }}
+        >
+          Keep learning, keep growing. Your UPSC success journey continues.
+        </Typography>
+      </Box>
+
       {/* Top Stats */}
-      <Box sx={{ mb: { xs: 2, sm: 3, md: 3.75 } }}>
+      <Box sx={{ mb: { xs: 1, sm: 1.5, md: 2 } }}>
         <Box
           sx={{
             display: "flex",
             flexWrap: "wrap",
-            gap: { xs: 1.5, sm: 2, md: 2.5 },
+            gap: { xs: 1.25, sm: 1.75, md: 2.5 },
           }}
         >
-
-          
           <StatCard
             icon={<AssignmentIcon />}
             label="Available Exams"
@@ -784,338 +603,376 @@ export default function StudentDashboard() {
           />
         </Box>
       </Box>
-      
-      <Card
-  sx={{
-    borderRadius: 4,
-    overflow: "hidden",
-    position: "relative",
-    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    color: "#fff",
-    p: 3,
-    minHeight: 220,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
-  }}
->
-  <Box>
-    <Avatar
-      sx={{
-        bgcolor: "rgba(255,255,255,0.2)",
-        width: 56,
-        height: 56,
-        mb: 2,
-      }}
-    >
-      <FaHistory size={26} />
-    </Avatar>
 
-    <Typography
-      variant="h5"
-      sx={{
-        fontWeight: 700,
-        mb: 1,
-      }}
-    >
-      Previous Year Questions
-    </Typography>
-
-    <Typography
-      sx={{
-        opacity: 0.9,
-        lineHeight: 1.7,
-        fontSize: "0.95rem",
-      }}
-    >
-      Access subject-wise previous year question papers and sharpen your
-      preparation with real exam practice.
-    </Typography>
-  </Box>
-
-  <Button
-    variant="contained"
-    onClick={() => router.push("/student-pages/previous_year_questions")}
-    sx={{
-      mt: 3,
-      alignSelf: "flex-start",
-      bgcolor: "#fff",
-      color: "#5b21b6",
-      fontWeight: 700,
-      textTransform: "none",
-      px: 3,
-      borderRadius: 2,
-      "&:hover": {
-        bgcolor: "#f3f4f6",
-      },
-    }}
-  >
-    Start Practice
-  </Button>
-</Card>
-
-      {/* Available Exams */}
-      <Box sx={{ mb: { xs: 2, sm: 3, md: 3.75 } }}>
-        <Card
+      {/* Quick Access */}
+      <Box sx={{ mb: { xs: 0.5, sm: 1 } }}>
+        <Box
           sx={{
-            background: CARD_BG,
-            borderRadius: { xs: 1.5, sm: 2, md: 2.5 },
-            boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
-            p: { xs: 2, sm: 2.5, md: 3.125 },
-            transition: "all 0.3s ease",
+            display: "flex",
+            alignItems: "center",
+            gap: 1.2,
+            mb: { xs: 1.25, sm: 1.5 },
           }}
         >
           <Box
             sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: { xs: 1.5, sm: 2, md: 2.5 },
-              pb: { xs: 1, sm: 1.5, md: 1.875 },
-              borderBottom: `2px solid #f0f0f0`,
-              flexDirection: { xs: "column", sm: "row" },
-              gap: { xs: 1, sm: 0 },
+              width: "4px",
+              height: "20px",
+              borderRadius: "4px",
+              backgroundColor: "var(--primary)",
+            }}
+          />
+          <Typography
+            sx={{
+              fontWeight: 700,
+              color: "#2c3e50",
+              fontSize: { xs: 16, sm: 17, md: 18 },
             }}
           >
+            Quick Access
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: { xs: 1.25, sm: 1.75, md: 2.5 },
+          }}
+        >
+          <QuickAccessCard
+            icon={<MenuBookIcon />}
+            label="Practice by Subject"
+            description="All Subjects Covered for Comprehensive Preparation"
+            color="#e8f0fe"
+            iconColor="#1a73e8"
+          />
+          <QuickAccessCard
+            icon={<FeedOutlinedIcon />}
+            label="Practice by Topic"
+            description="Topic-wise Questions for focused learning"
+            color="#fef7e0"
+            iconColor="#e37400"
+          />
+          <QuickAccessCard
+            icon={<SignalCellularAltOutlinedIcon />}
+            label="Practice by Difficulty"
+            description="Easy, Medium, and Hard questions for all levels"
+            color="#e6f4ea"
+            iconColor="#137333"
+          />
+          <QuickAccessCard
+            icon={<FormatListBulletedOutlinedIcon />}
+            label="Practice by Answer Type"
+            description="MCQs, Statement, Match & more"
+            color="#fde8e8"
+            iconColor="#dc2626"
+          />
+        </Box>
+      </Box>
+
+      {/* PYQ Banner */}
+      <Card
+        sx={{
+          borderRadius: 0.5,
+          overflow: "hidden",
+          position: "relative",
+          background: "linear-gradient(135deg, #1a6b3c 0%, #16a34a 100%)",
+          color: "#fff",
+          p: { xs: 2, sm: 2.5, md: 3 },
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: { xs: 1.5, sm: 2, md: 3 },
+          boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            flex: 1,
+            minWidth: 0,
+            order: { xs: 2, sm: 1 },
+            textAlign: { xs: "center", sm: "left" },
+            width: "100%",
+          }}
+        >
+          <Box>
             <Typography
+              variant="h5"
               sx={{
                 fontWeight: 700,
-                color: "#2c3e50",
-                fontSize: { xs: 18, sm: 19, md: 20 },
-                textAlign: { xs: "center", sm: "left" },
+                mb: 1,
+                fontSize: { xs: 18, sm: 20, md: 24 },
               }}
             >
-              Available Exams
+              Previous Year Questions
             </Typography>
-            <Button
-              variant="outlined"
-              color="secondary"
+            <Typography
               sx={{
-                padding: { xs: "8px 16px", sm: "10px 20px" },
-                fontSize: { xs: "14px", sm: "16px" },
-                fontWeight: 600,
-                borderRadius: 2,
-                mt: { xs: 0, sm: 0 },
-                background: "transparent",
-                alignSelf: { xs: "stretch", sm: "auto" },
+                opacity: 0.9,
+                lineHeight: 1.6,
+                fontSize: { xs: "0.85rem", sm: "0.9rem", md: "0.95rem" },
               }}
-              onClick={() => router.push("/student-pages/my_exams")}
             >
-              View All
-            </Button>
+              Access subject-wise previous year question papers and sharpen your
+              preparation with real exam practice.
+            </Typography>
           </Box>
 
-          <Box
+          <Button
+            variant="contained"
+            onClick={() =>
+              router.push("/student-pages/previous_year_questions")
+            }
             sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: { xs: 1.5, sm: 2, md: 2.5 },
-              alignItems: "start",
+              mt: { xs: 2, sm: 3 },
+              alignSelf: { xs: "center", sm: "flex-start" },
+              bgcolor: "var(--white)",
+              color: "var(--primary)",
+              fontWeight: 700,
+              textTransform: "none",
+              px: 3,
+              py: { xs: 0.75, sm: 1 },
+              fontSize: { xs: 13, sm: 14 },
+              borderRadius: 0.5,
+              transition: "all 0.3s ease",
+              "&:hover": { bgcolor: "#f3f4f6", transform: "translateY(-2px)" },
             }}
           >
-            {loading ? (
-              <Typography>Loading exams...</Typography>
-            ) : availableExams.length > 0 ? (
-              availableExams.slice(0, 6).map((exam) => (
-                <Box
-                  key={exam.id}
+            Start Practice
+          </Button>
+        </Box>
+
+        <Box
+          sx={{
+            order: { xs: 1, sm: 2 },
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: { xs: "120px", sm: "150px", md: "220px" },
+          }}
+        >
+          <Box
+            component="img"
+            src="/Images/pyqs.webp"
+            alt="Previous Year Questions"
+            sx={{
+              width: "100%",
+              height: "auto",
+              maxHeight: { xs: "110px", sm: "140px", md: "200px" },
+              objectFit: "contain",
+            }}
+          />
+        </Box>
+      </Card>
+
+      {/* Available Exams + Upcoming Live Exams */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          alignItems: "stretch",
+          gap: { xs: 1.5, sm: 2, md: 2.5 },
+          mb: { xs: 2, sm: 3, md: 3.75 },
+        }}
+      >
+        {/* Available Exams */}
+        <Box
+          sx={{
+            flex: { xs: "1 1 100%", md: "1 1 50%" },
+            minWidth: 0,
+            display: "flex",
+          }}
+        >
+          <Card
+            sx={{
+              background: CARD_BG,
+              borderRadius: 0.5,
+              boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
+              p: { xs: 1.75, sm: 2.25, md: 3.125 },
+              transition: "all 0.3s ease",
+              display: "flex",
+              flexDirection: "column",
+              width: "100%",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: { xs: 1.25, sm: 1.75, md: 2.5 },
+                pb: { xs: 1, sm: 1.5, md: 1.875 },
+                borderBottom: `2px solid #f0f0f0`,
+                flexDirection: { xs: "column", sm: "row" },
+                gap: { xs: 1, sm: 0 },
+              }}
+            >
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  color: "#2c3e50",
+                  fontSize: { xs: 16, sm: 18, md: 20 },
+                  textAlign: { xs: "center", sm: "left" },
+                }}
+              >
+                Available Exams
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: { xs: 1, sm: 1.25 },
+                flex: 1,
+                justifyContent:
+                  loading || availableExams.length > 0
+                    ? "flex-start"
+                    : "center",
+                alignItems:
+                  loading || availableExams.length > 0 ? "stretch" : "center",
+                minHeight: { xs: 120, sm: 160 },
+              }}
+            >
+              {loading ? (
+                <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>
+                  Loading exams...
+                </Typography>
+              ) : availableExams.length > 0 ? (
+                <>
+                  {availableExams.slice(0, 3).map((exam) => (
+                    <ExamListRow
+                      key={exam.id}
+                      title={exam.title}
+                      questions={exam.questions ?? 0}
+                      duration={exam.duration ?? 0}
+                      examType={exam.examType}
+                      isPremium={exam.isPremium}
+                      onStart={() =>
+                        router.push(`/student-pages/exams/${exam.id}`)
+                      }
+                    />
+                  ))}
+                  <ViewAllLink
+                    label="View All Exams"
+                    onClick={() => router.push("/student-pages/my_exams")}
+                  />
+                </>
+              ) : (
+                <Typography
                   sx={{
-                    flex: { xs: "1 1 100%", sm: "1 1 280px", md: "1 1 300px" },
+                    color: TEXT_SECONDARY,
+                    textAlign: "center",
+                    fontSize: { xs: 13, sm: 14 },
                   }}
                 >
-                  <ExamCard
-                    title={exam.title}
-                    subject={exam.subject}
-                    meta={{
-                      duration: exam.duration ?? 0,
-                      questions: exam.questions ?? 0,
-                      due: exam.endDate ? formatDate(exam.endDate) : "",
-                      points: exam.points ?? 0,
-                      examType: exam.examType,
-                    }}
-                    startDate={exam.startDate}
-                    endDate={exam.endDate}
-                  />
-                </Box>
-              ))
-            ) : (
-              <Typography>No available exams at the moment.</Typography>
-            )}
-          </Box>
-        </Card>
-      </Box>
+                  No available exams at the moment.
+                </Typography>
+              )}
+            </Box>
+          </Card>
+        </Box>
 
-      {/* Upcoming Live Exams */}
-      <Box sx={{ mb: 3.75 }}>
-        <Card
+        {/* Upcoming Live Exams */}
+        <Box
           sx={{
-            background: CARD_BG,
-            borderRadius: 2.5,
-            boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
-            p: 3.125,
-            transition: "all 0.3s ease",
+            flex: { xs: "1 1 100%", md: "1 1 50%" },
+            minWidth: 0,
+            display: "flex",
           }}
         >
-          <Box
+          <Card
             sx={{
+              background: CARD_BG,
+              borderRadius: 0.5,
+              boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
+              p: { xs: 1.75, sm: 2.25, md: 3.125 },
+              transition: "all 0.3s ease",
               display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 2.5,
-              pb: 1.875,
-              borderBottom: `2px solid #f0f0f0`,
-              flexDirection: isMobile ? "column" : "row",
+              flexDirection: "column",
+              width: "100%",
             }}
           >
-            <Typography
-              sx={{ fontWeight: 700, color: "#2c3e50", fontSize: 20 }}
-            >
-              Upcoming Live Exams
-            </Typography>
-            <Button
-              variant="outlined"
-              color="secondary"
+            <Box
               sx={{
-                padding: "10px 20px",
-                fontSize: "16px",
-                fontWeight: 600,
-                borderRadius: 2,
-                mt: isMobile ? 1 : 0,
-                background: "transparent",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: { xs: 1.25, sm: 1.75, md: 2.5 },
+                pb: { xs: 1, sm: 1.5, md: 1.875 },
+                borderBottom: `2px solid #f0f0f0`,
+                flexDirection: { xs: "column", sm: "row" },
+                gap: { xs: 1, sm: 0 },
               }}
-              onClick={() => router.push("/student-pages/my_exams")}
             >
-              View All
-            </Button>
-          </Box>
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  color: "#2c3e50",
+                  fontSize: { xs: 16, sm: 18, md: 20 },
+                  textAlign: { xs: "center", sm: "left" },
+                }}
+              >
+                Upcoming Live Exams
+              </Typography>
+            </Box>
 
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 2.5,
-              alignItems: "stretch",
-            }}
-          >
-            {loading ? (
-              <Typography>Loading upcoming exams...</Typography>
-            ) : upcomingLiveExams.length > 0 ? (
-              upcomingLiveExams.slice(0, 6).map((exam: any) => (
-                <Box
-                  key={exam.id}
-                  sx={{ flex: { xs: "1 1 100%", sm: "1 1 300px" } }}
-                >
-                  <ExamCard
-                    title={exam.title}
-                    subject={exam.subject}
-                    meta={{
-                      duration: exam.duration ?? 0,
-                      questions: exam.questions ?? 0,
-                      due: exam.startDate ? formatDate(exam.startDate) : "",
-                      points: exam.points ?? 0,
-                      examType: exam.examType,
-                    }}
-                    timeRemaining={getTimeRemaining(exam.startDate)}
-                    startDate={exam.startDate}
-                    endDate={exam.endDate}
-                  />
-                </Box>
-              ))
-            ) : (
-              <Typography>No upcoming live exams at the moment.</Typography>
-            )}
-          </Box>
-        </Card>
-      </Box>
-
-      {/* Completed Exams */}
-      <Box sx={{ mb: 3.75 }}>
-        <Card
-          sx={{
-            background: CARD_BG,
-            borderRadius: 2.5,
-            boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
-            p: 3.125,
-            transition: "all 0.3s ease",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 2.5,
-              pb: 1.875,
-              borderBottom: `2px solid #f0f0f0`,
-              flexDirection: isMobile ? "column" : "row",
-            }}
-          >
-            <Typography
-              sx={{ fontWeight: 700, color: "#2c3e50", fontSize: 20 }}
-            >
-              Completed Exams
-            </Typography>
-            <Button
-              variant="outlined"
-              color="secondary"
+            <Box
               sx={{
-                padding: "10px 20px",
-                fontSize: "16px",
-                fontWeight: 600,
-                borderRadius: 2,
-                mt: isMobile ? 1 : 0,
-                background: "transparent",
+                display: "flex",
+                flexDirection: "column",
+                gap: { xs: 1, sm: 1.25 },
+                flex: 1,
+                justifyContent:
+                  loading || upcomingLiveExams.length > 0
+                    ? "flex-start"
+                    : "center",
+                alignItems:
+                  loading || upcomingLiveExams.length > 0
+                    ? "stretch"
+                    : "center",
+                minHeight: { xs: 120, sm: 160 },
               }}
-              onClick={() => router.push("/student-pages/exam_history")}
             >
-              View All
-            </Button>
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 2.5,
-              alignItems: "stretch",
-            }}
-          >
-            {loading ? (
-              <Typography>Loading completed exams...</Typography>
-            ) : completedExams.length > 0 ? (
-              completedExams.slice(0, 6).map((exam: any) => (
-                <Box
-                  key={exam.attemptId}
-                  sx={{ flex: { xs: "1 1 100%", sm: "1 1 300px" } }}
-                >
-                  <CompletedExamCard
-                    exam={{
-                      title: exam.title,
-                      subject: exam.subject,
-                      scorePercentage: Math.round(
-                        (parseInt(exam.score) / parseInt(exam.points)) * 100,
-                      ),
-                      completionDate: exam.completedAt,
-                      duration: exam.duration ?? 0,
-
-                      questions: exam.questions.toString(),
-                      scoreFraction: `${parseInt(exam.score)}/${parseInt(exam.points)}`,
-                      examType: exam.examType,
-                    }}
-                    onView={() =>
-                      router.push(
-                        `/student-pages/exam_res_rev?attemptId=${exam.attemptId}`,
-                      )
-                    }
+              {loading ? (
+                <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>
+                  Loading upcoming exams...
+                </Typography>
+              ) : upcomingLiveExams.length > 0 ? (
+                <>
+                  {upcomingLiveExams.slice(0, 3).map((exam: any) => (
+                    <ActivityListRow
+                      key={exam.id}
+                      title={exam.title}
+                      questions={exam.questions ?? 0}
+                      startDate={exam.startDate}
+                      timeRemaining={getTimeRemaining(exam.startDate)}
+                    />
+                  ))}
+                  <ViewAllLink
+                    label="View All Activity"
+                    onClick={() => router.push("/student-pages/my_exams")}
                   />
-                </Box>
-              ))
-            ) : (
-              <Typography>No completed exams yet.</Typography>
-            )}
-          </Box>
-        </Card>
+                </>
+              ) : (
+                <Typography
+                  sx={{
+                    color: TEXT_SECONDARY,
+                    textAlign: "center",
+                    fontSize: { xs: 13, sm: 14 },
+                  }}
+                >
+                  No upcoming live exams at the moment.
+                </Typography>
+              )}
+            </Box>
+          </Card>
+        </Box>
       </Box>
     </Box>
   );
