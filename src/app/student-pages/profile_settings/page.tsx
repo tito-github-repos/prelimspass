@@ -10,9 +10,13 @@ import {
   Select,
   MenuItem,
   FormControl,
+  FormHelperText,
   InputLabel,
   Card,
   CardContent,
+  Avatar,
+  Stack,
+  Divider,
   useTheme,
   CircularProgress,
   InputAdornment,
@@ -20,6 +24,65 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import * as yup from "yup";
 import { Snackbar, Alert } from "@mui/material";
+
+/* ---- Shared design tokens (matched to Exam History / Progress pages) ---- */
+const TEXT_SECONDARY = "#64748b";
+const TEXT_PRIMARY = "#1e293b";
+
+// Themes every TextField / Select focus & hover state to the brand color
+// instead of MUI's default blue.
+const FIELD_SX = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: 0.5,
+    "&:hover .MuiOutlinedInput-notchedOutline": {
+      borderColor: "var(--primary-light)",
+    },
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "var(--primary)",
+      borderWidth: "1px",
+    },
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "var(--primary)",
+  },
+};
+
+// Hover/selected styling for dropdown menus (e.g. Gender) — same pattern as
+// the Subject filter dropdown on the Exam History page. This targets the
+// menu's Paper (rendered in a portal), so it must be passed via
+// MenuProps.PaperProps.sx on the Select, not sx on the Select itself.
+const MENU_ITEM_SX = {
+  "& .MuiMenuItem-root:hover": {
+    backgroundColor: "var(--primary-light)",
+    color: "var(--primary)",
+  },
+  "& .MuiMenuItem-root.Mui-selected": {
+    backgroundColor: "var(--primary-light)",
+    color: "var(--primary)",
+  },
+  "& .MuiMenuItem-root.Mui-selected:hover": {
+    backgroundColor: "var(--primary-light)",
+    color: "var(--primary)",
+  },
+};
+
+const PRIMARY_BTN_SX = {
+  borderRadius: 0.25,
+  textTransform: "none" as const,
+  backgroundColor: "var(--primary)",
+  boxShadow: "none",
+  fontWeight: 600,
+  transition: "background-color 0.3s, color 0.3s",
+  "&:hover": {
+    backgroundColor: "var(--primary)",
+    opacity: 0.92,
+    boxShadow: "none",
+  },
+  "&.Mui-disabled": {
+    backgroundColor: "#e2e8f0",
+    color: "#94a3b8",
+  },
+};
 
 /* ---- Validation for Personal Information -- */
 const personalInformationSchema = yup.object({
@@ -95,7 +158,7 @@ interface TabPanelProps {
 
 const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => (
   <div role="tabpanel" hidden={value !== index}>
-    {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
   </div>
 );
 
@@ -141,7 +204,7 @@ const PersonalInformationTab = ({
 
   const handlePersonalInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoadingSubmit(true); // ✅ disable button
+    setLoadingSubmit(true); // disable button
     try {
       await personalInformationSchema.validate(personalInfo, {
         abortEarly: false,
@@ -185,7 +248,7 @@ const PersonalInformationTab = ({
         });
       }
     } finally {
-      setLoadingSubmit(false); // ✅ re-enable button
+      setLoadingSubmit(false); // re-enable button
     }
   };
 
@@ -193,6 +256,7 @@ const PersonalInformationTab = ({
     <>
       <Card
         sx={{
+          borderRadius: 0.5,
           boxShadow: "0 5px 15px rgba(0,0,0,0.05)",
           opacity: loading ? 0.5 : 1,
           pointerEvents: loading ? "none" : "auto",
@@ -208,30 +272,33 @@ const PersonalInformationTab = ({
               left: 0,
               width: "100%",
               height: "100%",
-              backgroundColor: "rgba(255,255,255,0.5)",
+              backgroundColor: "rgba(255,255,255,0.6)",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
               zIndex: 10,
-              borderRadius: 1,
+              borderRadius: 0.5,
             }}
           >
-            <CircularProgress />
+            <CircularProgress sx={{ color: "var(--primary)" }} />
           </Box>
         )}
         <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
           <Typography
-            variant="h5"
             sx={{
-              mb: 2,
-              pb: 1,
-              borderBottom: "2px solid #f0f0f0",
+              fontWeight: 700,
               color: "#2c3e50",
-              fontSize: { xs: "1.25rem", sm: "1.5rem" },
+              fontSize: { xs: 16, sm: 17, md: 19 },
+              mb: 0.25,
             }}
           >
             Personal Information
           </Typography>
+          <Typography variant="body2" sx={{ color: TEXT_SECONDARY, mb: 2.5 }}>
+            Your basic details, contact info, and demographic information.
+          </Typography>
+          <Divider sx={{ mb: 3 }} />
+
           <Box component="form" onSubmit={handlePersonalInfoSubmit}>
             <Box
               sx={{
@@ -254,6 +321,7 @@ const PersonalInformationTab = ({
                   size={isMobile ? "small" : "medium"}
                   error={!!errors.email}
                   helperText={errors.email}
+                  sx={FIELD_SX}
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
@@ -280,6 +348,7 @@ const PersonalInformationTab = ({
                       <InputAdornment position="start">+91</InputAdornment>
                     ),
                   }}
+                  sx={FIELD_SX}
                 />
               </Box>
             </Box>
@@ -303,6 +372,7 @@ const PersonalInformationTab = ({
                   size={isMobile ? "small" : "medium"}
                   error={!!errors.firstName}
                   helperText={errors.firstName}
+                  sx={FIELD_SX}
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
@@ -316,6 +386,7 @@ const PersonalInformationTab = ({
                   size={isMobile ? "small" : "medium"}
                   error={!!errors.lastName}
                   helperText={errors.lastName}
+                  sx={FIELD_SX}
                 />
               </Box>
             </Box>
@@ -325,7 +396,7 @@ const PersonalInformationTab = ({
                 display: "flex",
                 flexDirection: { xs: "column", sm: "row" },
                 gap: 2,
-                mb: 2,
+                mb: 3,
               }}
             >
               <Box sx={{ flex: 1 }}>
@@ -344,10 +415,16 @@ const PersonalInformationTab = ({
                     shrink: true,
                   }}
                   inputProps={{ max: "9999-12-31" }}
+                  sx={FIELD_SX}
                 />
               </Box>
-              <Box sx={{ flex: 1, mb: 2 }}>
-                <FormControl fullWidth size={isMobile ? "small" : "medium"}>
+              <Box sx={{ flex: 1 }}>
+                <FormControl
+                  fullWidth
+                  size={isMobile ? "small" : "medium"}
+                  error={!!errors.gender}
+                  sx={FIELD_SX}
+                >
                   <InputLabel>Gender</InputLabel>
                   <Select
                     label="Gender"
@@ -355,16 +432,14 @@ const PersonalInformationTab = ({
                     onChange={(e) =>
                       handlePersonalInfoChange("gender", e.target.value)
                     }
-                    error={!!errors.gender}
+                    MenuProps={{ PaperProps: { sx: MENU_ITEM_SX } }}
                   >
                     <MenuItem value="male">Male</MenuItem>
                     <MenuItem value="female">Female</MenuItem>
                     <MenuItem value="other">Other</MenuItem>
                   </Select>
                   {errors.gender && (
-                    <Typography variant="caption" color="error">
-                      {errors.gender}
-                    </Typography>
+                    <FormHelperText>{errors.gender}</FormHelperText>
                   )}
                 </FormControl>
               </Box>
@@ -374,8 +449,14 @@ const PersonalInformationTab = ({
               <Button
                 type="submit"
                 variant="contained"
+                disabled={loadingSubmit}
+                startIcon={
+                  loadingSubmit ? (
+                    <CircularProgress size={16} sx={{ color: "#94a3b8" }} />
+                  ) : undefined
+                }
                 sx={{
-                  bgcolor: "linear-gradient(to right, #6a11cb, #2575fc)",
+                  ...PRIMARY_BTN_SX,
                   fontSize: { xs: "0.875rem", sm: "1rem" },
                   px: { xs: 2, sm: 3 },
                 }}
@@ -455,7 +536,7 @@ const AccountSettingsTab = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoadingSubmit(true); // ✅ disable button
+    setLoadingSubmit(true); // disable button
 
     try {
       await accountSettingsSchema.validate(accountSettings, {
@@ -578,7 +659,7 @@ const AccountSettingsTab = ({
         });
       }
     } finally {
-      setLoadingSubmit(false); // ✅ re-enable button
+      setLoadingSubmit(false); // re-enable button
     }
   };
 
@@ -586,9 +667,11 @@ const AccountSettingsTab = ({
     <>
       <Card
         sx={{
+          borderRadius: 0.5,
           boxShadow: "0 5px 15px rgba(0,0,0,0.05)",
           opacity: loading ? 0.5 : 1,
           pointerEvents: loading ? "none" : "auto",
+          position: "relative",
           transition: "opacity 0.3s ease-in-out",
         }}
       >
@@ -600,30 +683,33 @@ const AccountSettingsTab = ({
               left: 0,
               width: "100%",
               height: "100%",
-              backgroundColor: "rgba(255,255,255,0.5)",
+              backgroundColor: "rgba(255,255,255,0.6)",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
               zIndex: 10,
-              borderRadius: 1,
+              borderRadius: 0.5,
             }}
           >
-            <CircularProgress />
+            <CircularProgress sx={{ color: "var(--primary)" }} />
           </Box>
         )}
         <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
           <Typography
-            variant="h5"
             sx={{
-              mb: 2,
-              pb: 1,
-              borderBottom: "2px solid #f0f0f0",
+              fontWeight: 700,
               color: "#2c3e50",
-              fontSize: { xs: "1.25rem", sm: "1.5rem" },
+              fontSize: { xs: 16, sm: 17, md: 19 },
+              mb: 0.25,
             }}
           >
             Account Settings
           </Typography>
+          <Typography variant="body2" sx={{ color: TEXT_SECONDARY, mb: 2.5 }}>
+            Update your username and manage your password.
+          </Typography>
+          <Divider sx={{ mb: 3 }} />
+
           <Box component="form" onSubmit={handleSubmit}>
             <TextField
               fullWidth
@@ -631,7 +717,7 @@ const AccountSettingsTab = ({
               value={accountSettings.username}
               onChange={handleChange("username")}
               disabled
-              sx={{ mb: 2 }}
+              sx={{ mb: 2, ...FIELD_SX }}
               size={isMobile ? "small" : "medium"}
               error={!!errors.username}
               helperText={
@@ -645,14 +731,18 @@ const AccountSettingsTab = ({
               type={showCurrent ? "text" : "password"}
               value={accountSettings.currentPassword}
               onChange={handleAccountChange("currentPassword")}
-              sx={{ mb: 2 }}
+              sx={{ mb: 2, ...FIELD_SX }}
               size={isMobile ? "small" : "medium"}
               error={!!errors.currentPassword}
               helperText={errors.currentPassword}
               slotProps={{
                 input: {
                   endAdornment: (
-                    <IconButton onClick={() => setShowCurrent(!showCurrent)}>
+                    <IconButton
+                      edge="end"
+                      size="small"
+                      onClick={() => setShowCurrent(!showCurrent)}
+                    >
                       {showCurrent ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   ),
@@ -665,7 +755,7 @@ const AccountSettingsTab = ({
               type={showNew ? "text" : "password"}
               value={accountSettings.newPassword}
               onChange={handleAccountChange("newPassword")}
-              sx={{ mb: 1 }}
+              sx={{ mb: 1, ...FIELD_SX }}
               size={isMobile ? "small" : "medium"}
               error={!!errors.newPassword}
               helperText={
@@ -675,7 +765,11 @@ const AccountSettingsTab = ({
               slotProps={{
                 input: {
                   endAdornment: (
-                    <IconButton onClick={() => setShowNew(!showNew)}>
+                    <IconButton
+                      edge="end"
+                      size="small"
+                      onClick={() => setShowNew(!showNew)}
+                    >
                       {showNew ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   ),
@@ -689,14 +783,18 @@ const AccountSettingsTab = ({
               type={showConfirm ? "text" : "password"}
               value={accountSettings.confirmPassword}
               onChange={handleAccountChange("confirmPassword")}
-              sx={{ mb: 3 }}
+              sx={{ mb: 3, ...FIELD_SX }}
               size={isMobile ? "small" : "medium"}
               error={!!errors.confirmPassword}
               helperText={errors.confirmPassword}
               slotProps={{
                 input: {
                   endAdornment: (
-                    <IconButton onClick={() => setShowConfirm(!showConfirm)}>
+                    <IconButton
+                      edge="end"
+                      size="small"
+                      onClick={() => setShowConfirm(!showConfirm)}
+                    >
                       {showConfirm ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   ),
@@ -707,8 +805,14 @@ const AccountSettingsTab = ({
               <Button
                 type="submit"
                 variant="contained"
+                disabled={loadingSubmit}
+                startIcon={
+                  loadingSubmit ? (
+                    <CircularProgress size={16} sx={{ color: "#94a3b8" }} />
+                  ) : undefined
+                }
                 sx={{
-                  bgcolor: "linear-gradient(to right, #6a11cb, #2575fc)",
+                  ...PRIMARY_BTN_SX,
                   fontSize: { xs: "0.875rem", sm: "1rem" },
                   px: { xs: 2, sm: 3 },
                 }}
@@ -841,11 +945,19 @@ const ProfilePage = () => {
     return null; // Prevent hydration mismatch by not rendering until mounted
   }
 
+  const fullName = [personalInfo.firstName, personalInfo.lastName]
+    .filter(Boolean)
+    .join(" ");
+  const initials =
+    `${personalInfo.firstName?.[0] || ""}${personalInfo.lastName?.[0] || ""}`.toUpperCase() ||
+    "?";
+
+  const TABS = ["Personal Information", "Account Settings"];
+
   return (
     <Box
       sx={{
         minHeight: "100vh",
-        backgroundColor: "#f5f7fa",
         p: {
           xs: "60px 8px 16px",
           sm: "70px 16px 24px",
@@ -854,31 +966,62 @@ const ProfilePage = () => {
         },
       }}
     >
-      {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+      <Box sx={{ maxWidth: 860, mx: "auto" }}>
+        {/* Page Header */}
+        <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+          <Typography
+            sx={{
+              fontWeight: 700,
+              fontSize: { xs: 22, sm: 26, md: 30 },
+              color: "#2c3e50",
+            }}
+          >
+            Profile Settings
+          </Typography>
+          <Typography
+            sx={{
+              color: TEXT_SECONDARY,
+              fontSize: { xs: 13, sm: 14 },
+              mt: 0.5,
+            }}
+          >
+            Manage your personal information and account security.
+          </Typography>
+        </Box>
+
+        {/* Tab Switcher */}
         <Box
           sx={{
-            display: "flex",
-            gap: 1,
-            flexWrap: "wrap",
-            justifyContent: { xs: "center", sm: "flex-start" },
+            display: "inline-flex",
+            gap: 0.5,
+            p: 0.5,
+            mb: 0.5,
+            bgcolor: "#eef1f5",
+            borderRadius: 999,
+            width: { xs: "100%", sm: "auto" },
           }}
         >
-          {["Personal Information", "Account Settings"].map((label, index) => (
+          {TABS.map((label, index) => (
             <Button
               key={label}
-              variant={activeTab === index ? "contained" : "text"}
               onClick={() => setActiveTab(index)}
+              disableRipple
               sx={{
-                bgcolor: activeTab === index ? "primary.main" : "transparent",
-                color: activeTab === index ? "white" : "text.primary",
-                borderRadius: "8px 8px 0 0",
-                px: { xs: 2, sm: 3 },
-                py: 1.5,
-                fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                flex: { xs: 1, sm: "unset" },
+                borderRadius: 999,
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: { xs: 12.5, sm: 13.5 },
+                px: { xs: 1.5, sm: 2.5 },
+                py: 0.9,
+                color: activeTab === index ? "#fff" : TEXT_SECONDARY,
+                backgroundColor:
+                  activeTab === index ? "var(--primary)" : "transparent",
+                boxShadow: "none",
                 "&:hover": {
-                  bgcolor:
-                    activeTab === index ? "primary.dark" : "action.hover",
+                  backgroundColor:
+                    activeTab === index ? "var(--primary)" : "#e2e8f0",
+                  opacity: activeTab === index ? 0.92 : 1,
                 },
               }}
             >
@@ -886,32 +1029,32 @@ const ProfilePage = () => {
             </Button>
           ))}
         </Box>
+
+        {/* Personal Information */}
+        <TabPanel value={activeTab} index={0}>
+          <PersonalInformationTab
+            personalInfo={personalInfo}
+            handlePersonalInfoChange={handlePersonalInfoChange}
+            isMobile={isMobile}
+            setPersonalInfo={setPersonalInfo}
+            fetchUserData={fetchUserData}
+            loading={loading}
+          />
+        </TabPanel>
+
+        {/* Account Settings */}
+        <TabPanel value={activeTab} index={1}>
+          <AccountSettingsTab
+            accountSettings={accountSettings}
+            setAccountSettings={setAccountSettings}
+            userData={userData}
+            fetchUserData={fetchUserData}
+            handleChange={handleChange}
+            isMobile={isMobile}
+            loading={loading}
+          />
+        </TabPanel>
       </Box>
-
-      {/* Personal Information */}
-      <TabPanel value={activeTab} index={0}>
-        <PersonalInformationTab
-          personalInfo={personalInfo}
-          handlePersonalInfoChange={handlePersonalInfoChange}
-          isMobile={isMobile}
-          setPersonalInfo={setPersonalInfo}
-          fetchUserData={fetchUserData}
-          loading={loading}
-        />
-      </TabPanel>
-
-      {/* Account Settings */}
-      <TabPanel value={activeTab} index={1}>
-        <AccountSettingsTab
-          accountSettings={accountSettings}
-          setAccountSettings={setAccountSettings}
-          userData={userData}
-          fetchUserData={fetchUserData}
-          handleChange={handleChange}
-          isMobile={isMobile}
-          loading={loading}
-        />
-      </TabPanel>
     </Box>
   );
 };
