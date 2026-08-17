@@ -9,10 +9,12 @@ import {
   Card,
   CardContent,
   Button,
-  ButtonGroup,
+  ToggleButtonGroup,
+  ToggleButton,
   List,
   ListItem,
   ListItemText,
+  Avatar,
   Chip,
   CircularProgress,
   Divider,
@@ -24,11 +26,142 @@ import {
 } from "@mui/material";
 import {
   Print as PrintIcon,
-  Download as DownloadIcon,
   CheckCircle as CheckCircleIcon,
   Cancel as CancelIcon,
   AccessTime as AccessTimeIcon,
+  EmojiEvents as EmojiEventsIcon,
+  HelpOutline as HelpOutlineIcon,
+  GpsFixed as GpsFixedIcon,
+  BarChart as BarChartIcon,
 } from "@mui/icons-material";
+
+// ---- Shared design tokens (matched to the rest of the app) ----
+const TEXT_PRIMARY = "#1e293b";
+const TEXT_SECONDARY = "#64748b";
+
+const PRIMARY_BTN_SX = {
+  borderRadius: 0.25,
+  textTransform: "none" as const,
+  backgroundColor: "var(--primary)",
+  boxShadow: "none",
+  fontWeight: 600,
+  "&:hover": {
+    backgroundColor: "var(--primary)",
+    opacity: 0.92,
+    boxShadow: "none",
+  },
+};
+
+const RESET_BTN_SX = {
+  borderRadius: 0.25,
+  textTransform: "none" as const,
+  borderColor: "var(--primary)",
+  color: "var(--primary)",
+  fontWeight: 600,
+  "&:hover": {
+    backgroundColor: "var(--primary-light)",
+    borderColor: "var(--primary)",
+  },
+};
+
+const FIELD_SX = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: 0.5,
+    "&:hover .MuiOutlinedInput-notchedOutline": {
+      borderColor: "var(--primary-light)",
+    },
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "var(--primary)",
+      borderWidth: "1px",
+    },
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "var(--primary)",
+  },
+};
+
+const MENU_ITEM_SX = {
+  "& .MuiMenuItem-root:hover": {
+    backgroundColor: "var(--primary-light)",
+    color: "var(--primary)",
+  },
+  "& .MuiMenuItem-root.Mui-selected": {
+    backgroundColor: "var(--primary-light)",
+    color: "var(--primary)",
+  },
+  "& .MuiMenuItem-root.Mui-selected:hover": {
+    backgroundColor: "var(--primary-light)",
+    color: "var(--primary)",
+  },
+};
+
+const TOGGLE_GROUP_SX = {
+  "& .MuiToggleButton-root": {
+    textTransform: "none",
+    fontSize: 12,
+    fontWeight: 600,
+    color: TEXT_SECONDARY,
+    borderColor: "#e2e8f0",
+    px: 1.5,
+    "&.Mui-selected": {
+      backgroundColor: "var(--primary)",
+      color: "#fff",
+      "&:hover": {
+        backgroundColor: "var(--primary)",
+        opacity: 0.9,
+      },
+    },
+    "&:hover": {
+      backgroundColor: "var(--primary-light)",
+    },
+  },
+};
+
+// Result chip tint — same pattern as the Attempt History / Exam Review
+// modals, instead of MUI's default theme success/error colors.
+const RESULT_META: Record<
+  string,
+  { label: string; color: string; bg: string }
+> = {
+  pass: { label: "Pass", color: "#16a34a", bg: "#f0fdf4" },
+  fail: { label: "Fail", color: "#dc2626", bg: "#fef2f2" },
+};
+
+// Per-question status tint (correct / incorrect / unanswered).
+const STATUS_META: Record<
+  string,
+  { label: string; color: string; bg: string }
+> = {
+  correct: { label: "Correct", color: "#16a34a", bg: "#f0fdf4" },
+  incorrect: { label: "Incorrect", color: "#dc2626", bg: "#fef2f2" },
+  unanswered: { label: "Unanswered", color: "#d97706", bg: "#fffbeb" },
+};
+
+// A small icon badge used next to Accuracy / Result / Time Taken, so those
+// three read the same as the icon-avatar stat cards above them instead of
+// relying on emoji alone.
+const InfoIconBadge = ({
+  icon,
+  color,
+  bg,
+}: {
+  icon: React.ReactNode;
+  color: string;
+  bg: string;
+}) => (
+  <Avatar
+    variant="rounded"
+    sx={{
+      bgcolor: bg,
+      color: color,
+      width: 32,
+      height: 32,
+      borderRadius: 1,
+    }}
+  >
+    {icon}
+  </Avatar>
+);
 
 // Helper function to format time
 const formatTime = (seconds: number): string => {
@@ -46,9 +179,9 @@ const formatTime = (seconds: number): string => {
 const ScoreCircle = ({ score }: { score: number }) => {
   const percentage = score;
   const getScoreColor = (val: number): string => {
-    if (val >= 60) return "#28a745";
-    if (val >= 40) return "#ffc107";
-    return "#dc3545";
+    if (val >= 60) return "#16a34a";
+    if (val >= 40) return "#d97706";
+    return "#dc2626";
   };
   const color = getScoreColor(percentage);
 
@@ -185,7 +318,7 @@ export default function ExamResultsReview() {
           height: "100vh",
         }}
       >
-        <CircularProgress />
+        <CircularProgress sx={{ color: "var(--primary)" }} />
       </Box>
     );
   }
@@ -246,7 +379,7 @@ export default function ExamResultsReview() {
         <Paper
           sx={{
             padding: { xs: 3, sm: 4, md: 5 },
-            borderRadius: 3,
+            borderRadius: 0.5,
             boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
             maxWidth: "600px",
             textAlign: "center",
@@ -264,17 +397,16 @@ export default function ExamResultsReview() {
                 width: 100,
                 height: 100,
                 borderRadius: "50%",
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                backgroundColor: "var(--primary-light)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                boxShadow: "0 5px 15px rgba(102, 126, 234, 0.4)",
               }}
             >
               <AccessTimeIcon
                 sx={{
                   fontSize: 50,
-                  color: "white",
+                  color: "var(--primary)",
                 }}
               />
             </Box>
@@ -293,7 +425,7 @@ export default function ExamResultsReview() {
 
           <Typography
             sx={{
-              color: "#6c757d",
+              color: TEXT_SECONDARY,
               fontSize: { xs: "1rem", sm: "1.125rem" },
               lineHeight: 1.6,
               mb: 4,
@@ -308,15 +440,10 @@ export default function ExamResultsReview() {
             variant="contained"
             onClick={handleGoToHistory}
             sx={{
-              textTransform: "none",
-              background: "linear-gradient(to right, #6a11cb, #2575fc)",
+              ...PRIMARY_BTN_SX,
               padding: { xs: "12px 32px", sm: "14px 40px" },
               fontSize: { xs: "1rem", sm: "1.125rem" },
-              borderRadius: 2,
-              boxShadow: "0 4px 12px rgba(106, 17, 203, 0.3)",
-              "&:hover": {
-                boxShadow: "0 6px 16px rgba(106, 17, 203, 0.4)",
-              },
+              borderRadius: 0.5,
             }}
           >
             Go to Exam History
@@ -332,10 +459,16 @@ export default function ExamResultsReview() {
   const wrongCount = attempt.wrong_answers || 0;
   const unansweredCount = attempt.unanswered || 0;
   const accuracy = attempt.accuracy || 0;
-  const result = attempt.result || "Fail";
   const totalTimeTaken = attempt.total_time_seconds || 0;
   const percentage =
     totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+
+  // Bug fix: this used to compare `attempt.result === "pass"` without
+  // lowercasing, so a capitalized "Pass" from the API would render as a
+  // red "Fail" chip. Normalize the same way the other pages/modals do.
+  const resultMeta =
+    RESULT_META[(attempt.result || "fail").toLowerCase()] ?? RESULT_META.fail;
+  const isPass = (attempt.result || "fail").toLowerCase() === "pass";
 
   // Time-based filter logic
   const getTimeFilterRange = (
@@ -369,6 +502,39 @@ export default function ExamResultsReview() {
     globalThis.window.print();
   };
 
+  // Stat card definitions for the 4-up grid — same icon-avatar pattern used
+  // on the Progress page's stat cards, instead of plain emoji labels.
+  const STAT_CARDS = [
+    {
+      icon: <EmojiEventsIcon fontSize="small" />,
+      value: score,
+      label: "Score",
+      color: "#16a34a",
+      bg: "#f0fdf4",
+    },
+    {
+      icon: <CheckCircleIcon fontSize="small" />,
+      value: correctCount,
+      label: "Correct",
+      color: "#16a34a",
+      bg: "#f0fdf4",
+    },
+    {
+      icon: <CancelIcon fontSize="small" />,
+      value: wrongCount,
+      label: "Wrong",
+      color: "#dc2626",
+      bg: "#fef2f2",
+    },
+    {
+      icon: <HelpOutlineIcon fontSize="small" />,
+      value: unansweredCount,
+      label: "Unanswered",
+      color: "#d97706",
+      bg: "#fffbeb",
+    },
+  ];
+
   return (
     <Box
       sx={{
@@ -391,7 +557,7 @@ export default function ExamResultsReview() {
           alignItems: "center",
           mb: { xs: 2, sm: 3 },
           paddingBottom: { xs: 1, sm: 1.5 },
-          borderBottom: "1px solid #e0e0e0",
+          borderBottom: "1px solid #f1f5f9",
           flexDirection: { xs: "column", sm: "row" },
           gap: { xs: 1.5, sm: 2, md: 0 },
         }}
@@ -399,13 +565,13 @@ export default function ExamResultsReview() {
         <Typography
           sx={{
             color: "#2c3e50",
-            fontWeight: 600,
+            fontWeight: 700,
             textAlign: { xs: "center", sm: "left" },
             fontSize: {
               xs: "1.1rem",
               sm: "1.25rem",
               md: "1.5rem",
-              lg: "2.125rem",
+              lg: "1.875rem",
             },
             lineHeight: 1.2,
           }}
@@ -416,8 +582,7 @@ export default function ExamResultsReview() {
           variant="contained"
           onClick={handleGoToHistory}
           sx={{
-            textTransform: "none",
-            background: "linear-gradient(to right, #6a11cb, #2575fc)",
+            ...PRIMARY_BTN_SX,
             width: { xs: "100%", sm: "auto" },
             mb: { xs: 0.5, sm: 0 },
           }}
@@ -431,21 +596,42 @@ export default function ExamResultsReview() {
         sx={{
           padding: { xs: 2, sm: 2.5, md: 3 },
           mb: { xs: 2, sm: 3 },
-          borderRadius: { xs: 1.5, sm: 2, md: 2.5 },
+          borderRadius: 0.5,
           boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
         }}
       >
-        <Typography
-          variant="h5"
+        <Box
           sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 1.25,
             mb: { xs: 2, sm: 3 },
-            color: "#2c3e50",
-            textAlign: "center",
-            fontSize: { xs: "1.25rem", sm: "1.5rem", md: "1.75rem" },
           }}
         >
-          Result Summary 📊
-        </Typography>
+          <Avatar
+            variant="rounded"
+            sx={{
+              bgcolor: "var(--primary-light)",
+              color: "var(--primary)",
+              width: 36,
+              height: 36,
+              borderRadius: 1,
+            }}
+          >
+            <BarChartIcon fontSize="small" />
+          </Avatar>
+          <Typography
+            variant="h5"
+            sx={{
+              color: "#2c3e50",
+              fontWeight: 700,
+              fontSize: { xs: "1.25rem", sm: "1.5rem", md: "1.75rem" },
+            }}
+          >
+            Result Summary
+          </Typography>
+        </Box>
 
         <Grid container spacing={3} sx={{ mb: 3 }}>
           <Grid
@@ -457,109 +643,52 @@ export default function ExamResultsReview() {
 
           <Grid size={{ xs: 12, md: 8 }}>
             <Grid container spacing={2}>
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <Card
-                  sx={{
-                    borderRadius: 2,
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  <CardContent sx={{ textAlign: "center", padding: 2 }}>
-                    <Typography
-                      sx={{ fontSize: "0.875rem", color: "#6c757d", mb: 0.5 }}
-                    >
-                      Score 🏆
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontSize: "1.5rem",
-                        fontWeight: 700,
-                        color: "#28a745",
-                      }}
-                    >
-                      {score}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <Card
-                  sx={{
-                    borderRadius: 2,
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  <CardContent sx={{ textAlign: "center", padding: 2 }}>
-                    <Typography
-                      sx={{ fontSize: "0.875rem", color: "#6c757d", mb: 0.5 }}
-                    >
-                      Correct ✔️
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontSize: "1.5rem",
-                        fontWeight: 700,
-                        color: "#28a745",
-                      }}
-                    >
-                      {correctCount}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <Card
-                  sx={{
-                    borderRadius: 2,
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  <CardContent sx={{ textAlign: "center", padding: 2 }}>
-                    <Typography
-                      sx={{ fontSize: "0.875rem", color: "#6c757d", mb: 0.5 }}
-                    >
-                      Wrong ❌
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontSize: "1.5rem",
-                        fontWeight: 700,
-                        color: "#dc3545",
-                      }}
-                    >
-                      {wrongCount}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <Card
-                  sx={{
-                    borderRadius: 2,
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  <CardContent sx={{ textAlign: "center", padding: 2 }}>
-                    <Typography
-                      sx={{ fontSize: "0.875rem", color: "#6c757d", mb: 0.5 }}
-                    >
-                      Unanswered ⏭️
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontSize: "1.5rem",
-                        fontWeight: 700,
-                        color: "#ffc107",
-                      }}
-                    >
-                      {unansweredCount}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
+              {STAT_CARDS.map((stat) => (
+                <Grid key={stat.label} size={{ xs: 6, sm: 3 }}>
+                  <Card
+                    sx={{
+                      borderRadius: 0.75,
+                      border: "1px solid #f1f5f9",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                    }}
+                  >
+                    <CardContent sx={{ textAlign: "center", padding: 2 }}>
+                      <Avatar
+                        variant="rounded"
+                        sx={{
+                          bgcolor: stat.bg,
+                          color: stat.color,
+                          width: 36,
+                          height: 36,
+                          mx: "auto",
+                          mb: 1,
+                          borderRadius: 1,
+                        }}
+                      >
+                        {stat.icon}
+                      </Avatar>
+                      <Typography
+                        sx={{
+                          fontSize: "0.8rem",
+                          color: TEXT_SECONDARY,
+                          mb: 0.5,
+                        }}
+                      >
+                        {stat.label}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: "1.5rem",
+                          fontWeight: 700,
+                          color: stat.color,
+                        }}
+                      >
+                        {stat.value}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
             </Grid>
 
             <Box
@@ -571,44 +700,107 @@ export default function ExamResultsReview() {
                 gap: 2,
               }}
             >
-              <Box sx={{ flex: 1, minWidth: "200px" }}>
-                <Typography
-                  sx={{ fontSize: "0.875rem", color: "#6c757d", mb: 0.5 }}
-                >
-                  Accuracy 🎯
-                </Typography>
-                <Typography
-                  sx={{ fontSize: "1.5rem", fontWeight: 700, color: "#2c3e50" }}
-                >
-                  {accuracy}%
-                </Typography>
-              </Box>
-
-              <Box sx={{ flex: 1, minWidth: "200px" }}>
-                <Typography
-                  sx={{ fontSize: "0.875rem", color: "#6c757d", mb: 0.5 }}
-                >
-                  Result 📜
-                </Typography>
-                <Chip
-                  label={result === "pass" ? "Pass" : "Fail"}
-                  color={result === "pass" ? "success" : "error"}
-                  size="medium"
-                  sx={{ fontSize: "1rem", padding: "0 16px" }}
+              <Box
+                sx={{
+                  flex: 1,
+                  minWidth: "200px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.5,
+                }}
+              >
+                <InfoIconBadge
+                  icon={<GpsFixedIcon fontSize="small" />}
+                  color="#2563eb"
+                  bg="#eff6ff"
                 />
+                <Box>
+                  <Typography
+                    sx={{ fontSize: "0.8rem", color: TEXT_SECONDARY }}
+                  >
+                    Accuracy
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: "1.25rem",
+                      fontWeight: 700,
+                      color: "#2c3e50",
+                    }}
+                  >
+                    {accuracy}%
+                  </Typography>
+                </Box>
               </Box>
 
-              <Box sx={{ flex: 1, minWidth: "200px" }}>
-                <Typography
-                  sx={{ fontSize: "0.875rem", color: "#6c757d", mb: 0.5 }}
-                >
-                  Total Time Taken ⏱️
-                </Typography>
-                <Typography
-                  sx={{ fontSize: "1.5rem", fontWeight: 700, color: "#2c3e50" }}
-                >
-                  {Math.floor(totalTimeTaken / 60)}m {totalTimeTaken % 60}s
-                </Typography>
+              <Box
+                sx={{
+                  flex: 1,
+                  minWidth: "200px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.5,
+                }}
+              >
+                <InfoIconBadge
+                  icon={
+                    isPass ? (
+                      <CheckCircleIcon fontSize="small" />
+                    ) : (
+                      <CancelIcon fontSize="small" />
+                    )
+                  }
+                  color={resultMeta.color}
+                  bg={resultMeta.bg}
+                />
+                <Box>
+                  <Typography
+                    sx={{ fontSize: "0.8rem", color: TEXT_SECONDARY }}
+                  >
+                    Result
+                  </Typography>
+                  <Chip
+                    label={resultMeta.label}
+                    size="small"
+                    sx={{
+                      fontWeight: 700,
+                      backgroundColor: resultMeta.bg,
+                      color: resultMeta.color,
+                      border: `1px solid ${resultMeta.color}33`,
+                    }}
+                  />
+                </Box>
+              </Box>
+
+              <Box
+                sx={{
+                  flex: 1,
+                  minWidth: "200px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.5,
+                }}
+              >
+                <InfoIconBadge
+                  icon={<AccessTimeIcon fontSize="small" />}
+                  color={TEXT_SECONDARY}
+                  bg="#f1f5f9"
+                />
+                <Box>
+                  <Typography
+                    sx={{ fontSize: "0.8rem", color: TEXT_SECONDARY }}
+                  >
+                    Total Time Taken
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: "1.25rem",
+                      fontWeight: 700,
+                      color: "#2c3e50",
+                    }}
+                  >
+                    {Math.floor(totalTimeTaken / 60)}m {totalTimeTaken % 60}s
+                  </Typography>
+                </Box>
               </Box>
             </Box>
           </Grid>
@@ -618,7 +810,7 @@ export default function ExamResultsReview() {
 
         <Typography
           sx={{
-            color: "#6c757d",
+            color: TEXT_SECONDARY,
             textAlign: "center",
             fontSize: { xs: "0.875rem", sm: "1rem" },
           }}
@@ -638,7 +830,7 @@ export default function ExamResultsReview() {
       <Paper
         sx={{
           padding: { xs: 2, sm: 2.5, md: 3 },
-          borderRadius: { xs: 1.5, sm: 2, md: 2.5 },
+          borderRadius: 0.5,
           boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
         }}
       >
@@ -655,9 +847,9 @@ export default function ExamResultsReview() {
           <Typography
             sx={{
               color: "#2c3e50",
+              fontWeight: 700,
               paddingBottom: { xs: 0.75, sm: 1 },
-              borderBottom: "2px solid #f0f0f0",
-              fontSize: { xs: "1.1rem", sm: "1.25rem", md: "1.5rem" },
+              fontSize: { xs: "1.1rem", sm: "1.25rem", md: "1.375rem" },
             }}
           >
             Question Review ({filteredQuestions.length} of {questions.length})
@@ -672,65 +864,33 @@ export default function ExamResultsReview() {
               alignItems: { xs: "stretch", sm: "center" },
             }}
           >
-            <ButtonGroup
-              variant="outlined"
+            <ToggleButtonGroup
+              value={filter}
+              exclusive
+              onChange={(e, newFilter) => newFilter && setFilter(newFilter)}
               size="small"
               sx={{
+                ...TOGGLE_GROUP_SX,
                 flex: { xs: 1, sm: "none" },
-                minWidth: { xs: "100%", sm: "auto" },
+                width: { xs: "100%", sm: "auto" },
+                "& .MuiToggleButton-root": {
+                  ...TOGGLE_GROUP_SX["& .MuiToggleButton-root"],
+                  flex: { xs: 1, sm: "none" },
+                },
               }}
             >
-              <Button
-                variant={filter === "all" ? "contained" : "outlined"}
-                onClick={() => setFilter("all")}
-                sx={{
-                  textTransform: "none",
-                  fontSize: { xs: 11, sm: 12 },
-                  flex: 1,
-                }}
-              >
-                All
-              </Button>
-              <Button
-                variant={filter === "correct" ? "contained" : "outlined"}
-                onClick={() => setFilter("correct")}
-                sx={{
-                  textTransform: "none",
-                  fontSize: { xs: 11, sm: 12 },
-                  flex: 1,
-                }}
-              >
-                Correct
-              </Button>
-              <Button
-                variant={filter === "incorrect" ? "contained" : "outlined"}
-                onClick={() => setFilter("incorrect")}
-                sx={{
-                  textTransform: "none",
-                  fontSize: { xs: 11, sm: 12 },
-                  flex: 1,
-                }}
-              >
-                Incorrect
-              </Button>
-              <Button
-                variant={filter === "unanswered" ? "contained" : "outlined"}
-                onClick={() => setFilter("unanswered")}
-                sx={{
-                  textTransform: "none",
-                  fontSize: { xs: 11, sm: 12 },
-                  flex: 1,
-                }}
-              >
-                Unanswered
-              </Button>
-            </ButtonGroup>
+              <ToggleButton value="all">All</ToggleButton>
+              <ToggleButton value="correct">Correct</ToggleButton>
+              <ToggleButton value="incorrect">Incorrect</ToggleButton>
+              <ToggleButton value="unanswered">Unanswered</ToggleButton>
+            </ToggleButtonGroup>
 
             <FormControl
               size="small"
               sx={{
                 minWidth: { xs: "100%", sm: 140 },
                 mt: { xs: 1, sm: 0 },
+                ...FIELD_SX,
               }}
             >
               <InputLabel
@@ -744,40 +904,16 @@ export default function ExamResultsReview() {
                 value={timeFilter}
                 label="Time-Based"
                 onChange={(e) => setTimeFilter(e.target.value)}
+                MenuProps={{ PaperProps: { sx: MENU_ITEM_SX } }}
                 sx={{
                   fontSize: { xs: "0.8rem", sm: "0.875rem" },
                 }}
               >
-                <MenuItem
-                  value="all"
-                  sx={{ fontSize: { xs: "0.8rem", sm: "0.875rem" } }}
-                >
-                  All Time
-                </MenuItem>
-                <MenuItem
-                  value="less30"
-                  sx={{ fontSize: { xs: "0.8rem", sm: "0.875rem" } }}
-                >
-                  Less than 30 sec
-                </MenuItem>
-                <MenuItem
-                  value="30to60"
-                  sx={{ fontSize: { xs: "0.8rem", sm: "0.875rem" } }}
-                >
-                  30-60 sec
-                </MenuItem>
-                <MenuItem
-                  value="1to2"
-                  sx={{ fontSize: { xs: "0.8rem", sm: "0.875rem" } }}
-                >
-                  1-2 min
-                </MenuItem>
-                <MenuItem
-                  value="more2"
-                  sx={{ fontSize: { xs: "0.8rem", sm: "0.875rem" } }}
-                >
-                  More than 2 min
-                </MenuItem>
+                <MenuItem value="all">All Time</MenuItem>
+                <MenuItem value="less30">Less than 30 sec</MenuItem>
+                <MenuItem value="30to60">30-60 sec</MenuItem>
+                <MenuItem value="1to2">1-2 min</MenuItem>
+                <MenuItem value="more2">More than 2 min</MenuItem>
               </Select>
             </FormControl>
 
@@ -789,175 +925,220 @@ export default function ExamResultsReview() {
                 justifyContent: { xs: "center", sm: "flex-start" },
               }}
             >
+              {/* Bug fix: this used to render a startIcon PLUS a second,
+                  xs-only PrintIcon inside the button — two overlapping
+                  print icons on mobile. Now there's exactly one icon,
+                  always, with the "Print" label appearing next to it
+                  only at sm+. */}
               <Button
                 variant="outlined"
-                color="secondary"
-                startIcon={<PrintIcon />}
                 onClick={handlePrint}
                 sx={{
-                  textTransform: "none",
+                  ...RESET_BTN_SX,
                   fontSize: { xs: 11, sm: 12 },
                   minWidth: { xs: "auto", sm: 120 },
                 }}
               >
+                <PrintIcon fontSize="small" sx={{ mr: { xs: 0, sm: 1 } }} />
                 <Box sx={{ display: { xs: "none", sm: "inline" } }}>Print</Box>
-                <Box sx={{ display: { xs: "inline", sm: "none" } }}>
-                  <PrintIcon />
-                </Box>
               </Button>
             </Box>
           </Box>
         </Box>
 
-        {filteredQuestions.map((question: any, index: number) => (
-          <Card
-            key={question.id}
-            sx={{
-              mb: 2,
-              borderRadius: 1,
-              overflow: "hidden",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            <Box
+        {filteredQuestions.map((question: any) => {
+          const statusMeta =
+            STATUS_META[question.status] ?? STATUS_META.unanswered;
+
+          return (
+            <Card
+              key={question.id}
               sx={{
-                padding: { xs: 1, sm: 1.5 },
-                backgroundColor: "#f8f9fa",
-                borderBottom: "1px solid #e0e0e0",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexDirection: { xs: "column", sm: "row" },
-                gap: { xs: 1, sm: 0 },
+                mb: 2,
+                borderRadius: 0.75,
+                overflow: "hidden",
+                border: "1px solid #f1f5f9",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
               }}
             >
-              <Typography
-                sx={{
-                  fontWeight: 600,
-                  fontSize: { xs: "1rem", sm: "1.25rem" },
-                }}
-              >
-                Question {question.questionOrder}
-              </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <AccessTimeIcon sx={{ fontSize: 16, color: "#6a11cb" }} />
-                  <Typography sx={{ fontSize: "0.875rem", color: "#6c757d" }}>
-                    {formatTime(question.timeTaken)}
-                  </Typography>
-                </Box>
-                <Chip
-                  label={
-                    question.status === "correct"
-                      ? "Correct"
-                      : question.status === "incorrect"
-                        ? "Incorrect"
-                        : "Unanswered"
-                  }
-                  color={
-                    question.status === "correct"
-                      ? "success"
-                      : question.status === "incorrect"
-                        ? "error"
-                        : "warning"
-                  }
-                  size="small"
-                />
-              </Box>
-            </Box>
-            <CardContent sx={{ padding: { xs: 1.5, sm: 2 } }}>
-              <Typography
-                sx={{
-                  mb: 2,
-                  lineHeight: 1.5,
-                  fontSize: { xs: "0.9rem", sm: "1rem" },
-                  whiteSpace: "pre-wrap",
-                  fontWeight: 600,
-                }}
-              >
-                {question.text}
-              </Typography>
-
-              <List>
-                {question.options.map((option: any, optIndex: number) => (
-                  <ListItem
-                    key={`option-${question.id}-${optIndex}`}
-                    sx={{
-                      padding: "12px 15px",
-                      border: "1px solid #e0e0e0",
-                      borderRadius: 1,
-                      mb: 1,
-                      backgroundColor: (() => {
-                        if (option.correct) return "#d4edda";
-                        if (option.selected && !option.correct)
-                          return "#f8d7da";
-                        if (option.selected) return "#fff3cd";
-                        return "transparent";
-                      })(),
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 30,
-                        height: 30,
-                        borderRadius: "50%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mr: 1.5,
-                        fontWeight: 600,
-                        flexShrink: 0,
-                      }}
-                    >
-                      {String.fromCodePoint(65 + optIndex)}
-                    </Box>
-                    <ListItemText
-                      primary={
-                        <Typography sx={{ whiteSpace: "pre-wrap" }}>
-                          {option.text}
-                        </Typography>
-                      }
-                    />
-                    {option.correct && (
-                      <CheckCircleIcon sx={{ color: "#28a745", ml: 1 }} />
-                    )}
-                    {option.selected && !option.correct && (
-                      <CancelIcon sx={{ color: "#dc3545", ml: 1 }} />
-                    )}
-                    {option.selected && option.correct && (
-                      <CheckCircleIcon sx={{ color: "#28a745", ml: 1 }} />
-                    )}
-                  </ListItem>
-                ))}
-              </List>
-
               <Box
                 sx={{
-                  mt: 2,
-                  padding: 1.5,
-                  borderRadius: 1,
-                  borderLeft: "4px solid #2575fc",
-                  backgroundColor: "#e3f2fd",
+                  padding: { xs: 1, sm: 1.5 },
+                  backgroundColor: "#f8fafc",
+                  borderBottom: "1px solid #e2e8f0",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: { xs: 1, sm: 0 },
                 }}
               >
-                <Typography sx={{ fontWeight: 600, mb: 0.5, color: "#2575fc" }}>
-                  Explanation:
-                </Typography>
                 <Typography
                   sx={{
-                    color: "#1976d2",
-                    fontWeight: 500,
-                    whiteSpace: "pre-wrap",
+                    fontWeight: 700,
+                    color: TEXT_PRIMARY,
+                    fontSize: { xs: "1rem", sm: "1.1rem" },
                   }}
                 >
-                  {question.explanation || "Explanation not available"}
+                  Question {question.questionOrder}
                 </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    <AccessTimeIcon
+                      sx={{ fontSize: 16, color: TEXT_SECONDARY }}
+                    />
+                    <Typography
+                      sx={{ fontSize: "0.875rem", color: TEXT_SECONDARY }}
+                    >
+                      {formatTime(question.timeTaken)}
+                    </Typography>
+                  </Box>
+                  <Chip
+                    label={statusMeta.label}
+                    size="small"
+                    sx={{
+                      backgroundColor: statusMeta.bg,
+                      color: statusMeta.color,
+                      fontWeight: 700,
+                      fontSize: 11,
+                      border: `1px solid ${statusMeta.color}33`,
+                    }}
+                  />
+                </Box>
               </Box>
-            </CardContent>
-          </Card>
-        ))}
+              <CardContent sx={{ padding: { xs: 1.5, sm: 2 } }}>
+                <Typography
+                  sx={{
+                    mb: 2,
+                    lineHeight: 1.5,
+                    fontSize: { xs: "0.9rem", sm: "1rem" },
+                    whiteSpace: "pre-wrap",
+                    fontWeight: 600,
+                    color: TEXT_PRIMARY,
+                  }}
+                >
+                  {question.text}
+                </Typography>
+
+                <List sx={{ p: 0 }}>
+                  {question.options.map((option: any, optIndex: number) => {
+                    // Bug fix: the original had a third "selected" branch here
+                    // that could never execute — if option.correct is true,
+                    // the first check already returns; if option.selected is
+                    // true and option.correct is false, the second check
+                    // already returns. There's no remaining case for it to
+                    // catch, so it was dead code. Reduced to the two real states.
+                    const isCorrect = option.correct;
+                    const isWrongSelected = option.selected && !option.correct;
+
+                    const bg = isCorrect
+                      ? "#f0fdf4"
+                      : isWrongSelected
+                        ? "#fef2f2"
+                        : "transparent";
+                    const borderColor = isCorrect
+                      ? "#bbf7d0"
+                      : isWrongSelected
+                        ? "#fecaca"
+                        : "#e2e8f0";
+                    const letterBg = isCorrect
+                      ? "#dcfce7"
+                      : isWrongSelected
+                        ? "#fee2e2"
+                        : "#f1f5f9";
+                    const letterColor = isCorrect
+                      ? "#16a34a"
+                      : isWrongSelected
+                        ? "#dc2626"
+                        : TEXT_SECONDARY;
+
+                    return (
+                      <ListItem
+                        key={`option-${question.id}-${optIndex}`}
+                        sx={{
+                          padding: "12px 15px",
+                          border: `1px solid ${borderColor}`,
+                          borderRadius: 0.75,
+                          mb: 1,
+                          backgroundColor: bg,
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: 30,
+                            height: 30,
+                            borderRadius: "50%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            mr: 1.5,
+                            fontWeight: 700,
+                            fontSize: 13,
+                            flexShrink: 0,
+                            backgroundColor: letterBg,
+                            color: letterColor,
+                          }}
+                        >
+                          {String.fromCodePoint(65 + optIndex)}
+                        </Box>
+                        <ListItemText
+                          primary={
+                            <Typography
+                              sx={{
+                                whiteSpace: "pre-wrap",
+                                color: TEXT_PRIMARY,
+                              }}
+                            >
+                              {option.text}
+                            </Typography>
+                          }
+                        />
+                        {/* Bug fix: the original rendered a checkmark for
+                            option.correct AND a second checkmark for
+                            option.selected && option.correct, showing two
+                            overlapping icons on a correctly-selected answer.
+                            Each option now renders exactly one icon. */}
+                        {isCorrect && (
+                          <CheckCircleIcon sx={{ color: "#16a34a", ml: 1 }} />
+                        )}
+                        {isWrongSelected && (
+                          <CancelIcon sx={{ color: "#dc2626", ml: 1 }} />
+                        )}
+                      </ListItem>
+                    );
+                  })}
+                </List>
+
+                <Box
+                  sx={{
+                    mt: 2,
+                    padding: 1.5,
+                    borderRadius: 0.75,
+                    borderLeft: "4px solid #2563eb",
+                    backgroundColor: "#eff6ff",
+                  }}
+                >
+                  <Typography
+                    sx={{ fontWeight: 700, mb: 0.5, color: "#2563eb" }}
+                  >
+                    Explanation:
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: "#1d4ed8",
+                      fontWeight: 500,
+                      whiteSpace: "pre-wrap",
+                    }}
+                  >
+                    {question.explanation || "Explanation not available"}
+                  </Typography>
+                </Box>
+              </CardContent>
+            </Card>
+          );
+        })}
 
         {/* Navigation */}
         <Box
@@ -975,8 +1156,7 @@ export default function ExamResultsReview() {
             variant="contained"
             onClick={handleGoToHistory}
             sx={{
-              textTransform: "none",
-              background: "linear-gradient(to right, #6a11cb, #2575fc)",
+              ...PRIMARY_BTN_SX,
               width: { xs: "100%", sm: "auto" },
             }}
           >
