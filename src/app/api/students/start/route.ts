@@ -1,4 +1,4 @@
-// app/api/students/exams/start/route.ts
+// app/api/students/start/route.ts
 
 //this for create exam attempt id and start the exam details store in todb
 
