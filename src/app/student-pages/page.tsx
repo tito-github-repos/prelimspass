@@ -10,6 +10,7 @@ import {
   useTheme,
   Avatar,
   Chip,
+  CircularProgress,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import AssignmentIcon from "@mui/icons-material/Assignment";
@@ -177,6 +178,7 @@ interface ExamListRowProps {
   examType: "practice" | "mock" | "live";
   isPremium?: boolean;
   onStart?: () => void;
+  isStarting?: boolean;
 }
 
 const ExamListRow = ({
@@ -186,6 +188,7 @@ const ExamListRow = ({
   examType,
   isPremium,
   onStart,
+  isStarting,
 }: ExamListRowProps) => {
   const typeColor = EXAM_TYPE_COLORS[examType] || PRIMARY_PURPLE;
 
@@ -273,6 +276,7 @@ const ExamListRow = ({
         <Button
           variant="contained"
           onClick={onStart}
+          disabled={isStarting}
           sx={{
             textTransform: "none",
             background: isPremium ? PRIMARY_PURPLE : SUCCESS_GREEN,
@@ -284,13 +288,20 @@ const ExamListRow = ({
             py: { xs: 0.6, sm: 0.75 },
             boxShadow: "none",
             whiteSpace: "nowrap",
+            minWidth: { xs: 88, sm: 100 },
             "&:hover": {
               background: isPremium ? PRIMARY_PURPLE : SUCCESS_GREEN,
               opacity: 0.9,
             },
           }}
         >
-          {isPremium ? "Enroll Now" : "Start Now"}
+          {isStarting ? (
+            <CircularProgress size={16} sx={{ color: "#fff" }} />
+          ) : isPremium ? (
+            "Enroll Now"
+          ) : (
+            "Start Now"
+          )}
         </Button>
       </Box>
     </Box>
@@ -418,6 +429,11 @@ export default function StudentDashboard() {
   const [upcomingLiveExams, setUpcomingLiveExams] = useState<any[]>([]);
   const [completedExams, setCompletedExams] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  // Tracks which exam's "Start Now" button is mid-flight, so we can disable
+  // just that button and show a spinner instead of a page-wide loading state.
+  const [startingExamId, setStartingExamId] = useState<number | string | null>(
+    null,
+  );
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
@@ -526,6 +542,76 @@ export default function StudentDashboard() {
       localStorage.getItem("username") || sessionStorage.getItem("username");
     if (storedUsername) setUsername(storedUsername);
   }, []);
+
+  // Creates a new attempt for this exam via the same endpoint the PYQ and
+  // My Exams pages use, then redirects to the actual exam-taking flow.
+  // The previous version of this handler just did
+  // router.push(`/student-pages/exams/${exam.id}`) - it never called the
+  // start API at all, so no attempt was ever created and the student never
+  // landed on exam_taking.
+  const startExam = async (examId: number, examType: string) => {
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (!token) {
+      router.push("/");
+      return;
+    }
+
+    setStartingExamId(examId);
+    try {
+      const response = await fetch("/api/students/start", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ examId }),
+      });
+
+      if (response.status === 401) {
+        alert("Your session has expired. Please log in again.");
+        setStartingExamId(null);
+        router.push("/");
+        return;
+      }
+
+      const raw = await response.text();
+      let data: any = null;
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch {
+        console.error("Start-exam response was not JSON:", response.status, raw);
+        alert(`Could not start the exam (server returned status ${response.status}).`);
+        setStartingExamId(null);
+        return;
+      }
+
+      if (!response.ok || !data?.success || data?.attemptId == null) {
+        alert(data?.message || "Failed to start exam");
+        setStartingExamId(null);
+        return;
+      }
+
+      if (examType === "mock" || examType === "live") {
+        try {
+          const elem = document.documentElement;
+          if (elem.requestFullscreen) await elem.requestFullscreen();
+          else if ((elem as any).webkitRequestFullscreen) await (elem as any).webkitRequestFullscreen();
+          else if ((elem as any).mozRequestFullScreen) await (elem as any).mozRequestFullScreen();
+          else if ((elem as any).msRequestFullscreen) await (elem as any).msRequestFullscreen();
+        } catch (error) {
+          console.error("Fullscreen error:", error);
+        }
+      }
+
+      router.push(
+        `/student-pages/exam_taking?examId=${examId}&attemptId=${data.attemptId}`,
+      );
+    } catch (error) {
+      console.error("Failed to start exam:", error);
+      alert("Failed to start exam. Please check your connection and try again.");
+      setStartingExamId(null);
+    }
+  };
 
   return (
     <Box
@@ -853,9 +939,8 @@ export default function StudentDashboard() {
                       duration={exam.duration ?? 0}
                       examType={exam.examType}
                       isPremium={exam.isPremium}
-                      onStart={() =>
-                        router.push(`/student-pages/exams/${exam.id}`)
-                      }
+                      isStarting={startingExamId === exam.id}
+                      onStart={() => startExam(exam.id, exam.examType)}
                     />
                   ))}
                   <ViewAllLink
