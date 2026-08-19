@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { usePreventNavigation } from "@/hooks/usePreventNavigation";
 import { useMediaQuery } from "@mui/material";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useSidebar } from "@/app/components/student_layout";
 import LiveExamWarningModal from "@/app/components/LiveExamWarningModal";
 import LateEntryModal from "@/app/components/LateEntryModal";
 import LeaveExamModal from "@/app/components/LeaveExamModal";
@@ -47,10 +46,11 @@ const ExamContent: React.FC = () => {
   const [examData, setExamData] = useState<ExamData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [examStarted, setExamStarted] = useState(false);
 
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [userAnswers, setUserAnswers] = useState<Record<number, string>>({});
-   const [flaggedQuestions, setFlaggedQuestions] = useState<Set<number>>(
+  const [flaggedQuestions, setFlaggedQuestions] = useState<Set<number>>(
     new Set(),
   );
   const [timeLeft, setTimeLeft] = useState(0);
@@ -117,7 +117,12 @@ const ExamContent: React.FC = () => {
       setIsFullscreen(isCurrentlyFullscreen);
 
       // Show modal for all exam types when exiting fullscreen
-      if (!isCurrentlyFullscreen && examData && !submittingRef.current) {
+      if (
+        !isCurrentlyFullscreen &&
+        examData &&
+        examStarted &&
+        !submittingRef.current
+      ) {
         setShowFullscreenExitModal(true);
       }
     };
@@ -142,13 +147,14 @@ const ExamContent: React.FC = () => {
         handleFullscreenChange,
       );
     };
-  }, [examData]);
+  }, [examData, examStarted]);
 
   // Enter fullscreen when exam starts for mock or live exams
   useEffect(() => {
     const initializeExam = async () => {
       if (
         examData &&
+        examStarted &&
         (examData.examType === "mock" || examData.examType === "live")
       ) {
         // Wait for DOM to be fully rendered
@@ -182,12 +188,18 @@ const ExamContent: React.FC = () => {
     };
 
     initializeExam();
-  }, [examData]);
+  }, [examData, examStarted]);
 
   const questionStartRef = useRef<number>(Date.now());
   const questionTimeMap = useRef<Record<number, number>>({});
   const submittingRef = useRef(false);
   const [allowNavigation, setAllowNavigation] = useState(false);
+
+  // Keep navigator state in sync with viewport: open (pinned) on desktop,
+  // closed (drawer) by default on mobile.
+  useEffect(() => {
+    setShowNavigator(isDesktop);
+  }, [isDesktop]);
 
   useEffect(() => {
     if (!examId) {
@@ -332,7 +344,7 @@ const ExamContent: React.FC = () => {
 
   // Timer effect
   useEffect(() => {
-    if (!examData || timeLeft <= 0) return;
+    if (!examData || !examStarted || timeLeft <= 0) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -346,10 +358,12 @@ const ExamContent: React.FC = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [examData, timeLeft]);
+  }, [examData, examStarted, timeLeft]);
 
   // Current Question Live Timer
   useEffect(() => {
+    if (!examStarted) return;
+
     const interval = setInterval(() => {
       const seconds = Math.floor(
         (Date.now() - questionStartRef.current) / 1000,
@@ -359,7 +373,7 @@ const ExamContent: React.FC = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [currentQuestion]);
+  }, [currentQuestion, examStarted]);
 
   // Use custom hook to prevent navigation within the application
   usePreventNavigation(!allowNavigation, (href?: string) => {
@@ -449,13 +463,21 @@ const ExamContent: React.FC = () => {
     };
   }, []);
 
-  // Handle ESC key for all exam types
+  // Handle ESC key for all exam types.
+  // On mobile, if the navigator drawer is open, ESC closes the drawer
+  // first instead of immediately triggering the fullscreen-exit warning.
   useEffect(() => {
-    if (!examData || allowNavigation) return;
+    if (!examData || !examStarted || allowNavigation) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !submittingRef.current) {
         e.preventDefault();
+
+        if (!isDesktop && showNavigator) {
+          setShowNavigator(false);
+          return;
+        }
+
         setShowFullscreenExitModal(true);
       }
     };
@@ -465,10 +487,11 @@ const ExamContent: React.FC = () => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [examData, allowNavigation]);
+  }, [examData, examStarted, allowNavigation, isDesktop, showNavigator]);
 
   // Live tab switch detection
   useEffect(() => {
+    if (!examStarted) return;
     if (examData?.examType !== "live" && examData?.examType !== "mock") return;
 
     const handleViolation = () => {
@@ -514,7 +537,7 @@ const ExamContent: React.FC = () => {
       document.removeEventListener("visibilitychange", handleVisibility);
       window.removeEventListener("blur", handleBlur);
     };
-  }, [examData, attemptId]);
+  }, [examData, examStarted, attemptId]);
 
   // Auto-save answers periodically
   useEffect(() => {
@@ -536,7 +559,7 @@ const ExamContent: React.FC = () => {
 
   // Check for auto submit flag and restore saved answers
   useEffect(() => {
-    if (!examId) return; // முக்கியம்
+    if (!examId) return;
 
     const autoSubmit = sessionStorage.getItem("autoSubmit");
 
@@ -569,6 +592,12 @@ const ExamContent: React.FC = () => {
     }
   }, [examId]);
 
+  const handleStartExam = () => {
+    setExamStarted(true);
+    examStartRef.current = Date.now();
+    questionStartRef.current = Date.now();
+  };
+
   const saveQuestionTime = () => {
     const currentQ = getCurrentQuestion();
     if (currentQ) {
@@ -579,6 +608,24 @@ const ExamContent: React.FC = () => {
       questionStartRef.current = now;
     }
   };
+
+  // near your other refs
+  const examHeaderRef = useRef<HTMLDivElement>(null);
+  const [headerHeight, setHeaderHeight] = useState(48);
+
+  useEffect(() => {
+    const el = examHeaderRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setHeaderHeight(entry.contentRect.height);
+      }
+    });
+    observer.observe(el);
+
+    return () => observer.disconnect();
+  }, [examStarted]); // re-attach once the header actually renders
 
   const getCutoffTime = (difficulty?: string) => {
     switch (difficulty || "") {
@@ -669,7 +716,7 @@ const ExamContent: React.FC = () => {
       }
       return newSet;
     });
-   };
+  };
 
   const clearAnswer = () => {
     const currentQ = getCurrentQuestion();
@@ -688,6 +735,8 @@ const ExamContent: React.FC = () => {
     questionStartRef.current = Date.now();
     setLiveQuestionTime(0);
     setCurrentQuestion(questionNum);
+    // Auto-close the drawer on mobile once a question is picked
+    if (!isDesktop) setShowNavigator(false);
   };
 
   const goToPrevious = () => {
@@ -860,6 +909,110 @@ const ExamContent: React.FC = () => {
     );
   }
 
+  // Pre-exam screen: a full-width "hall pass" layout — no boxed card.
+  // Sections are separated by hairline dividers instead of a bordered surface.
+  if (!examStarted) {
+    return (
+      <div className={`${styles.examContainer} ${styles.containerFull}`}>
+        <div className={styles.hallPassScreen}>
+          <div className={styles.hallPass}>
+            <div className={styles.hallPassStrip}>
+              <span className={styles.hallPassType}>
+                {examData.examType.toUpperCase()} EXAM
+              </span>
+            </div>
+
+            <div className={styles.hallPassBody}>
+              <h1 className={styles.hallPassTitle}>{examData.title}</h1>
+
+              <div className={styles.hallPassMeta}>
+                <div className={styles.hallPassMetaItem}>
+                  <span className={styles.hallPassMetaLabel}>Questions</span>
+                  <span className={styles.hallPassMetaValue}>
+                    {examData.totalQuestions}
+                  </span>
+                </div>
+                <div className={styles.hallPassMetaItem}>
+                  <span className={styles.hallPassMetaLabel}>Duration</span>
+                  <span className={styles.hallPassMetaValue}>
+                    {examData.duration} min
+                  </span>
+                </div>
+                <div className={styles.hallPassMetaItem}>
+                  <span className={styles.hallPassMetaLabel}>Points</span>
+                  <span className={styles.hallPassMetaValue}>
+                    {examData.points || 200}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.hallPassChecklist}>
+              <p className={styles.hallPassChecklistLabel}>Before you begin</p>
+
+              <div className={styles.checklistItem}>
+                <i className={`fas fa-check-circle ${styles.checkIcon}`}></i>
+                <p>Select only one answer for each question.</p>
+              </div>
+
+              <div className={styles.checklistItem}>
+                <i className={`fas fa-check-circle ${styles.checkIcon}`}></i>
+                <p>
+                  Each question has a recommended cut-off time based on its
+                  difficulty level. Finishing within the suggested time helps
+                  improve speed and exam performance.
+                </p>
+              </div>
+
+              <div className={styles.checklistItem}>
+                <i className={`fas fa-check-circle ${styles.checkIcon}`}></i>
+                <p>You may flag questions for review before submitting.</p>
+              </div>
+
+              <div
+                className={`${styles.checklistItem} ${styles.checklistWarning}`}
+              >
+                <i
+                  className={`fas fa-exclamation-triangle ${styles.warningIcon}`}
+                ></i>
+                <p>
+                  Do not switch to another tab or window during the exam; doing
+                  so will result in automatic submission.
+                </p>
+              </div>
+
+              <div
+                className={`${styles.checklistItem} ${styles.checklistWarning}`}
+              >
+                <i
+                  className={`fas fa-exclamation-triangle ${styles.warningIcon}`}
+                ></i>
+                <p>
+                  The exam will be automatically submitted when the timer
+                  expires. Once submitted, you cannot return to the exam.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.hallPassStub}>
+              <div className={styles.hallPassStubText}>
+                <p>Ready when you are.</p>
+                <p>Starting begins your timer immediately.</p>
+              </div>
+              <button
+                className={styles.hallPassStartBtn}
+                onClick={handleStartExam}
+                type="button"
+              >
+                Start Exam <i className="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <LiveExamWarningModal
@@ -897,7 +1050,10 @@ const ExamContent: React.FC = () => {
         }}
       />
 
-      <div className={`${styles.examContainer} ${styles.containerFull}`}>
+      <div
+        className={`${styles.examContainer} ${styles.containerFull}`}
+        style={{ ["--header-height" as any]: `${headerHeight}px` }}
+      >
         {/* Exam Header */}
         <div className={styles.examHeader}>
           <div className={styles.examInfo}>
@@ -906,39 +1062,75 @@ const ExamContent: React.FC = () => {
               {examData!.totalQuestions} questions • {examData!.duration}{" "}
               minutes • {examData!.points || 200} points
             </p>
+          </div>
+          <div
+            className={`${styles.timerCard} ${
+              getQuestionTimerStatus().className
+            }`}
+          >
+            <div className={styles.timerMain}>
+              <i className="fas fa-clock"></i>
+              <span>{formatTime(timeLeft)}</span>
             </div>
-            <div
-              className={`${styles.timerCard} ${
-                getQuestionTimerStatus().className
-              }`}
-            >
-              <div className={styles.timerMain}>
-                <i className="fas fa-clock"></i>
-                <span>{formatTime(timeLeft)}</span>
-              </div>
-              <div className={styles.timerRight}>
-                <span className={styles.timerStatusTop}>
-                  {formatTime(
-                    (questionTimeMap.current[currentQ?.id || 0] || 0) +
-                      liveQuestionTime,
-                  )}
-                  {" / "}
-                  {getCutoffTime(currentQ?.difficultyLevel)} sec
-                </span>
-                <span className={styles.timerStatusBottom}>
-                  {getQuestionTimerStatus().status}
-                </span>
-              </div>
+            <div className={styles.timerRight}>
+              <span className={styles.timerStatusTop}>
+                {formatTime(
+                  (questionTimeMap.current[currentQ?.id || 0] || 0) +
+                    liveQuestionTime,
+                )}
+                {" / "}
+                {getCutoffTime(currentQ?.difficultyLevel)} sec
+              </span>
+              <span className={styles.timerStatusBottom}>
+                {getQuestionTimerStatus().status}
+              </span>
             </div>
           </div>
+        </div>
 
-          <div className={styles.examContent}>
-          {/* Question Navigator Sidebar */}
+        {/* Mobile-only slim progress strip — always visible even with drawer closed */}
+        {!isDesktop && (
+          <div className={styles.mobileProgressStrip}>
+            <div className={styles.mobileProgressBarTrack}>
+              <div
+                className={styles.mobileProgressBarFill}
+                style={{
+                  width: `${
+                    (answeredCount / (examData!.totalQuestions || 1)) * 100
+                  }%`,
+                }}
+              />
+            </div>
+            <span className={styles.mobileProgressText}>
+              {answeredCount}/{examData!.totalQuestions} answered
+              {flaggedQuestions.size > 0
+                ? ` • ${flaggedQuestions.size} flagged`
+                : ""}
+            </span>
+          </div>
+        )}
+
+        <div className={styles.examContent}>
+          {/* Backdrop for mobile drawer */}
+          {!isDesktop && showNavigator && (
+            <div
+              className={styles.drawerBackdrop}
+              onClick={() => setShowNavigator(false)}
+            />
+          )}
+
+          {/* Question Navigator Sidebar / Mobile Bottom-Sheet Drawer */}
           <div
             className={`${styles.questionSidebar} ${
-              showNavigator ? "" : styles.compact
-            } ${isDesktop ? styles.questionSidebarDesktop : ""}`}
+              isDesktop
+                ? styles.questionSidebarDesktop
+                : `${styles.questionSidebarDrawer} ${
+                    showNavigator ? styles.drawerOpen : ""
+                  }`
+            }`}
           >
+            {!isDesktop && <div className={styles.drawerHandle} />}
+
             <div className={styles.sidebarHeader}>
               <h3 className={styles.sidebarTitle}>Question Navigator</h3>
               {!isDesktop && (
@@ -1004,30 +1196,6 @@ const ExamContent: React.FC = () => {
                 <span>Unanswered</span>
               </div>
             </div>
-
-            <div className={styles.examNotes}>
-              <p>
-                <strong>Instructions:</strong>
-              </p>
-              <ul className={styles.instructionsList}>
-                <li>Select only one answer for each question.</li>
-                <li>
-                  Each question has a recommended cut-off time based on its
-                  difficulty level. Finishing within the suggested time helps
-                  improve speed and exam performance.
-                </li>
-                <li>You may flag questions for review before submitting.</li>
-                <li>
-                  The exam will be automatically submitted when the timer
-                  expires.
-                </li>
-                <li>
-                  Do not switch to another tab or window during the exam; doing
-                  so will result in automatic submission.
-                </li>
-                <li>Once submitted, you cannot return to the exam.</li>
-              </ul>
-            </div>
           </div>
 
           {/* Main Question Area */}
@@ -1040,11 +1208,16 @@ const ExamContent: React.FC = () => {
                 <div className={styles.questionActions}>
                   {!isDesktop && (
                     <button
-                      className={`${styles.btn} ${styles.btnOutline}`}
-                      onClick={() => setShowNavigator(!showNavigator)}
+                      className={`${styles.btn} ${styles.btnNavigatorTrigger}`}
+                      onClick={() => setShowNavigator(true)}
+                      type="button"
+                      aria-label="Open question navigator"
                     >
-                      <i className="fas fa-list"></i>{" "}
-                      {showNavigator ? "Hide Navigator" : "Show Navigator"}
+                      <i className="fas fa-list-ol"></i>
+                      Questions
+                      <span className={styles.navigatorBadge}>
+                        {answeredCount}/{examData!.totalQuestions}
+                      </span>
                     </button>
                   )}
                   <button

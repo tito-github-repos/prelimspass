@@ -1,6 +1,20 @@
 /* ============================================================
    EXAM TAKING — clean single-pass layout stylesheet
    Fixed header | full-bleed sidebar | gap-free question area
+
+   COLOR SYSTEM (see :root theme)
+   -------------------------------------------------------------
+   --primary   (green)  = brand chrome + primary actions the user
+                           takes (Start Exam, Next, selected answer)
+   --secondary (violet) = wayfinding / secondary interactive UI
+                           that must stay visually distinct from
+                           brand-green status colors — specifically
+                           "current question" (grid square + legend
+                           dot) and the mobile navigator trigger.
+   status colors         = green/amber/red for answered/flagged/
+                           danger — independent of brand, always
+                           mean the same thing everywhere (timer,
+                           question grid, correctness).
    ============================================================ */
 
 /* ---------- Layout shell ---------- */
@@ -23,7 +37,7 @@
 
 /* ---------- Fixed header (always visible) ---------- */
 .examHeader {
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  background: var(--primary);
   color: white;
   padding: 8px 16px;
   display: flex;
@@ -63,14 +77,6 @@
   flex: 1;
 }
 
-/* tall-enough container keeps Navbar from collapsing */
-.examInfo p::after {
-  display: inline;
-  content: attr(data-fill);
-  font-size: 11px;
-  /* just ensures the row is tall enough */
-}
-
 /* ---------- Content wrapper (starts below fixed header) ---------- */
 .examContent {
   display: flex;
@@ -81,14 +87,14 @@
   padding: 0;
   box-sizing: border-box;
   overflow-x: hidden;
-  padding-top: 48px; /* .examHeader min-height reserve */
+  padding-top: var(--header-height, 48px);
 }
 
 /* ---------- Question Navigator Sidebar ---------- */
 .questionSidebar {
   width: 260px;
-  background: #f8f9fa;
-  border-right: 1px solid #e0e0e0;
+  background: #f8fafc;
+  border-right: 1px solid #e2e8f0;
   padding: 14px;
   overflow-y: auto;
   height: calc(100vh - 48px);
@@ -96,20 +102,27 @@
 }
 
 .questionSidebarDesktop {
-  border-right: 2px solid #e0e0e0;
+  border-right: 2px solid #e2e8f0;
 }
 
-.questionSidebar.top70 { top: 70px; }
-.questionSidebar.width280 { width: 280px; }
-.questionSidebar.width300 { width: 300px; }
-.questionSidebar.width100 { width: 100%; }
-.questionSidebar.widthAuto { width: auto; }
+.questionSidebar.top70 {
+  top: 70px;
+}
 
-.questionSidebar.compact {
+.questionSidebar.width280 {
+  width: 280px;
+}
+
+.questionSidebar.width300 {
+  width: 300px;
+}
+
+.questionSidebar.width100 {
+  width: 100%;
+}
+
+.questionSidebar.widthAuto {
   width: auto;
-  max-height: 150px;
-  overflow-y: auto;
-  padding: 14px;
 }
 
 .sidebarTitle {
@@ -117,14 +130,7 @@
   margin-bottom: 12px;
   color: #2c3e50;
   padding-bottom: 8px;
-  border-bottom: 2px solid #e0e0e0;
-  text-align: left;
-}
-
-.questionSidebar.compact .sidebarTitle {
-  font-size: 15px;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
+  border-bottom: 2px solid #e2e8f0;
   text-align: left;
 }
 
@@ -136,7 +142,7 @@
 }
 
 .btnClose {
-  background: #dc3545;
+  background: #dc2626;
   color: white;
   border: none;
   border-radius: 50%;
@@ -148,15 +154,13 @@
   cursor: pointer;
   font-size: 12px;
 }
-.btnClose:hover { background: #c82333; }
+
+.btnClose:hover {
+  background: #b91c1c;
+}
 
 .questionGrid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 7px;
-  margin-bottom: 14px;
-}
-.questionSidebar.compact .questionGrid {
   grid-template-columns: repeat(5, 1fr);
   gap: 7px;
   margin-bottom: 14px;
@@ -169,24 +173,53 @@
   align-items: center;
   justify-content: center;
   background: white;
-  border: 2px solid #ddd;
+  border: 2px solid #e2e8f0;
   border-radius: 5px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
   font-size: 12px;
   color: #333;
 }
-.questionSidebar.compact .questionNumber {
-  width: 36px; height: 36px; font-size: 12px;
-  border-radius: 5px; background: white; border: 2px solid #ddd; color: #333;
+
+.questionNumber:hover {
+  border-color: var(--primary);
+  color: var(--primary);
 }
-.questionNumber:hover { border-color: #6a11cb; color: #6a11cb; }
-.questionNumber.current:hover { border: none; color: #000000; background: #8B5CF6; }
-.questionNumber.current { background: #6a11cb; border-color: #6a11cb; color: white; }
-.questionNumber.answered { background: #28a745; border-color: #28a745; color: #000000; }
-.questionNumber.flagged  { background: #ffc107; border-color: #ffc107; color: #000000; }
-.questionNumber.unanswered { background: white; border-color: #ddd; color: #333; }
+
+/* "current" uses SECONDARY (violet), deliberately not brand green —
+   it sits in the same grid as "answered" (green), so it needs to read
+   as a different thing at a glance. */
+.questionNumber.current:hover {
+  border-color: var(--secondary);
+  color: white;
+  background: var(--secondary);
+  opacity: 0.92;
+}
+
+.questionNumber.current {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: white;
+}
+
+.questionNumber.answered {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.questionNumber.flagged {
+  background: #ffc107;
+  border-color: #ffc107;
+  color: #000000;
+}
+
+.questionNumber.unanswered {
+  background: white;
+  border-color: #e2e8f0;
+  color: #333;
+}
 
 .questionStatus {
   display: flex;
@@ -194,21 +227,124 @@
   gap: 8px;
   margin-bottom: 16px;
 }
-.questionSidebar.compact .questionStatus { gap: 8px; margin-bottom: 16px; }
 
-.statusItem { display: flex; align-items: center; font-size: 13px; }
-.statusColor { width: 13px; height: 13px; border-radius: 3px; margin-right: 4px; }
-.statusCurrent   { background: #6a11cb; }
-.statusAnswered  { background: #28a745; }
-.statusFlagged   { background: #ffc107; }
-.statusUnanswered{ background: #ddd; }
+.statusItem {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+}
 
-.examNotes { font-size: 13px; color: #7f8c8d; margin-top: 16px; }
-.questionSidebar.compact .examNotes { font-size: 13px; color: #7f8c8d; margin-top: 14px; }
-.examNotes p { margin-bottom: 8px; font-weight: bold; }
-.examNotes ul { padding-left: 18px; }
-.examNotes li { margin-bottom: 4px; font-size: 13px; }
-.instructionsList { padding-left: 18px; margin-top: 8px; }
+.statusColor {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  margin-right: 4px;
+}
+
+.statusCurrent {
+  background: var(--secondary);
+}
+
+.statusAnswered {
+  background: var(--primary);
+}
+
+.statusFlagged {
+  background: #ffc107;
+}
+
+.statusUnanswered {
+  background: #e2e8f0;
+}
+
+.examNotes {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 16px;
+}
+
+.examNotes p {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.examNotes ul {
+  padding-left: 18px;
+}
+
+.examNotes li {
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.instructionsList {
+  padding-left: 18px;
+  margin-top: 8px;
+}
+
+/* ---------- Pre-exam Instructions Screen (legacy classes kept for
+   safety in case any other route still references them — the active
+   pre-exam screen is the Hall Pass block further down) ---------- */
+.instructionsScreen {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  box-sizing: border-box;
+}
+
+.instructionsCard {
+  width: 100%;
+  max-width: 680px;
+  background: white;
+  border-radius: 8px;
+  padding: 36px 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.instructionsTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 8px;
+}
+
+.instructionsMeta {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 24px;
+}
+
+.instructionsCard .examNotes {
+  margin-top: 0;
+  font-size: 14px;
+}
+
+.instructionsCard .examNotes li {
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.startExamBtn {
+  margin-top: 28px;
+  width: 100%;
+  justify-content: center;
+  padding: 12px 22px;
+  font-size: 16px;
+}
+
+@media (max-width: 480px) {
+  .instructionsCard {
+    padding: 24px 20px;
+  }
+
+  .instructionsTitle {
+    font-size: 20px;
+  }
+}
 
 /* ---------- Main Question Area ---------- */
 .questionMain {
@@ -233,7 +369,7 @@
   gap: 10px;
   margin-bottom: 18px;
   padding-bottom: 12px;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid #f1f5f9;
 }
 
 /* large title on the left, action buttons flow right — both in one flexible row */
@@ -262,7 +398,7 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: background-color 0.2s, opacity 0.2s, border-color 0.2s;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
@@ -271,115 +407,240 @@
 
 .btnOutline {
   background: white;
-  border: 1px solid #2575fc;
+  border: 1px solid var(--primary);
   color: #000000;
 }
-.btnOutline:hover { background: #f0f5ff; }
+
+.btnOutline:hover {
+  background: var(--primary-light);
+}
 
 .btnPrimary {
-  background: linear-gradient(to right, #6a11cb, #2575fc);
+  background: var(--primary);
   color: white;
 }
-.btnPrimary:hover { opacity: 0.9; transform: translateY(-2px); }
+
+.btnPrimary:hover {
+  opacity: 0.9;
+}
 
 .btnFlag {
   background: #ffc107;
   color: #000000;
 }
-.btnFlag:hover { background: #e0a800; }
-.btnFlag.flagged { background: #dc3545; }
 
-/* horizontal compact inline-cutoff bar */
+.btnFlag:hover {
+  background: #b45309;
+}
+
+.btnFlag.flagged {
+  background: #dc2626;
+}
+
+.btnFlag.flagged:hover {
+  background: #b91c1c;
+}
+
+/* horizontal compact inline-cutoff bar — informational only, so it
+   stays neutral slate rather than borrowing a brand color. */
 .cutoffContainer {
   display: inline-flex;
   align-items: center;
   gap: 5px;
   padding: 4px 10px;
-  border: 1px solid #2575fc;
+  border: 1px solid #cbd5e1;
   border-radius: 4px;
   font-size: 12px;
   font-weight: 600;
-  color: #2575fc;
+  color: #475569;
   cursor: default;
   white-space: nowrap;
   line-height: 1.4;
 }
-.cutoffContainer i { font-size: 11px; }
-.cutoffLabel { color: #555; font-weight: 500; }
-.cutoffValue { color: #2575fc; font-weight: 700; }
+
+.cutoffContainer i {
+  font-size: 11px;
+}
+
+.cutoffLabel {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.cutoffValue {
+  color: #334155;
+  font-weight: 700;
+}
 
 .btnClear {
-  background: #6c757d;
+  background: #64748b;
   color: white;
 }
-.btnClear:hover { background: #5a6268; }
-.btnClear:disabled { background: #e9ecef; color: #6c757d; cursor: not-allowed; opacity: 0.65; transform: none; }
+
+.btnClear:hover {
+  background: #475569;
+}
+
+.btnClear:disabled {
+  background: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
 
 .btnOutline:disabled,
 .btnPrimary:disabled,
 .btnFlag:disabled,
 .btnDanger:disabled {
-  background: #e9ecef; color: #6c757d; cursor: not-allowed; opacity: 0.65; transform: none;
+  background: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.65;
 }
+
 .btnOutline:disabled:hover,
 .btnPrimary:disabled:hover,
 .btnFlag:disabled:hover,
 .btnDanger:disabled:hover {
-  background: #e9ecef; color: #6c757d; cursor: not-allowed; opacity: 0.65; transform: none;
+  background: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
-.btnClear:hover:not(:disabled) { background: #5a6268; transform: scale(1.05); }
-.btnClear:active:not(:disabled) { animation: shake 0.3s ease-in-out; }
+.btnClear:hover:not(:disabled) {
+  background: #475569;
+}
+
+.btnClear:active:not(:disabled) {
+  animation: shake 0.3s ease-in-out;
+}
 
 @keyframes shake {
-  0%,100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
 }
 
 .btnDanger {
-  background: #dc3545;
+  background: #dc2626;
   color: white;
 }
-.btnDanger:hover { background: #c82333; }
 
-.btnLarge { padding: 10px 22px; font-size: 15px; }
+.btnDanger:hover {
+  background: #b91c1c;
+}
+
+.btnLarge {
+  padding: 10px 22px;
+  font-size: 15px;
+}
+
+/* ---------- Mobile navigator trigger + badge ----------
+   Secondary (violet), same reasoning as "current": this opens the
+   navigator that highlights the current question, so keeping it in
+   the same violet family reinforces that connection, and keeps it
+   visually distinct from the green primary CTAs (Next / Start). */
+.btnNavigatorTrigger {
+  background: white;
+  border: 1px solid var(--secondary);
+  color: var(--secondary);
+}
+
+.btnNavigatorTrigger:hover {
+  background: var(--secondary-light);
+}
+
+.navigatorBadge {
+  background: var(--secondary);
+  color: white;
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: 4px;
+}
 
 /* ---------- Question body ---------- */
 .questionContent {
   background: white;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 22px 26px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
   margin-bottom: 24px;
 }
-.questionText { font-size: 17px; margin-bottom: 22px; line-height: 1.6; }
 
-.optionsList { list-style: none; padding: 0; margin: 0; }
+.questionText {
+  font-size: 17px;
+  margin-bottom: 22px;
+  line-height: 1.6;
+  color: #1e293b;
+}
+
+.optionsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
 .optionItem {
   padding: 14px 16px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #e2e8f0;
   border-radius: 8px;
   margin-bottom: 12px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: background-color 0.2s, border-color 0.2s;
   display: flex;
   align-items: center;
+  background-color: #f0f0f0;
 }
-.optionItem:hover { border-color: #6a11cb; background: #f8f7ff; }
-.optionItem.selected { border-color: #2575fc; background: #e8f0fe; }
+
+.optionItem:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+/* Selected answer uses PRIMARY (green) — this is the user's own choice
+   / the main interactive action on the page, so it gets the brand
+   color, same as Start/Next. */
+.optionItem.selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
 
 .optionMarker {
-  width: 28px; height: 28px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: #f0f0f0;
-  display: flex; align-items: center; justify-content: center;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-right: 14px;
   font-weight: 600;
   flex-shrink: 0;
+  color: #1e293b;
 }
-.optionText { flex: 1; }
+
+.optionItem.selected .optionMarker {
+  background: var(--primary);
+  color: white;
+}
+
+.optionText {
+  flex: 1;
+  color: #1e293b;
+}
 
 /* ---------- Exam footer ---------- */
 .examFooter {
@@ -387,13 +648,19 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 0;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid #e2e8f0;
   margin-top: 24px;
 }
 
-.navButtons { display: flex; gap: 12px; }
+.navButtons {
+  display: flex;
+  gap: 12px;
+}
 
-.progressText { color: #7f8c8d; font-size: 14px; }
+.progressText {
+  color: #64748b;
+  font-size: 14px;
+}
 
 /* ======================================================
    RESPONSIVE — 5 breakpoints covering all real devices
@@ -408,18 +675,30 @@
     gap: 8px;
     margin-bottom: 14px;
   }
+
   .questionNumber {
-    width: 36px; height: 36px; font-size: 12px;
-    background: white; border: 2px solid #ddd; color: #333; border-radius: 5px;
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+    background: white;
+    border: 2px solid #e2e8f0;
+    color: #333;
+    border-radius: 5px;
   }
 }
 
 /* ---- ≤ 1024 px (tablet landscape / small desktop) ---- */
 @media (max-width: 1024px) {
-  .questionContainer { max-width: 100%; }
+  .questionContainer {
+    max-width: 100%;
+  }
 }
 
-/* ---- ≤ 992 px (tablet portrait) ---- */
+/* ---- ≤ 992 px (tablet portrait) ----
+   NOTE: The mobile/desktop *behavior* (drawer vs static sidebar) is driven
+   by the isDesktop JS flag at 1024px. These CSS rules below (992px and
+   under) style the mobile drawer, backdrop, and progress strip so there's
+   no visual gap between the JS breakpoint (1024px) and these styles. */
 @media (max-width: 992px) {
   .examContent {
     flex-direction: column;
@@ -427,22 +706,20 @@
     overflow: visible;
     height: auto;
   }
-  .questionSidebar {
-    width: 100%;
-    height: auto;
-    position: static;
-    border-right: none;
-    border-bottom: 1px solid #e0e0e0;
-    overflow: visible;
-    padding: 0 16px 16px;
-    margin-top: 14px;
-  }
+
   .questionMain {
     height: auto;
     padding: 20px 16px;
   }
-  .questionHeader h2 { flex: 1 1 100%; }
-  .questionActions { flex: 1 1 100%; margin-top: 8px; }
+
+  .questionHeader h2 {
+    flex: 1 1 100%;
+  }
+
+  .questionActions {
+    flex: 1 1 100%;
+    margin-top: 8px;
+  }
 }
 
 /* ---- ≤ 768 px (mobile) ---- */
@@ -453,34 +730,62 @@
     height: auto;
   }
 
-  .examHeader { padding: 6px 12px; gap: 8px; }
-
-  .examInfo h1 { font-size: 15px; }
-  .examInfo p  { font-size: 11px; }
-
-  .questionSidebar {
-    max-height: none;
-    padding: 0 14px 14px;
-    border-bottom: 2px solid #e0e0e0;
-    overflow: visible;
-    margin-top: 14px;
+  .examHeader {
+    padding: 6px 12px;
+    gap: 8px;
   }
-  .sidebarTitle       { font-size: 14px; }
-  .questionGrid       { grid-template-columns: repeat(4, 1fr); gap: 6px; }
-  .questionNumber     { width: 34px; height: 34px; font-size: 12px; }
 
-  .questionMain { padding: 16px 14px; }
+  .examInfo h1 {
+    font-size: 15px;
+  }
+
+  .examInfo p {
+    font-size: 11px;
+  }
+
+  .sidebarTitle {
+    font-size: 14px;
+  }
+
+  .questionGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .questionNumber {
+    width: 34px;
+    height: 34px;
+    font-size: 12px;
+  }
+
+  .questionMain {
+    padding: 16px 14px;
+  }
 
   .questionHeader {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  .questionHeader h2    { flex: 1 1 100%; font-size: 17px; }
-  .questionActions      { margin-top: 0; flex-wrap: wrap; }
 
-  .questionContent { padding: 0 16px 16px; }
-  .questionText    { font-size: 15px; margin-bottom: 18px; }
+  .questionHeader h2 {
+    flex: 1 1 100%;
+    font-size: 17px;
+  }
+
+  .questionActions {
+    margin-top: 0;
+    flex-wrap: wrap;
+  }
+
+  .questionContent {
+    padding: 0 16px 16px;
+  }
+
+  .questionText {
+    font-size: 15px;
+    margin-bottom: 18px;
+  }
 
   .optionItem {
     padding: 14px 16px;
@@ -489,62 +794,163 @@
     justify-content: flex-start;
     margin-bottom: 10px;
   }
-  .optionMarker { font-weight: bold; margin-right: 10px; }
+
+  .optionMarker {
+    font-weight: bold;
+    margin-right: 10px;
+  }
 
   .examFooter {
     flex-direction: column;
     gap: 12px;
     padding: 14px 0;
   }
-  .navButtons       { width: 100%; justify-content: space-between; }
-  .btnLarge         { padding: 10px 20px; font-size: 14px; }
-  .progressText     { text-align: center; margin: 8px 0; }
+
+  .navButtons {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .btnLarge {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  .progressText {
+    text-align: center;
+    margin: 8px 0;
+  }
 }
 
 /* ---- ≤ 600 px ---- */
 @media (max-width: 600px) {
-  .examHeader { padding: 5px 10px; gap: 6px; }
-  .examInfo h1 { font-size: 14px; }
-  .examInfo p  { font-size: 10px; }
-  .questionGrid { grid-template-columns: repeat(4, 1fr); gap: 5px; }
-  .questionNumber { width: 32px; height: 32px; font-size: 11px; }
-  .btn { padding: 5px 9px; font-size: 12px; }
+  .examHeader {
+    padding: 5px 10px;
+    gap: 6px;
+  }
+
+  .examInfo h1 {
+    font-size: 14px;
+  }
+
+  .examInfo p {
+    font-size: 10px;
+  }
+
+  .questionGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+  }
+
+  .questionNumber {
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+  }
+
+  .btn {
+    padding: 5px 9px;
+    font-size: 12px;
+  }
 }
 
 /* ---- ≤ 480 px (small phone) ---- */
 @media (max-width: 480px) {
-  .examContent { height: auto; overflow: visible; }
-  .examHeader  { padding: 4px 8px; gap: 6px; }
-  .examInfo h1 { font-size: 13px; }
-  .examInfo p  { font-size: 9.5px; }
-
-  .questionSidebar {
-    padding: 0 10px 10px;
-    margin-top: 12px;
+  .examContent {
+    height: auto;
+    overflow: visible;
   }
-  .sidebarTitle    { font-size: 13px; }
-  .questionGrid    { grid-template-columns: repeat(3, 1fr); gap: 5px; }
-  .questionNumber  { width: 30px; height: 30px; font-size: 11px; }
 
-  .questionMain  { padding: 12px 10px; }
-  .questionHeader h2 { font-size: 15px; }
-  .btn           { padding: 4px 8px; font-size: 11.5px; }
-  .btnLarge      { padding: 8px 14px; font-size: 12px; }
+  .examHeader {
+    padding: 4px 8px;
+    gap: 6px;
+  }
+
+  .examInfo h1 {
+    font-size: 13px;
+  }
+
+  .examInfo p {
+    font-size: 9.5px;
+  }
+
+  .sidebarTitle {
+    font-size: 13px;
+  }
+
+  .questionGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+  }
+
+  .questionNumber {
+    width: 30px;
+    height: 30px;
+    font-size: 11px;
+  }
+
+  .questionMain {
+    padding: 12px 10px;
+  }
+
+  .questionHeader h2 {
+    font-size: 15px;
+  }
+
+  .btn {
+    padding: 4px 8px;
+    font-size: 11.5px;
+  }
+
+  .btnLarge {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
 }
 
 /* ---- ≤ 375 px ---- */
 @media (max-width: 375px) {
-  .examInfo p { display: none; }
-  .examInfo h1 { font-size: 13px; }
-  .questionGrid  { grid-template-columns: repeat(3, 1fr); }
-  .questionNumber { width: 28px; height: 28px; font-size: 10px; }
+  .examInfo p {
+    display: none;
+  }
+
+  .examInfo h1 {
+    font-size: 13px;
+  }
+
+  .questionGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .questionNumber {
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
+  }
 }
 
 /* ---- ≤ 767px single-row device bridge (old rule placeholder) ---- */
 @media (max-width: 767px) {
-  .examContent { margin-top: 0; }
-  .examHeader  { position: fixed; margin-top: 0; }
-  .questionSidebar { margin-top: 14px; }
+  .examContent {
+    margin-top: 0;
+  }
+
+  .examHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .examInfo {
+    width: 100%;
+  }
+
+  .timerCard {
+    width: 100%;
+    min-width: 0;
+    justify-content: space-between;
+  }
+
   .questionMain {
     min-height: calc(100vh - 48px);
     padding: 0 14px 0;
@@ -560,46 +966,107 @@
 /* ---------- Modals (unchanged) ---------- */
 .modal {
   display: none;
-  position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
   z-index: 1000;
-  align-items: center; justify-content: center;
+  align-items: center;
+  justify-content: center;
 }
-.modal.show { display: flex; }
+
+.modal.show {
+  display: flex;
+}
+
 .modalContent {
-  background: white; border-radius: 10px; padding: 28px;
-  max-width: 480px; width: 92%; text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  background: white;
+  border-radius: 8px;
+  padding: 28px;
+  max-width: 480px;
+  width: 92%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
-.modalTitle { font-size: 22px; margin-bottom: 12px; color: #2c3e50; }
-.modalText  { margin-bottom: 22px; color: #7f8c8d; }
-.modalButtons { display: flex; gap: 12px; justify-content: center; }
+
+.modalTitle {
+  font-size: 22px;
+  margin-bottom: 12px;
+  color: #2c3e50;
+}
+
+.modalText {
+  margin-bottom: 22px;
+  color: #64748b;
+}
+
+.modalButtons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
 
 .overlay {
   display: none;
-  position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
   z-index: 2000;
-  align-items: center; justify-content: center;
+  align-items: center;
+  justify-content: center;
 }
-.overlay.show { display: flex; }
-.overlayContent {
-  background: white; border-radius: 10px; padding: 36px;
-  text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-}
-.overlayContent i  { font-size: 44px; color: #6a11cb; margin-bottom: 16px; animation: spin 1s infinite linear; }
-.overlayContent p  { font-size: 17px; color: #2c3e50; margin: 0; }
 
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.overlay.show {
+  display: flex;
+}
+
+.overlayContent {
+  background: white;
+  border-radius: 8px;
+  padding: 36px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.overlayContent i {
+  font-size: 44px;
+  color: var(--primary);
+  margin-bottom: 16px;
+  animation: spin 1s infinite linear;
+}
+
+.overlayContent p {
+  font-size: 17px;
+  color: #2c3e50;
+  margin: 0;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 @media (max-width: 768px) {
-  .modalButtons { flex-direction: column; }
+  .modalButtons {
+    flex-direction: column;
+  }
 }
 
 /* =========================================================
    TIMER CARD  — horizontal row, right side of nav bar
+   Status colors (good/warning/danger) are intentionally NOT tied to
+   the brand tokens — they're a universal traffic-light convention
+   and need to keep meaning the same thing regardless of brand color.
    ========================================================= */
 .timerCard {
   display: flex;
@@ -610,10 +1077,11 @@
   min-width: 200px;
   border-radius: 6px;
   color: white;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   flex-shrink: 0;
 }
+
 .timerMain {
   display: flex;
   align-items: center;
@@ -623,7 +1091,12 @@
   white-space: nowrap;
   line-height: 1;
 }
-.timerMain .fas { font-size: 1.1rem; opacity: 0.85; }
+
+.timerMain .fas {
+  font-size: 1.1rem;
+  opacity: 0.85;
+}
+
 .timerRight {
   display: flex;
   flex-direction: column;
@@ -634,9 +1107,325 @@
   white-space: nowrap;
   line-height: 1.3;
 }
-.timerStatusTop    { font-weight: 600; }
-.timerStatusBottom { opacity: 0.8; }
 
-.timerGood    { background: linear-gradient(135deg,#16a34a,#22c55e); }
-.timerWarning { background: linear-gradient(135deg,#ea580c,#f97316); }
-.timerDanger  { background: linear-gradient(135deg,#dc2626,#ef4444); }
+.timerStatusTop {
+  font-weight: 600;
+}
+
+.timerStatusBottom {
+  opacity: 0.8;
+}
+
+.timerGood {
+  /* background: #16a34a; */
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.timerWarning {
+  background: #d97706;
+}
+
+.timerDanger {
+  background: #dc2626;
+}
+
+/* ---------- Mobile progress strip (always visible, drawer or not) ---------- */
+.mobileProgressStrip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: var(--header-height, 48px);
+  z-index: 900;
+}
+
+.mobileProgressBarTrack {
+  flex: 1;
+  height: 6px;
+  background: #eee;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.mobileProgressBarFill {
+  height: 100%;
+  background: var(--primary);
+  transition: width 0.3s ease;
+}
+
+.mobileProgressText {
+  font-size: 11px;
+  color: #555;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ---------- Drawer backdrop (mobile) ---------- */
+.drawerBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1400;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------- Bottom-sheet drawer (mobile question navigator) ---------- */
+.questionSidebarDrawer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: auto;
+  width: 100%;
+  max-height: 70vh;
+  height: auto;
+  background: #f8fafc;
+  border-right: none;
+  border-top: 1px solid #e2e8f0;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+  z-index: 1500;
+  padding: 10px 16px 20px;
+  margin-top: 0;
+  transform: translateY(100%);
+  transition: transform 0.28s ease;
+  overflow-y: auto;
+}
+
+.questionSidebarDrawer.drawerOpen {
+  transform: translateY(0);
+}
+
+.drawerHandle {
+  width: 40px;
+  height: 4px;
+  background: #cbd5e1;
+  border-radius: 2px;
+  margin: 0 auto 12px;
+}
+
+/* ============================================================
+   Hall-pass pre-exam screen
+   Already mostly green — tokenized to var(--primary) so it tracks
+   the theme instead of a hardcoded hex, and the hover gradient on
+   the Start button is flattened (no gradients anywhere else in the
+   app's buttons, so this stays consistent with that).
+   ============================================================ */
+
+.hallPassScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 24px 64px;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+.hallPass {
+  width: 100%;
+  max-width: 720px;
+}
+
+/* Top strip: exam type + attempt id, ticket-header style */
+.hallPassStrip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #dfe6e0;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #6b7a71;
+}
+
+.hallPassType {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.hallPassId {
+  color: #6b7a71;
+}
+
+/* Title + meta row */
+.hallPassBody {
+  padding: 28px 0 8px;
+}
+
+.hallPassTitle {
+  margin: 0 0 20px;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #16281f;
+}
+
+.hallPassMeta {
+  display: flex;
+  border-top: 1px solid #dfe6e0;
+  border-bottom: 1px solid #dfe6e0;
+}
+
+.hallPassMetaItem {
+  flex: 1;
+  padding: 14px 20px;
+  border-right: 1px solid #dfe6e0;
+}
+
+.hallPassMetaItem:last-child {
+  border-right: none;
+}
+
+.hallPassMetaLabel {
+  display: block;
+  font-size: 12px;
+  color: #6b7a71;
+  margin-bottom: 4px;
+}
+
+.hallPassMetaValue {
+  display: block;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: #16281f;
+}
+
+/* Checklist */
+.hallPassChecklist {
+  padding: 24px 0 8px;
+}
+
+.hallPassChecklistLabel {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: #6b7a71;
+}
+
+.checklistItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.checklistItem p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #16281f;
+}
+
+.checkIcon {
+  color: var(--primary);
+  font-size: 15px;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.warningIcon {
+  color: #d97706;
+  font-size: 15px;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.checklistWarning p {
+  color: #16281f;
+  font-weight: 600;
+}
+
+/* Ticket-stub divider + start button */
+.hallPassStub {
+  position: relative;
+  margin-top: 20px;
+  border-top: 2px dashed #b9c7bd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 24px;
+}
+
+.hallPassStub::before {
+  left: -20px;
+}
+
+.hallPassStub::after {
+  right: -20px;
+}
+
+.hallPassStubText p {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7a71;
+  line-height: 1.5;
+}
+
+.hallPassStartBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.hallPassStartBtn:hover {
+  opacity: 0.9;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .hallPassScreen {
+    padding: 32px 16px 48px;
+  }
+
+  .hallPassTitle {
+    font-size: 24px;
+  }
+
+  .hallPassMeta {
+    flex-direction: column;
+  }
+
+  .hallPassMetaItem {
+    border-right: none;
+    border-bottom: 1px solid #dfe6e0;
+  }
+
+  .hallPassMetaItem:last-child {
+    border-bottom: none;
+  }
+
+  .hallPassStub {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .hallPassStartBtn {
+    justify-content: center;
+  }
+}
