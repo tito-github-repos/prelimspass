@@ -184,28 +184,30 @@ const ScoreCircle = ({ score }: { score: number }) => {
     return "#dc2626";
   };
   const color = getScoreColor(percentage);
+  const size = 150;
 
   return (
-    <Box sx={{ position: "relative", display: "inline-flex", mb: 2 }}>
+    <Box sx={{ position: "relative", width: size, height: size, mb: 2 }}>
       <CircularProgress
         variant="determinate"
         value={percentage}
-        size={150}
+        size={size}
         thickness={8}
         sx={{
           color: color,
           backgroundColor: "transparent",
           borderRadius: "50%",
           boxShadow: "inset 0 0 0 8px #e9ecef",
+          display: "block", // ADD THIS — kills the SVG baseline gap
         }}
       />
       <Box
         sx={{
+          position: "absolute",
           top: 0,
           left: 0,
-          bottom: 0,
-          right: 0,
-          position: "absolute",
+          width: size, // exact match, not top/left/bottom/right
+          height: size,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
