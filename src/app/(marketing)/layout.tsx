@@ -1,6 +1,6 @@
+import FloatingPyqButton from "../components/landingpage/FloatingPyqButton";
 import Footer from "../components/landingpage/Footer";
 import Header from "../components/landingpage/Header";
-
 
 export default function MarketingLayout({
   children,
@@ -11,7 +11,10 @@ export default function MarketingLayout({
     <>
       <Header />
 
-      <main>{children}</main>
+      <main>
+        {children}
+        <FloatingPyqButton />
+      </main>
 
       <Footer />
     </>
