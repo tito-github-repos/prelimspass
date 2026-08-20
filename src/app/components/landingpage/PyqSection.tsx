@@ -28,7 +28,7 @@ const ways = [
       "+ More",
     ],
     cta: "Explore Topics",
-    href: "http://localhost:3000/login",
+    href: "/login",
   },
   {
     color: "#2563eb",
@@ -46,7 +46,7 @@ const ways = [
       "+ More",
     ],
     cta: "Explore Answer Types",
-    href: "http://localhost:3000/login",
+    href: "/login",
   },
   {
     color: "#7c3aed",
@@ -58,7 +58,7 @@ const ways = [
     sub: "Build strong basics and \n move up steadily",
     tags: ["Easy", "Medium", "Hard"],
     cta: "Explore Difficulty Levels",
-    href: "http://localhost:3000/login",
+    href: "/login",
   },
 ];
 
