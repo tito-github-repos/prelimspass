@@ -72,7 +72,7 @@ export default function OtpEmail({ otp }: OtpEmailProps) {
             the next 5 minutes.
           </Text>
 
-          {/* OTP box */}
+          {/* OTP box input */}
           <Section
             style={{
               backgroundColor: "#f0fdf4",
