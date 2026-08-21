@@ -12,6 +12,7 @@ const createSubjectSchema = yup.object({
     .array()
     .of(yup.string().required("Topic name is required"))
     .min(1, "At least one topic is required"),
+  is_pyq: yup.boolean().default(false),
 });
 
 // ----------------------
@@ -40,6 +41,7 @@ export async function GET() {
           topic_id: topic.topic_id,
           topic_name: topic.topic_name,
           questionCount,
+          is_pyq: topic.is_pyq, // NEW - so the edit modal / any topic-level UI can read it too
           canEdit: questionCount === 0,
           canDelete: questionCount === 0,
         };
@@ -51,6 +53,7 @@ export async function GET() {
         subject_id: subject.subject_id,
         subject_name: subject.subject_name,
         topic_count: topics.length,
+        is_pyq: subject.is_pyq, // NEW - this was missing, so the frontend always saw `undefined`
         canEdit: !subjectHasQuestions,
         canDelete: !subjectHasQuestions,
         topics,
@@ -76,14 +79,16 @@ export async function POST(req: Request) {
     const body = await req.json();
     await createSubjectSchema.validate(body, { abortEarly: false });
 
-    const { subject_name, topics } = body;
+    const { subject_name, topics, is_pyq = false } = body;
 
     const subject = await prisma.subjects.create({
       data: {
         subject_name,
+        is_pyq, // NEW - write the subject-level flag
         topics: {
           create: topics.map((topicName: string) => ({
             topic_name: topicName,
+            is_pyq, // NEW - every topic inherits the subject's PYQ flag, per our agreed design
           })),
         },
       },
@@ -137,7 +142,7 @@ export async function PUT(req: Request) {
     }
 
     const body = await req.json();
-    const { subject_name, topics } = body;
+    const { subject_name, topics, is_pyq } = body;
 
     if (!Array.isArray(topics) || topics.length === 0) {
       return NextResponse.json(
@@ -159,10 +164,13 @@ export async function PUT(req: Request) {
     // Start transaction
     await prisma.$transaction(
       async (tx) => {
-        // 1️⃣ Update subject name
+        // 1️⃣ Update subject name + is_pyq flag
         await tx.subjects.update({
           where: { subject_id: subjectId },
-          data: { subject_name },
+          data: {
+            subject_name,
+            is_pyq: !!is_pyq, // NEW - persist the toggle value
+          },
         });
 
         // 2️⃣ Fetch existing topics
@@ -185,21 +193,29 @@ export async function PUT(req: Request) {
           }
         }
 
-        // 4️⃣ Update existing topics
+        // 4️⃣ Update existing topics - also cascade is_pyq so topics stay
+        //    in sync with the subject's current flag
         for (const topic of topics) {
           if (topic.topic_id) {
             await tx.topics.update({
               where: { topic_id: topic.topic_id },
-              data: { topic_name: topic.topic_name },
+              data: {
+                topic_name: topic.topic_name,
+                is_pyq: !!is_pyq, // NEW
+              },
             });
           }
         }
 
-        // 5️⃣ Create new topics
+        // 5️⃣ Create new topics - inherit the same flag
         for (const topic of topics) {
           if (!topic.topic_id) {
             await tx.topics.create({
-              data: { subject_id: subjectId, topic_name: topic.topic_name },
+              data: {
+                subject_id: subjectId,
+                topic_name: topic.topic_name,
+                is_pyq: !!is_pyq, // NEW
+              },
             });
           }
         }

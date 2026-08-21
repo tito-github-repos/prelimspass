@@ -1,3 +1,4 @@
+//prelimspass\src\app\api\questions\route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
@@ -38,9 +39,12 @@ export async function GET() {
         topic_id: q.topic_id,
         created_at: q.created_at,
         explanation: q.explanation,
+        is_pyq: q.is_pyq, // NEW - lets the list UI show Normal / PYQ
 
         examCount,
-        canEdit: examCount === 0,
+        // PYQ questions are managed through their own flow, so lock
+        // edit here regardless of exam usage (matches the exams pattern).
+        canEdit: examCount === 0 && !q.is_pyq,
         canDelete: examCount === 0,
       };
     });
@@ -117,6 +121,15 @@ export async function POST(req: Request) {
       );
     }
 
+    // NEW - this route only ever creates normal (non-PYQ) questions, and
+    // a normal question must not be filed under a PYQ topic.
+    if (topicExists.is_pyq) {
+      return NextResponse.json(
+        { error: "Cannot add a normal question under a PYQ topic" },
+        { status: 400 },
+      );
+    }
+
     const newQuestion = await prisma.questions.create({
       data: {
         question_text: question_text.trim(),
@@ -130,6 +143,7 @@ export async function POST(req: Request) {
         subject_id,
         topic_id,
         explanation: explanation || null,
+        is_pyq: false, // NEW - explicit, this route never creates PYQ questions
       },
     });
 
@@ -180,6 +194,28 @@ export async function PUT(req: Request) {
       );
     }
 
+    // 🔒 PYQ GUARD
+    // PYQ questions are created and maintained through their own flow.
+    // Editing one through this normal-question route is blocked outright.
+    const existingQuestion = await prisma.questions.findUnique({
+      where: { question_id },
+      select: { is_pyq: true },
+    });
+
+    if (!existingQuestion) {
+      return NextResponse.json(
+        { error: "Question not found" },
+        { status: 404 },
+      );
+    }
+
+    if (existingQuestion.is_pyq) {
+      return NextResponse.json(
+        { error: "PYQ questions cannot be edited through this route." },
+        { status: 400 },
+      );
+    }
+
     // 🔒 CHECK EXAM USAGE
     const examCount = await prisma.exam_questions.count({
       where: { question_id },
@@ -196,6 +232,23 @@ export async function PUT(req: Request) {
     if (!validAnswers.includes(correct_answer.toUpperCase())) {
       return NextResponse.json(
         { error: "Correct answer must be A, B, C, or D" },
+        { status: 400 },
+      );
+    }
+
+    // NEW - keep a normal question pinned to a normal topic
+    const topicExists = await prisma.topics.findUnique({
+      where: { topic_id },
+    });
+    if (!topicExists) {
+      return NextResponse.json(
+        { error: "Invalid topic selected" },
+        { status: 400 },
+      );
+    }
+    if (topicExists.is_pyq) {
+      return NextResponse.json(
+        { error: "Cannot move a normal question under a PYQ topic" },
         { status: 400 },
       );
     }

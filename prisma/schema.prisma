@@ -33,20 +33,25 @@ model subjects {
   subject_id           Int                    @id @default(autoincrement())
   subject_name         String                 @unique @db.VarChar(100)
   created_at           DateTime               @default(now())
+  is_pyq               Boolean                @default(false)
   exam_subject_configs exam_subject_configs[]
   questions            questions[]
   topics               topics[]
+
+  @@index([is_pyq])
 }
 
 model topics {
   topic_id             Int                    @id @default(autoincrement())
   subject_id           Int
   topic_name           String                 @db.VarChar(255)
+  is_pyq               Boolean                @default(false)
   exam_subject_configs exam_subject_configs[]
   questions            questions[]
   subject              subjects               @relation(fields: [subject_id], references: [subject_id], onDelete: Cascade)
 
   @@index([subject_id])
+  @@index([is_pyq])
 }
 
 model exams {
@@ -59,6 +64,7 @@ model exams {
   scheduled_start         DateTime?
   scheduled_end           DateTime?
   is_active               Boolean                 @default(true)
+  is_pyq                  Boolean                 @default(false)
   created_by              Int?
   created_at              DateTime                @default(now())
   allow_multiple_attempts Boolean                 @default(true)
@@ -75,6 +81,7 @@ model exams {
 
   @@index([created_by])
   @@index([exam_type])
+  @@index([is_pyq])
 }
 
 model exam_subject_configs {
@@ -124,6 +131,7 @@ model questions {
   updated_at             DateTime                 @updatedAt
   updated_by             Int?
   explanation            String?                  @db.Text
+  is_pyq                 Boolean                  @default(false)
   exam_questions         exam_questions[]
   creator                users?                   @relation(fields: [created_by], references: [user_id])
   subject                subjects                 @relation(fields: [subject_id], references: [subject_id])
@@ -134,17 +142,19 @@ model questions {
   @@index([subject_id])
   @@index([topic_id])
   @@index([created_by], map: "questions_created_by_fkey")
+  @@index([is_pyq])
 }
 
 model student_details {
-  student_id Int                    @id @default(autoincrement())
-  user_id    Int                    @unique
-  dob        DateTime               @db.Date
-  gender     student_details_gender
-  grade      String?                @db.VarChar(50)
-  school     String?                @db.VarChar(255)
-  section    String?                @db.VarChar(10)
-  user       users                  @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  student_id   Int                    @id @default(autoincrement())
+  user_id      Int                    @unique
+  dob          DateTime               @db.Date
+  gender       student_details_gender
+  grade        String?                @db.VarChar(50)
+  school       String?                @db.VarChar(255)
+  section      String?                @db.VarChar(10)
+  is_paid_user Boolean                @default(false)
+  user         users                  @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }
 
 model student_exam_attempts {
@@ -224,18 +234,31 @@ model student_exam_questions {
 }
 
 model pyq_exam_meta {
-  id           Int       @id @default(autoincrement())
-  exam_id      Int       @unique(map: "exam_id")
-  subject      String    @db.VarChar(100)
-  categoryType String    @db.VarChar(50)
-  category     String    @db.VarChar(100)
-  created_at   DateTime? @default(now()) @db.DateTime(0)
-  set_number   Int?
-  exams        exams     @relation(fields: [exam_id], references: [exam_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pyq_exam")
+  id      Int @id @default(autoincrement())
+  exam_id Int @unique(map: "exam_id")
 
-  @@index([category], map: "idx_category")
-  @@index([categoryType], map: "idx_categoryType")
-  @@index([subject], map: "idx_subject")
+  subject     String          @db.VarChar(100)
+  filter_type pyq_filter_type
+  topic       String?         @db.VarChar(150)
+  difficulty  String?         @db.VarChar(50)
+  answer_type String?         @db.VarChar(50)
+
+  set_number Int?
+  created_at DateTime @default(now()) @db.DateTime(0)
+
+  exams exams @relation(fields: [exam_id], references: [exam_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pyq_exam")
+
+  @@index([subject], map: "idx_pyq_subject")
+  @@index([filter_type], map: "idx_pyq_filter_type")
+  @@index([topic], map: "idx_pyq_topic")
+  @@index([difficulty], map: "idx_pyq_difficulty")
+  @@index([answer_type], map: "idx_pyq_answer_type")
+}
+
+enum pyq_filter_type {
+  topic
+  difficulty
+  answer_type
 }
 
 enum exam_type {

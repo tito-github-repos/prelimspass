@@ -1,3 +1,4 @@
+//prelimspass\src\app\api\exams\[examId]\route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import jwt from "jsonwebtoken";
@@ -61,7 +62,8 @@ export async function GET(
       scheduled_start: exam.scheduled_start?.toISOString() || null,
       scheduled_end: exam.scheduled_end?.toISOString() || null,
       description: exam.description,
-      canEdit: exam._count.exam_assignments === 0,
+      is_pyq: exam.is_pyq, // NEW - lets the view modal / edit button know what it's looking at
+      canEdit: exam._count.exam_assignments === 0 && !exam.is_pyq, // NEW - PYQ exams are never editable through this route
       canDelete: exam._count.exam_assignments === 0,
       selection_mode: exam.selection_mode || "auto",
       subjects: exam.exam_subject_configs.map((cfg) => ({
@@ -170,6 +172,32 @@ export async function PUT(
       );
     }
 
+    /* ================= PYQ GUARD ================= */
+    // PYQ exams are created and maintained exclusively through
+    // POST /api/exams/pyq. This route is for normal practice/mock/live
+    // exams only, so editing a PYQ exam through here is blocked outright.
+    const existingExam = await prisma.exams.findUnique({
+      where: { exam_id: examId },
+      select: { is_pyq: true },
+    });
+
+    if (!existingExam) {
+      return NextResponse.json(
+        { success: false, message: "Exam not found" },
+        { status: 404 },
+      );
+    }
+
+    if (existingExam.is_pyq) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "PYQ exams cannot be edited through this route.",
+        },
+        { status: 400 },
+      );
+    }
+
     /* ================= LOCK CHECK ================= */
     const assignedStudents = await prisma.exam_assignment_students.count({
       where: { assignment: { exam_id: examId } },
@@ -219,7 +247,10 @@ export async function PUT(
         const topicIds = Object.keys(topicCounts).map(Number);
 
         const topics = await tx.topics.findMany({
-          where: { topic_id: { in: topicIds } },
+          where: {
+            topic_id: { in: topicIds },
+            is_pyq: false, // NEW - only normal topics can back a normal exam
+          },
         });
 
         // Insert subject configs
@@ -237,7 +268,10 @@ export async function PUT(
           const topicId = Number(topicIdStr);
 
           const allQuestions = await tx.questions.findMany({
-            where: { topic_id: topicId },
+            where: {
+              topic_id: topicId,
+              is_pyq: false, // NEW - the critical fix, same as the create route
+            },
           });
 
           if (allQuestions.length < count) {
@@ -263,7 +297,10 @@ export async function PUT(
       /* ================= MANUAL MODE ================= */
       if (selectionMode === "manual") {
         const questions = await tx.questions.findMany({
-          where: { question_id: { in: selectedQuestions } },
+          where: {
+            question_id: { in: selectedQuestions },
+            is_pyq: false, // NEW
+          },
           select: {
             question_id: true,
             topic_id: true,
@@ -273,7 +310,6 @@ export async function PUT(
           },
         });
 
-        // 🔥 ADD THIS
         const topicMap: Record<number, number> = {};
 
         questions.forEach((q) => {
@@ -299,7 +335,6 @@ export async function PUT(
           }),
         });
 
-        // 🔽 KEEP YOUR EXISTING QUESTION INSERT LOGIC BELOW
         const orderedQuestions = selectedQuestions
           .map((id: number) => questions.find((q) => q.question_id === id))
           .filter(Boolean);
@@ -318,108 +353,15 @@ export async function PUT(
       }
 
       /* ---------- INSERT QUESTIONS ---------- */
-      console.log("🧾 examQuestionsData:", examQuestionsData);
       await tx.exam_questions.createMany({
         data: examQuestionsData,
       });
-      console.log("🧾 examQuestionsData:", examQuestionsData);
-
-      // =====================================================
-      // PYQ META UPDATE
-      // =====================================================
-
-      const isPYQ = examTitle.startsWith("[PYQ]");
-
-      const existingMeta = await tx.pyq_exam_meta.findUnique({
-        where: {
-          exam_id: examId,
-        },
-      });
-
-      if (isPYQ) {
-        const parts = examTitle.split("|").map((p) => p.trim());
-
-        if (parts.length < 4) {
-          throw new Error(
-            "Invalid PYQ format. Expected: [PYQ]|<subject>|<type>|<category>|[Set-N]",
-          );
-        }
-
-        const [, subject, rawType, category, setPart] = parts;
-
-        const typeMap: any = {
-          topic: "topic",
-          "topic-wise": "topic",
-          difficulty: "difficulty",
-          "difficulty-wise": "difficulty",
-          "answer-type": "answer_type",
-          answer_type: "answer_type",
-        };
-
-        const normalizedType = typeMap[rawType?.toLowerCase()?.trim()];
-
-        if (!normalizedType) {
-          throw new Error(
-            `Invalid PYQ type: ${rawType}. Use: topic, difficulty, or answer-type`,
-          );
-        }
-
-        let set_number: number | null = null;
-
-        if (setPart) {
-          const match = setPart.match(/set[-_\s]?(\d+)/i);
-
-          if (match) {
-            set_number = Number(match[1]);
-          }
-        }
-
-        // ---------------------------------------
-        // UPDATE existing meta
-        // ---------------------------------------
-        if (existingMeta) {
-          await tx.pyq_exam_meta.update({
-            where: {
-              exam_id: examId,
-            },
-            data: {
-              subject: subject.trim(),
-              categoryType: normalizedType,
-              category: category.trim(),
-              set_number,
-            },
-          });
-        }
-
-        // ---------------------------------------
-        // CREATE new meta
-        // ---------------------------------------
-        else {
-          await tx.pyq_exam_meta.create({
-            data: {
-              exam_id: examId,
-              subject: subject.trim(),
-              categoryType: normalizedType,
-              category: category.trim(),
-              set_number,
-            },
-          });
-        }
-      }
-
-      // ---------------------------------------
-      // DELETE meta if changed from PYQ
-      // to normal exam
-      // ---------------------------------------
-      else if (existingMeta) {
-        await tx.pyq_exam_meta.delete({
-          where: {
-            exam_id: examId,
-          },
-        });
-      }
 
       /* ---------- UPDATE EXAM ---------- */
+      // NOTE: no more PYQ meta handling here - PYQ exams never reach this
+      // far since the guard above already blocked them, and this route
+      // never creates/updates pyq_exam_meta anymore. That table is owned
+      // exclusively by POST /api/exams/pyq.
       await tx.exams.update({
         where: { exam_id: examId },
         data: {
