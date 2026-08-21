@@ -1458,6 +1458,9 @@ export default function QuestionBankPage() {
                           Difficulty
                         </TableCell>
                         <TableCell sx={{ fontWeight: "bold" }}>
+                          Category
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>
                           Actions
                         </TableCell>
                       </TableRow>
@@ -1509,6 +1512,14 @@ export default function QuestionBankPage() {
                               />
                             </TableCell>
                             <TableCell>
+                              <Chip
+                                label={q.is_pyq ? "PYQ" : "Normal"}
+                                color={q.is_pyq ? "secondary" : "default"}
+                                size="small"
+                                variant={q.is_pyq ? "filled" : "outlined"}
+                              />
+                            </TableCell>
+                            <TableCell>
                               <Box sx={{ display: "flex", gap: 1 }}>
                                 <Tooltip title="View" arrow>
                                   <IconButton
@@ -1522,9 +1533,11 @@ export default function QuestionBankPage() {
                                 {/* Edit */}
                                 <Tooltip
                                   title={
-                                    q.canEdit
-                                      ? "Edit Question"
-                                      : "Cannot edit: question already used in exam"
+                                    q.is_pyq
+                                      ? "PYQ questions cannot be edited here"
+                                      : q.canEdit
+                                        ? "Edit Question"
+                                        : "Cannot edit: question already used in exam"
                                   }
                                   arrow
                                 >
@@ -1545,7 +1558,7 @@ export default function QuestionBankPage() {
                         ))
                       ) : (
                         <TableRow>
-                          <TableCell colSpan={5} align="center" sx={{ py: 5 }}>
+                          <TableCell colSpan={6} align="center" sx={{ py: 5 }}>
                             <Typography variant="body1" color="text.secondary">
                               {searchTerm ||
                               selectedSubjectId ||
@@ -1857,6 +1870,10 @@ export default function QuestionBankPage() {
                 </Typography>
                 <Typography>
                   <b>Subject:</b> {selectedQuestion.subject_name}
+                </Typography>
+                <Typography>
+                  <b>Category:</b>{" "}
+                  {selectedQuestion.is_pyq ? "PYQ" : "Normal"}
                 </Typography>
 
                 {/* Explanation */}

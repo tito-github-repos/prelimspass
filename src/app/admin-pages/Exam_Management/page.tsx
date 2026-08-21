@@ -53,11 +53,13 @@ import {
 import dynamic from "next/dynamic";
 import Sidebar from "../../components/Sidebar";
 import CreateExamModal from "../../components/CreateExamModal";
+
 import EditExamModal from "../../components/EditExamModal";
 import ExamDetailsModal from "../../components/ExamDetailsModal";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import AssignExamModal from "../../components/AssignExamModal";
 import ExamResultsModal from "@/app/components/ExamResultsModal";
+import CreatePyqExamModal from "@/app/components/Createpyqexammodal";
 
 const Header = dynamic(() => import("../../components/Header"), { ssr: false });
 
@@ -77,6 +79,7 @@ interface Exam {
   subject_id: number;
   topic_id: number;
   exam_type: "practice" | "mock" | "live";
+  is_pyq: boolean; // NEW - true = PYQ exam, false = normal exam
   status: "active" | "draft" | "completed" | "inactive";
   questions_count: number;
   duration_minutes: number;
@@ -105,6 +108,7 @@ const ExamManagement: React.FC = () => {
 
   // Modal states
   const [createExamModalOpen, setCreateExamModalOpen] = useState(false);
+  const [createPyqExamModalOpen, setCreatePyqExamModalOpen] = useState(false);
   const [examTypeSelection, setExamTypeSelection] = useState<
     "select" | "practice" | "mock" | "live" | ""
   >("");
@@ -346,6 +350,10 @@ const ExamManagement: React.FC = () => {
     fetchQuestionCounts();
   };
 
+  const handleCreatePyqExam = () => {
+    setCreatePyqExamModalOpen(true);
+  };
+
   const handleCloseCreateModal = () => {
     setCreateExamModalOpen(false);
     setExamTypeSelection("");
@@ -387,6 +395,10 @@ const ExamManagement: React.FC = () => {
       allowCamera: true,
       requireID: true,
     });
+  };
+
+  const handleCloseCreatePyqModal = () => {
+    setCreatePyqExamModalOpen(false);
   };
 
   const handleEditClick = (exam: Exam) => {
@@ -470,7 +482,7 @@ const ExamManagement: React.FC = () => {
         exam.id === examId
           ? {
               ...exam,
-              canEdit: assignedCount === 0,
+              canEdit: assignedCount === 0 && !exam.is_pyq,
               canDelete: assignedCount === 0,
             }
           : exam,
@@ -534,32 +546,43 @@ const ExamManagement: React.FC = () => {
               justifyContent: "space-between",
               alignItems: "center",
               mb: 3,
+              flexWrap: "wrap",
+              gap: 2,
             }}
           >
             <Typography variant="h6" sx={{ color: "text.primary" }}>
               Search & Filter Exams
             </Typography>
-            <Button
-              variant="contained"
-              startIcon={
-                loading ? (
-                  <CircularProgress size={18} color="inherit" />
-                ) : (
-                  <Add />
-                )
-              }
-              onClick={handleCreateExam}
-              sx={{
-                "&.Mui-disabled": {
-                  opacity: 1,
-                  color: "white",
-                  backgroundColor: "primary.main",
-                },
-              }}
-              disabled={loading}
-            >
-              {loading ? "Loading..." : "Create New Exam"}
-            </Button>
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="outlined"
+                startIcon={<Add />}
+                onClick={handleCreatePyqExam}
+              >
+                Create PYQ Exam
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={
+                  loading ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : (
+                    <Add />
+                  )
+                }
+                onClick={handleCreateExam}
+                sx={{
+                  "&.Mui-disabled": {
+                    opacity: 1,
+                    color: "white",
+                    backgroundColor: "primary.main",
+                  },
+                }}
+                disabled={loading}
+              >
+                {loading ? "Loading..." : "Create New Exam"}
+              </Button>
+            </Stack>
           </Box>
 
           <Grid container spacing={2}>
@@ -664,6 +687,9 @@ const ExamManagement: React.FC = () => {
                         Exam Title
                       </TableCell>
                       <TableCell sx={{ fontWeight: "bold" }}>Type</TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        Category
+                      </TableCell>
                       <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
                       <TableCell sx={{ fontWeight: "bold" }}>
                         Duration (mins)
@@ -705,6 +731,14 @@ const ExamManagement: React.FC = () => {
                                     <LiveTv />
                                   )
                                 }
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                label={exam.is_pyq ? "PYQ" : "Normal"}
+                                color={exam.is_pyq ? "secondary" : "default"}
+                                size="small"
+                                variant={exam.is_pyq ? "filled" : "outlined"}
                               />
                             </TableCell>
                             <TableCell>
@@ -764,11 +798,13 @@ const ExamManagement: React.FC = () => {
                                 {/* Edit */}
                                 <Tooltip
                                   title={
-                                    isLiveInactive
-                                      ? "Cannot edit: live exam is inactive"
-                                      : exam.canEdit
-                                        ? "Edit Exam"
-                                        : "Cannot edit: exam already assigned to students"
+                                    exam.is_pyq
+                                      ? "PYQ exams cannot be edited here"
+                                      : isLiveInactive
+                                        ? "Cannot edit: live exam is inactive"
+                                        : exam.canEdit
+                                          ? "Edit Exam"
+                                          : "Cannot edit: exam already assigned to students"
                                   }
                                   arrow
                                 >
@@ -777,7 +813,9 @@ const ExamManagement: React.FC = () => {
                                       size="small"
                                       color="secondary"
                                       disabled={
-                                        exam.canEdit === false || isLiveInactive
+                                        exam.canEdit === false ||
+                                        isLiveInactive ||
+                                        exam.is_pyq
                                       }
                                       onClick={() => handleEditClick(exam)}
                                     >
@@ -843,7 +881,7 @@ const ExamManagement: React.FC = () => {
                       })
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={5} align="center" sx={{ py: 5 }}>
+                        <TableCell colSpan={6} align="center" sx={{ py: 5 }}>
                           <Typography variant="body1" color="text.secondary">
                             No exams found
                           </Typography>
@@ -877,6 +915,12 @@ const ExamManagement: React.FC = () => {
         <CreateExamModal
           open={createExamModalOpen}
           onClose={handleCloseCreateModal}
+          onSuccess={fetchExams}
+        />
+
+        <CreatePyqExamModal
+          open={createPyqExamModalOpen}
+          onClose={handleCloseCreatePyqModal}
           onSuccess={fetchExams}
         />
 
