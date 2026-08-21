@@ -4,13 +4,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyToken } from "@/utils/auth";
 
+// Maps the query param "type" (topic | difficulty | answer_type) to both
+// the pyq_filter_type enum value AND the actual column on pyq_exam_meta
+// that holds the comparison value for that type. Only one of
+// topic/difficulty/answer_type is ever populated per row, matching
+// whichever filter_type that exam was tagged with.
+const FILTER_COLUMN_MAP: Record<string, "topic" | "difficulty" | "answer_type"> = {
+  topic: "topic",
+  difficulty: "difficulty",
+  answer_type: "answer_type",
+};
+
 export async function GET(req: NextRequest) {
   try {
     // ---------------- AUTH ----------------
-    // Previously this route never checked who was asking, so it could never
-    // tell you which student's attempts to attach to each exam. That's the
-    // root cause of "Retake" / "View Result" not surviving a page reload -
-    // the response literally never contained attempt data.
     const authHeader = req.headers.get("authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return NextResponse.json(
@@ -41,16 +48,35 @@ export async function GET(req: NextRequest) {
           success: false,
           message: "subject, type and value are required",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // FETCH FROM PYQ META + JOIN EXAMS
+    const matchColumn = FILTER_COLUMN_MAP[type];
+    if (!matchColumn) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Invalid type "${type}". Use: topic, difficulty, or answer_type`,
+        },
+        { status: 400 },
+      );
+    }
+
+    // FETCH FROM PYQ META + JOIN EXAMS - using the real schema columns
+    // (filter_type + topic/difficulty/answer_type), not the old
+    // categoryType/category fields that never actually existed on this table.
     const pyqExams = await prisma.pyq_exam_meta.findMany({
       where: {
         subject: { equals: subject },
-        categoryType: { equals: type },
-        category: { equals: value },
+        filter_type: type as "topic" | "difficulty" | "answer_type",
+        [matchColumn]: { equals: value },
+        // Belt-and-braces: only ever surface exams that are actually
+        // flagged is_pyq on the exams table itself, and still active.
+        exams: {
+          is_pyq: true,
+          is_active: true,
+        },
       },
       include: {
         exams: true,
@@ -67,28 +93,9 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // Drop any meta rows with no linked exam before we bother looking up
-    // attempts for them.
-    const validItems = pyqExams.filter((item) => {
-      if (!item.exams) {
-        console.warn("Pyq exam meta has no associated exam:", {
-          pyqExamId: item.id,
-          examId: item.exam_id,
-          subject: item.subject,
-          categoryType: item.categoryType,
-          category: item.category,
-        });
-        return false;
-      }
-      return true;
-    });
-
-    const examIds = validItems.map((item) => item.exams!.exam_id);
+    const examIds = pyqExams.map((item) => item.exams.exam_id);
 
     // ---------------- ATTACH THIS STUDENT'S LATEST ATTEMPT PER EXAM ----------------
-    // One query for every exam on this page instead of one query per exam.
-    // Ordered newest-first so the first attempt we see per exam_id is the
-    // latest one - this is what "latest attempt" is actually derived from.
     const attempts = examIds.length
       ? await prisma.student_exam_attempts.findMany({
           where: {
@@ -108,22 +115,24 @@ export async function GET(req: NextRequest) {
     }
 
     // FORMAT RESPONSE
-    const exams = validItems.map((item) => ({
-      exam_id: item.exams!.exam_id,
-      exam_title: item.exams!.exam_title,
-      exam_type: item.exams!.exam_type,
+    const exams = pyqExams.map((item) => ({
+      exam_id: item.exams.exam_id,
+      exam_title: item.exams.exam_title,
+      exam_type: item.exams.exam_type,
 
-      duration_minutes: item.exams!.time_limit_minutes,
+      duration_minutes: item.exams.time_limit_minutes,
+      question_count: item.exams.question_count,
+      total_marks: Number(item.exams.total_marks),
 
-      question_count: item.exams!.question_count,
-
-      total_marks: Number(item.exams!.total_marks),
+      // Only meaningful when type === "difficulty" - null otherwise,
+      // frontend already falls back to "Medium" for display.
+      difficulty: item.difficulty,
 
       set_number: item.set_number,
 
       // This student's latest attempt at this exam, or null if they've
       // never attempted it. The frontend reads this field name directly.
-      last_attempt_id: latestAttemptByExam.get(item.exams!.exam_id) ?? null,
+      last_attempt_id: latestAttemptByExam.get(item.exams.exam_id) ?? null,
     }));
 
     return NextResponse.json({
@@ -137,7 +146,7 @@ export async function GET(req: NextRequest) {
         success: false,
         message: "Failed to fetch PYQ exams",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

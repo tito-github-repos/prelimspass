@@ -1,3 +1,4 @@
+//prelimspass\src\app\api\students\exams\route.ts
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
@@ -49,10 +50,44 @@ export async function GET(req: Request) {
 
     /* ======================================================
        SINGLE EXAM META (START EXAM)
+       Handles both normal exams (must be assigned) and PYQ exams
+       (globally available to every student, no assignment row needed).
     ====================================================== */
     if (examId) {
       const examIdNum = Number(examId);
 
+      const exam = await prisma.exams.findUnique({
+        where: { exam_id: examIdNum },
+      });
+
+      if (!exam) {
+        return NextResponse.json(
+          { success: false, message: "Exam not found" },
+          { status: 404 },
+        );
+      }
+
+      // PYQ exams are available to every student by design - no
+      // exam_assignment_students row exists or is needed for them.
+      if (exam.is_pyq) {
+        return NextResponse.json({
+          success: true,
+          data: {
+            id: exam.exam_id,
+            title: exam.exam_title,
+            duration: exam.time_limit_minutes,
+            questions: exam.question_count,
+            examType: exam.exam_type,
+            shuffleQuestions: false,
+            state: getExamState(exam),
+            startDate: exam.scheduled_start,
+            endDate: exam.scheduled_end,
+            points: String(exam.total_marks ?? 0),
+          },
+        });
+      }
+
+      // Normal exam - must be explicitly assigned to this student
       const assignment = await prisma.exam_assignment_students.findFirst({
         where: {
           student_id: studentId,
@@ -74,92 +109,33 @@ export async function GET(req: Request) {
         );
       }
 
-      const exam = assignment.assignment.exam;
+      const assignedExam = assignment.assignment.exam;
 
       return NextResponse.json({
         success: true,
         data: {
-          id: exam.exam_id,
-          title: exam.exam_title,
-          duration: exam.time_limit_minutes,
-
-          // ✅ UI EXPECTS THIS
-          questions: exam.question_count,
-
-          examType: exam.exam_type,
+          id: assignedExam.exam_id,
+          title: assignedExam.exam_title,
+          duration: assignedExam.time_limit_minutes,
+          questions: assignedExam.question_count,
+          examType: assignedExam.exam_type,
           shuffleQuestions: assignment.assignment.shuffle_questions,
-          state: getExamState(exam),
-          startDate: exam.scheduled_start,
-          endDate: exam.scheduled_end,
-
-          // ✅ FROM total_marks
-          points: String(exam.total_marks ?? 0),
+          state: getExamState(assignedExam),
+          startDate: assignedExam.scheduled_start,
+          endDate: assignedExam.scheduled_end,
+          points: String(assignedExam.total_marks ?? 0),
         },
       });
     }
 
     /* ======================================================
-   AUTO ASSIGN PYQ EXAMS
-====================================================== */
-
-     // 1. Get all PYQ exams
-     const pyqExams = await prisma.exams.findMany({
-       where: {
-         exam_title: {
-           startsWith: "[PYQ]",
-         },
-       },
-     });
-
-     // 2. Get already assigned exams for this student
-    const existingAssignments = await prisma.exam_assignment_students.findMany({
-      where: { student_id: studentId },
-      include: {
-        assignment: true,
-      },
-    });
-
-    // 3. Collect assigned exam IDs
-    const assignedExamIds = new Set(
-      existingAssignments.map((a) => a.assignment.exam_id),
-    );
-
-    // 4. Filter missing PYQ exams
-    const missingPYQ = pyqExams.filter(
-      (exam) => !assignedExamIds.has(exam.exam_id),
-    );
-
-    // 5. Assign missing exams
-    for (const exam of missingPYQ) {
-      // check assignment exists
-      let assignment = await prisma.exam_assignments.findFirst({
-        where: { exam_id: exam.exam_id },
-      });
-
-      // create assignment if not exists
-      if (!assignment) {
-        assignment = await prisma.exam_assignments.create({
-          data: {
-            exam_id: exam.exam_id,
-            mode: "same",
-          },
-        });
-      }
-
-      // assign student (avoid duplicate)
-      await prisma.exam_assignment_students.createMany({
-        data: [
-          {
-            assignment_id: assignment.id,
-            student_id: studentId,
-          },
-        ],
-        skipDuplicates: true,
-      });
-    }
-
-    /* ======================================================
        AVAILABLE EXAMS LIST (My Exams page)
+       Normal exams ONLY - PYQ exams live in their own dedicated module
+       (Previous Year Questions page / /api/students/exams/pyq) and are
+       never auto-assigned or listed here. There is no more PYQ
+       auto-assignment step in this route: PYQ availability is driven
+       entirely by the is_pyq flag + pyq_exam_meta, not by
+       exam_assignment_students rows.
     ====================================================== */
     const assignedExams = await prisma.exam_assignment_students.findMany({
       where: { student_id: studentId },
@@ -188,6 +164,12 @@ export async function GET(req: Request) {
     const exams = assignedExams
       .filter((a) => {
         const exam = a.assignment.exam;
+
+        // NEW - explicit guard: My Exams must never show PYQ exams, even
+        // if a stale assignment row somehow exists for one from before
+        // this route was cleaned up.
+        if (exam.is_pyq) return false;
+
         const state = getExamState(exam);
 
         // Only show upcoming or available exams that haven't been completed
@@ -204,16 +186,11 @@ export async function GET(req: Request) {
           id: exam.exam_id,
           title: exam.exam_title,
           duration: exam.time_limit_minutes,
-
-          // ✅ UI EXPECTS `questions`
           questions: exam.question_count,
-
           examType: exam.exam_type,
           state: getExamState(exam),
           startDate: exam.scheduled_start,
           endDate: exam.scheduled_end,
-
-          // ✅ DISPLAY EXACT DB VALUE
           points: String(exam.total_marks ?? 0),
         };
       });
