@@ -1,3 +1,4 @@
+//prelimspass\src\app\api\questions\bulk\route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
@@ -28,8 +29,11 @@ export async function POST(req: Request) {
       select: { subject_id: true },
     });
 
+    // NEW - only normal (non-PYQ) topics may back a bulk-uploaded normal
+    // question. A PYQ topic_id simply won't be found here, so it falls
+    // through to the "Invalid topic" error below like any bad ID.
     const topics = await prisma.topics.findMany({
-      where: { topic_id: { in: topicIds } },
+      where: { topic_id: { in: topicIds }, is_pyq: false },
       select: { topic_id: true },
     });
 
@@ -86,6 +90,7 @@ export async function POST(req: Request) {
         subject_id: q.subject_id,
         topic_id: q.topic_id,
         explanation: q.explanation?.trim() || null,
+        is_pyq: false, // NEW - explicit, this route never creates PYQ questions
       });
     });
 

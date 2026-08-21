@@ -1,3 +1,4 @@
+//prelimspass\src\app\api\exams\route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { shuffleArray } from "@/utils/shuffle";
@@ -9,6 +10,9 @@ import jwt from "jsonwebtoken";
 export async function GET() {
   try {
     const exams = await prisma.exams.findMany({
+      // Now returns BOTH normal and PYQ exams. Category is exposed via
+      // is_pyq in the transformed response so the UI can distinguish them
+      // (e.g. an "Exam Category" column showing Normal / PYQ).
       orderBy: { created_at: "desc" },
       include: {
         exam_subject_configs: {
@@ -31,7 +35,6 @@ export async function GET() {
     });
 
     const transformedExams = exams.map((exam) => {
-      // Check if any students are assigned
       const hasAssignedStudents = exam.exam_assignments.some(
         (assignment) => assignment.students.length > 0,
       );
@@ -52,6 +55,7 @@ export async function GET() {
         id: exam.exam_id,
         exam_name: exam.exam_title,
         exam_type: exam.exam_type,
+        is_pyq: exam.is_pyq, // NEW - lets the list UI show Normal / PYQ
         selection_mode: exam.selection_mode || "auto",
         status,
         questions_count: exam.question_count,
@@ -61,7 +65,9 @@ export async function GET() {
         scheduled_start: exam.scheduled_start?.toISOString() || null,
         scheduled_end: exam.scheduled_end?.toISOString() || null,
 
-        canEdit: !hasAssignedStudents,
+        // PYQ exams are never editable through the normal edit flow
+        // (matches the guard already enforced in PUT /api/exams/[examId]).
+        canEdit: !hasAssignedStudents && !exam.is_pyq,
         canDelete: !hasAssignedStudents,
 
         subjects: exam.exam_subject_configs.map((cfg) => ({
@@ -184,68 +190,12 @@ export async function POST(req: Request) {
 
     // -----------------------------
     // TRANSACTION START
+    // NOTE: PYQ exam creation has its own dedicated route
+    // (POST /api/exams/pyq). This route is exclusively for normal
+    // practice/mock/live exams, so there is no PYQ metadata handling
+    // here anymore, and every question lookup below explicitly
+    // excludes is_pyq: true records.
     // -----------------------------
-
-    // For PYQ exams, validate and prepare metadata BEFORE transaction
-    let pyqMetaData: {
-      subject: string;
-      categoryType: string;
-      category: string;
-      set_number: number | null;
-    } | null = null;
-
-    if (examTitle.startsWith("[PYQ]")) {
-      const parts = examTitle.split("|").map((p) => p.trim());
-
-      if (parts.length < 4) {
-        return NextResponse.json(
-          {
-            success: false,
-            message:
-              "Invalid PYQ format. Expected: [PYQ]|<subject>|<type>|<category>|[Set-N]",
-          },
-          { status: 400 },
-        );
-      }
-
-      const [, subject, rawType, category, setPart] = parts;
-
-      const typeMap: any = {
-        topic: "topic",
-        "topic-wise": "topic",
-        difficulty: "difficulty",
-        "difficulty-wise": "difficulty",
-        "answer-type": "answer_type",
-        answer_type: "answer_type",
-      };
-
-      const normalizedType = typeMap[rawType?.toLowerCase()?.trim()];
-
-      if (!normalizedType) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: `Invalid PYQ type: ${rawType}. Use: topic, difficulty, or answer-type`,
-          },
-          { status: 400 },
-        );
-      }
-
-      let set_number: number | null = null;
-      if (setPart) {
-        const match = setPart.match(/Set-(\d+)/i);
-        if (match) {
-          set_number = Number(match[1]);
-        }
-      }
-
-      pyqMetaData = {
-        subject: subject.trim(),
-        categoryType: normalizedType,
-        category: category.trim(),
-        set_number,
-      };
-    }
 
     const createdExam = await prisma.$transaction(
       async (tx) => {
@@ -266,26 +216,20 @@ export async function POST(req: Request) {
             question_count: totalQuestions,
             total_marks: 0, // will update later
             is_active: true,
+            is_pyq: false, // NEW - explicit, this route never creates PYQ exams
             created_by: userId,
           },
         });
-
-        // Insert PYQ metadata if applicable
-        if (pyqMetaData) {
-          await tx.pyq_exam_meta.create({
-            data: {
-              exam_id: exam.exam_id,
-              ...pyqMetaData,
-            },
-          });
-        }
 
         // -----------------------------
         // INSERT exam_subject_configs (AUTO + MANUAL)
         // -----------------------------
         if (isManual) {
           const questionRecords = await tx.questions.findMany({
-            where: { question_id: { in: selectedQuestions } },
+            where: {
+              question_id: { in: selectedQuestions },
+              is_pyq: false, // NEW - manual picks must come from the normal question bank only
+            },
             select: {
               question_id: true,
               topic_id: true,
@@ -320,7 +264,10 @@ export async function POST(req: Request) {
           const topicIds = Object.keys(topicCounts).map(Number);
 
           const topics = await tx.topics.findMany({
-            where: { topic_id: { in: topicIds } },
+            where: {
+              topic_id: { in: topicIds },
+              is_pyq: false, // NEW - only normal (non-PYQ) topics can back an auto-selected exam
+            },
             select: { topic_id: true, subject_id: true },
           });
 
@@ -342,7 +289,10 @@ export async function POST(req: Request) {
 
         if (isManual) {
           const questions = await tx.questions.findMany({
-            where: { question_id: { in: selectedQuestions } },
+            where: {
+              question_id: { in: selectedQuestions },
+              is_pyq: false, // NEW
+            },
             select: { question_id: true, marks: true, negative_marks: true },
           });
 
@@ -371,7 +321,10 @@ export async function POST(req: Request) {
             if (count <= 0) continue;
 
             const allQuestions = await tx.questions.findMany({
-              where: { topic_id: topicId },
+              where: {
+                topic_id: topicId,
+                is_pyq: false, // NEW - the critical fix: normal auto-selection must never pull PYQ questions
+              },
               select: { question_id: true, marks: true, negative_marks: true },
             });
 

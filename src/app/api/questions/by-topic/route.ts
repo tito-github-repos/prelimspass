@@ -1,3 +1,4 @@
+//prelimspass\src\app\api\questions\by-topic\route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
@@ -14,7 +15,10 @@ export async function GET(req: Request) {
     }
 
     const questions = await prisma.questions.findMany({
-      where: { topic_id: topicId },
+      where: {
+        topic_id: topicId,
+        is_pyq: false, // NEW - manual selection must never surface PYQ questions
+      },
       select: {
         question_id: true,
         question_text: true,

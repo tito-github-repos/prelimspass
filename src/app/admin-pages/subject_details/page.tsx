@@ -24,6 +24,8 @@ import {
   Tooltip,
   Alert,
   Snackbar,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import { Edit, Delete, Add, Close } from "@mui/icons-material";
 import dynamic from "next/dynamic";
@@ -45,6 +47,7 @@ interface Subject {
   subject_id: number;
   subject_name: string;
   topic_count: number;
+  is_pyq: boolean;
   canEdit: boolean;
   canDelete: boolean;
   topics: Topic[];
@@ -54,6 +57,7 @@ interface Subject {
 interface CreateSubjectForm {
   subject_name: string;
   topics: string[];
+  is_pyq: boolean;
 }
 
 interface EditTopic {
@@ -65,6 +69,7 @@ interface EditTopic {
 interface EditSubjectForm {
   subject_name: string;
   topics: EditTopic[];
+  is_pyq: boolean;
 }
 
 const createSubjectSchema = yup.object({
@@ -133,6 +138,7 @@ const SubjectDetails: React.FC = () => {
   const [formData, setFormData] = useState<CreateSubjectForm>({
     subject_name: "",
     topics: [""],
+    is_pyq: false,
   });
   const [errors, setErrors] = useState<any>({});
   const [creating, setCreating] = useState(false);
@@ -141,6 +147,7 @@ const SubjectDetails: React.FC = () => {
   const [editFormData, setEditFormData] = useState<EditSubjectForm>({
     subject_name: "",
     topics: [],
+    is_pyq: false,
   });
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -218,6 +225,7 @@ const SubjectDetails: React.FC = () => {
     setFormData({
       subject_name: "",
       topics: [""],
+      is_pyq: false,
     });
     setErrors({});
   };
@@ -403,7 +411,7 @@ const SubjectDetails: React.FC = () => {
       // Clear previous errors
       setErrors({});
 
-      // Call your API
+      // Call your API - is_pyq is already part of formData, sent automatically
       const res = await fetch("/api/subjects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -457,6 +465,7 @@ const SubjectDetails: React.FC = () => {
 
     setEditFormData({
       subject_name: subject.subject_name,
+      is_pyq: subject.is_pyq,
       topics: subject.topics.map((t) => ({
         topic_id: t.topic_id,
         topic_name: t.topic_name,
@@ -482,6 +491,7 @@ const SubjectDetails: React.FC = () => {
       // build payload after validation
       const payload = {
         subject_name: editFormData.subject_name,
+        is_pyq: editFormData.is_pyq,
         topics: editFormData.topics
           .filter((t) => t.topic_name.trim() !== "")
           .map((t) => ({
@@ -659,6 +669,7 @@ const SubjectDetails: React.FC = () => {
                       <TableCell sx={{ fontWeight: "bold" }}>
                         Topics Count
                       </TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>Type</TableCell>
                       <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
                     </TableRow>
                   </TableHead>
@@ -678,6 +689,14 @@ const SubjectDetails: React.FC = () => {
                             color="primary"
                             size="small"
                             variant="outlined"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={subject.is_pyq ? "PYQ" : "Normal"}
+                            color={subject.is_pyq ? "secondary" : "default"}
+                            size="small"
+                            variant={subject.is_pyq ? "filled" : "outlined"}
                           />
                         </TableCell>
                         <TableCell>
@@ -783,6 +802,47 @@ const SubjectDetails: React.FC = () => {
               helperText={errors.subject_name}
               placeholder="e.g., Mathematics, Science, History"
             />
+
+            {/* PYQ Toggle */}
+            <Box
+              sx={{
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+                px: 2,
+                py: 1,
+              }}
+            >
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.is_pyq}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        is_pyq: e.target.checked,
+                      }))
+                    }
+                    color="secondary"
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography sx={{ fontWeight: 600, fontSize: "0.9rem" }}>
+                      PYQ Subject
+                    </Typography>
+                    <Typography
+                      sx={{ fontSize: "0.75rem", color: "text.secondary" }}
+                    >
+                      {formData.is_pyq
+                        ? "This subject and its topics will appear in the Previous Year Questions module."
+                        : "Regular subject used for normal exam creation."}
+                    </Typography>
+                  </Box>
+                }
+                sx={{ m: 0, alignItems: "flex-start" }}
+              />
+            </Box>
 
             {/* Topics */}
             <Box>
@@ -914,6 +974,50 @@ const SubjectDetails: React.FC = () => {
               }
               error={!subjectHasLockedTopics && !!errors.subject_name}
             />
+
+            {/* PYQ Toggle */}
+            <Box
+              sx={{
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+                px: 2,
+                py: 1,
+              }}
+            >
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={editFormData.is_pyq}
+                    disabled={subjectHasLockedTopics}
+                    onChange={(e) =>
+                      setEditFormData((prev) => ({
+                        ...prev,
+                        is_pyq: e.target.checked,
+                      }))
+                    }
+                    color="secondary"
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography sx={{ fontWeight: 600, fontSize: "0.9rem" }}>
+                      PYQ Subject
+                    </Typography>
+                    <Typography
+                      sx={{ fontSize: "0.75rem", color: "text.secondary" }}
+                    >
+                      {subjectHasLockedTopics
+                        ? "Can't change type: questions already exist under this subject."
+                        : editFormData.is_pyq
+                          ? "This subject and its topics appear in the Previous Year Questions module."
+                          : "Regular subject used for normal exam creation."}
+                    </Typography>
+                  </Box>
+                }
+                sx={{ m: 0, alignItems: "flex-start" }}
+              />
+            </Box>
 
             {/* Topics */}
             <Box>
