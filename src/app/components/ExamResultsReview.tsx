@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   Box,
@@ -234,6 +234,29 @@ export default function ExamResultsReview() {
   >("all");
   const [timeFilter, setTimeFilter] = useState<string>("all");
 
+  // Keeps the latest resultData available inside the popstate handler below
+  // without re-subscribing that effect (which would call pushState again
+  // and break back-button behavior). The effect that registers the
+  // listener runs once on mount, before resultData has loaded from the
+  // API - a plain closure over resultData would stay stuck on its
+  // initial `null` value forever.
+  const resultDataRef = useRef<any>(null);
+  useEffect(() => {
+    resultDataRef.current = resultData;
+  }, [resultData]);
+
+  // PYQ exams have their own dedicated section - "back" from a PYQ
+  // attempt's results should return there, not to the regular Exam
+  // History list (which never shows PYQ exams in the first place).
+  const getBackDestination = (data: any) =>
+    data?.exam?.is_pyq
+      ? "/student-pages/previous_year_questions"
+      : "/student-pages/exam_history";
+
+  const backLabel = resultData?.exam?.is_pyq
+    ? "Back to Previous Year Questions"
+    : "Back to Exam History";
+
   // Function to exit fullscreen
   const exitFullscreen = () => {
     if (document.fullscreenElement) {
@@ -251,7 +274,7 @@ export default function ExamResultsReview() {
   useEffect(() => {
     const handlePopState = () => {
       exitFullscreen();
-      router.push("/student-pages/exam_history");
+      router.push(getBackDestination(resultDataRef.current));
     };
 
     window.addEventListener("popstate", handlePopState);
@@ -264,7 +287,7 @@ export default function ExamResultsReview() {
 
   const handleGoToHistory = () => {
     exitFullscreen();
-    router.push("/student-pages/exam_history");
+    router.push(getBackDestination(resultData));
   };
 
   useEffect(() => {
@@ -448,7 +471,7 @@ export default function ExamResultsReview() {
               borderRadius: 0.5,
             }}
           >
-            Go to Exam History
+            {backLabel}
           </Button>
         </Paper>
       </Box>
@@ -589,7 +612,7 @@ export default function ExamResultsReview() {
             mb: { xs: 0.5, sm: 0 },
           }}
         >
-          Back to Exam History
+          {backLabel}
         </Button>
       </Box>
 
@@ -1162,7 +1185,7 @@ export default function ExamResultsReview() {
               width: { xs: "100%", sm: "auto" },
             }}
           >
-            Back to Exam History
+            {backLabel}
           </Button>
         </Box>
       </Paper>

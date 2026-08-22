@@ -10,7 +10,7 @@ export async function GET(req: Request) {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     if (!decoded || decoded.role !== "student") {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -37,10 +37,16 @@ export async function GET(req: Request) {
     });
 
     // 2️⃣ Fetch all completed attempts with exam -> subject_configs -> subject relation
+    // is_pyq: false - subject performance must only reflect regular exams,
+    // never PYQ ones, matching Exam History / My Exams / Progress trend,
+    // which already exclude is_pyq exams.
     const attempts = await prisma.student_exam_attempts.findMany({
       where: {
         student_id: studentId,
         status: "completed",
+        exam: {
+          is_pyq: false,
+        },
       },
       select: {
         correct_answers: true,
@@ -63,13 +69,13 @@ export async function GET(req: Request) {
     const subjectStats = subjects.map((subject) => {
       const filteredAttempts = attempts.filter((a) =>
         a.exam.exam_subject_configs.some(
-          (config) => config.subject_id === subject.subject_id
-        )
+          (config) => config.subject_id === subject.subject_id,
+        ),
       );
 
       const totalCorrect = filteredAttempts.reduce(
         (sum, a) => sum + Number(a.correct_answers),
-        0
+        0,
       );
       const totalAttempted = filteredAttempts.reduce(
         (sum, a) =>
@@ -77,7 +83,7 @@ export async function GET(req: Request) {
           Number(a.correct_answers) +
           Number(a.wrong_answers) +
           Number(a.unanswered),
-        0
+        0,
       );
 
       const accuracy =
@@ -98,11 +104,11 @@ export async function GET(req: Request) {
     const nonZeroSubjects = subjectStats.filter((s) => s.totalAttempted > 0);
     const strongestSubject = nonZeroSubjects.reduce(
       (prev, curr) => (curr.accuracy > prev.accuracy ? curr : prev),
-      nonZeroSubjects[0] || { subject_name: "", accuracy: 0 }
+      nonZeroSubjects[0] || { subject_name: "", accuracy: 0 },
     );
     const weakestSubject = nonZeroSubjects.reduce(
       (prev, curr) => (curr.accuracy < prev.accuracy ? curr : prev),
-      nonZeroSubjects[0] || { subject_name: "", accuracy: 0 }
+      nonZeroSubjects[0] || { subject_name: "", accuracy: 0 },
     );
 
     // 5️⃣ Return response
@@ -110,21 +116,25 @@ export async function GET(req: Request) {
       success: true,
       data: {
         subjects: subjectStats,
-        strongestSubject: strongestSubject.subject_name ? {
-          name: strongestSubject.subject_name,
-          accuracy: strongestSubject.accuracy
-        } : null,
-        weakestSubject: weakestSubject.subject_name ? {
-          name: weakestSubject.subject_name,
-          accuracy: weakestSubject.accuracy
-        } : null,
+        strongestSubject: strongestSubject.subject_name
+          ? {
+              name: strongestSubject.subject_name,
+              accuracy: strongestSubject.accuracy,
+            }
+          : null,
+        weakestSubject: weakestSubject.subject_name
+          ? {
+              name: weakestSubject.subject_name,
+              accuracy: weakestSubject.accuracy,
+            }
+          : null,
       },
     });
   } catch (error) {
     console.error("❌ GET /student-subject-performance error:", error);
     return NextResponse.json(
       { success: false, message: "Failed to fetch subject performance" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
