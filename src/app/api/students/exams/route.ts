@@ -48,6 +48,12 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const examId = searchParams.get("id");
 
+    const studentDetails = await prisma.student_details.findUnique({
+      where: { user_id: studentId },
+      select: { is_paid_user: true },
+    });
+    const isPaidUser = studentDetails?.is_paid_user ?? false;
+
     /* ======================================================
        SINGLE EXAM META (START EXAM)
        Handles both normal exams (must be assigned) and PYQ exams
@@ -83,6 +89,7 @@ export async function GET(req: Request) {
             startDate: exam.scheduled_start,
             endDate: exam.scheduled_end,
             points: String(exam.total_marks ?? 0),
+            isLocked: false,
           },
         });
       }
@@ -124,6 +131,7 @@ export async function GET(req: Request) {
           startDate: assignedExam.scheduled_start,
           endDate: assignedExam.scheduled_end,
           points: String(assignedExam.total_marks ?? 0),
+          isLocked: !isPaidUser,
         },
       });
     }
@@ -192,6 +200,7 @@ export async function GET(req: Request) {
           startDate: exam.scheduled_start,
           endDate: exam.scheduled_end,
           points: String(exam.total_marks ?? 0),
+          isLocked: !isPaidUser,
         };
       });
 

@@ -22,6 +22,9 @@ import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 import SignalCellularAltOutlinedIcon from "@mui/icons-material/SignalCellularAltOutlined";
 import FormatListBulletedOutlinedIcon from "@mui/icons-material/FormatListBulletedOutlined";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import LockIcon from "@mui/icons-material/Lock";
+import { useStudentAuth } from "@/context/StudentAuthContext";
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 
 const CARD_BG = "#ffffff";
 const TEXT_SECONDARY = "#64748b";
@@ -177,7 +180,9 @@ interface ExamListRowProps {
   duration: string | number;
   examType: "practice" | "mock" | "live";
   isPremium?: boolean;
+  locked?: boolean;
   onStart?: () => void;
+  onUpgrade?: () => void;
   isStarting?: boolean;
 }
 
@@ -187,7 +192,9 @@ const ExamListRow = ({
   duration,
   examType,
   isPremium,
+  locked,
   onStart,
+  onUpgrade,
   isStarting,
 }: ExamListRowProps) => {
   const typeColor = EXAM_TYPE_COLORS[examType] || PRIMARY_PURPLE;
@@ -201,12 +208,14 @@ const ExamListRow = ({
         gap: { xs: 1, sm: 1.5, md: 2 },
         p: { xs: 1.25, sm: 1.75, md: 2 },
         borderRadius: 0.5,
-        border: `1px solid #eef0f2`,
-        background: "#fff",
+        border: locked ? "1px solid #f5deb3" : "1px solid #eef0f2",
+        background: locked
+          ? "linear-gradient(135deg, #fffdf7 0%, #fff9ec 100%)"
+          : "#fff",
         flexDirection: { xs: "column", sm: "row" },
         transition: "all 0.2s ease",
         "&:hover": {
-          borderColor: "#dfe3e8",
+          borderColor: locked ? "#e8c877" : "#dfe3e8",
           boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
         },
       }}
@@ -263,40 +272,61 @@ const ExamListRow = ({
           justifyContent: { xs: "space-between", sm: "flex-end" },
         }}
       >
-        <Chip
-          label={isPremium ? "PREMIUM" : examType.toUpperCase()}
-          size="small"
-          sx={{
-            backgroundColor: isPremium ? "#fef3c7" : `${typeColor}1a`,
-            color: isPremium ? "#d97706" : typeColor,
-            fontWeight: 700,
-            fontSize: { xs: 10, sm: 11 },
-          }}
-        />
+        {!locked && (
+          <Chip
+            label={isPremium ? "PREMIUM" : examType.toUpperCase()}
+            size="small"
+            sx={{
+              backgroundColor: isPremium ? "#fef3c7" : `${typeColor}1a`,
+              color: isPremium ? "#d97706" : typeColor,
+              fontWeight: 700,
+              fontSize: { xs: 10, sm: 11 },
+            }}
+          />
+        )}
         <Button
           variant="contained"
-          onClick={onStart}
+          onClick={locked ? onUpgrade : onStart}
           disabled={isStarting}
+          startIcon={
+            locked ? (
+              <WorkspacePremiumIcon sx={{ fontSize: 16 }} />
+            ) : undefined
+          }
           sx={{
             textTransform: "none",
-            background: isPremium ? PRIMARY_PURPLE : SUCCESS_GREEN,
+            background: locked
+              ? "linear-gradient(90deg, #f2b73f 0%, #d99a1b 100%)"
+              : isPremium
+                ? PRIMARY_PURPLE
+                : SUCCESS_GREEN,
             color: "#fff",
             borderRadius: 2,
             fontWeight: 700,
             fontSize: { xs: 12, sm: 13 },
             px: { xs: 1.5, sm: 2 },
             py: { xs: 0.6, sm: 0.75 },
-            boxShadow: "none",
+            boxShadow: locked ? "0 2px 8px rgba(217, 154, 27, 0.35)" : "none",
             whiteSpace: "nowrap",
             minWidth: { xs: 88, sm: 100 },
             "&:hover": {
-              background: isPremium ? PRIMARY_PURPLE : SUCCESS_GREEN,
-              opacity: 0.9,
+              background: locked
+                ? "linear-gradient(90deg, #eab030 0%, #c88c17 100%)"
+                : isPremium
+                  ? PRIMARY_PURPLE
+                  : SUCCESS_GREEN,
+              boxShadow: locked
+                ? "0 4px 12px rgba(217, 154, 27, 0.45)"
+                : "none",
+              opacity: locked ? 1 : 0.9,
+              transform: locked ? "translateY(-1px)" : "none",
             },
           }}
         >
           {isStarting ? (
             <CircularProgress size={16} sx={{ color: "#fff" }} />
+          ) : locked ? (
+            "Upgrade"
           ) : isPremium ? (
             "Enroll Now"
           ) : (
@@ -424,6 +454,7 @@ const ViewAllLink = ({
 export default function StudentDashboard() {
   const router = useRouter();
   const theme = useTheme();
+  const { isPaidUser } = useStudentAuth();
   const [isMobile, setIsMobile] = useState(false);
   const [availableExams, setAvailableExams] = useState<any[]>([]);
   const [upcomingLiveExams, setUpcomingLiveExams] = useState<any[]>([]);
@@ -545,10 +576,6 @@ export default function StudentDashboard() {
 
   // Creates a new attempt for this exam via the same endpoint the PYQ and
   // My Exams pages use, then redirects to the actual exam-taking flow.
-  // The previous version of this handler just did
-  // router.push(`/student-pages/exams/${exam.id}`) - it never called the
-  // start API at all, so no attempt was ever created and the student never
-  // landed on exam_taking.
   const startExam = async (examId: number, examType: string) => {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     if (!token) {
@@ -939,8 +966,12 @@ export default function StudentDashboard() {
                       duration={exam.duration ?? 0}
                       examType={exam.examType}
                       isPremium={exam.isPremium}
+                      locked={exam.isLocked ?? !isPaidUser}
                       isStarting={startingExamId === exam.id}
                       onStart={() => startExam(exam.id, exam.examType)}
+                      onUpgrade={() => router.push("/pricing")
+                        // alert("Please upgrade to premium to access this exam.")
+                      }
                     />
                   ))}
                   <ViewAllLink

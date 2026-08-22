@@ -23,6 +23,8 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import PublicIcon from "@mui/icons-material/Public";
+import LockIcon from "@mui/icons-material/Lock";
+import { useStudentAuth } from "@/context/StudentAuthContext";
 
 /* ---------------------------------- */
 /* Design tokens                       */
@@ -46,7 +48,6 @@ const TYPE_STYLES: Record<
   mock: { bg: "#fff4e0", color: "#b8720a", label: "Mock" },
   live: { bg: "#eef0ff", color: "#5b5bf0", label: "Live" },
 };
-
 // "Not Attempted" is intentionally muted/quiet; "Completed" is the strongest, greenest state.
 const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
   "Not Attempted": { bg: "#f4f5f6", color: "#a1a8b0" },
@@ -191,7 +192,12 @@ const getRowStatus = (exam: any) => {
   return "Not Attempted";
 };
 
-const getActionLabel = (status: string, examType: string) => {
+const getActionLabel = (
+  status: string,
+  examType: string,
+  locked: boolean,
+) => {
+  if (locked) return "Upgrade";
   switch (status) {
     case "Completed":
       return "View Results";
@@ -215,6 +221,7 @@ const ROWS_PER_PAGE = 8;
 /* ---------------------------------- */
 export default function MyExamsPage() {
   const router = useRouter();
+  const { isPaidUser } = useStudentAuth();
   const [availableExams, setAvailableExams] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [startingExamId, setStartingExamId] = useState<number | null>(null);
@@ -431,6 +438,7 @@ export default function MyExamsPage() {
           <Button
             variant="contained"
             fullWidth={false}
+            onClick={() => router.push("/pricing")}
             sx={{
               background: BUTTON_GRADIENT,
               "&:hover": { background: BUTTON_GRADIENT_HOVER },
@@ -625,8 +633,10 @@ export default function MyExamsPage() {
         ) : (
           pagedExams.map((exam) => {
             const status = getRowStatus(exam);
-            const actionLabel = getActionLabel(status, exam.examType);
+            const locked = exam.isLocked ?? (!exam.is_pyq && !isPaidUser);
+            const actionLabel = getActionLabel(status, exam.examType, locked);
             const enabled =
+              !locked &&
               status !== "Ended" &&
               isStartEnabled(exam.startDate, exam.endDate, exam.examType);
 
@@ -779,11 +789,20 @@ export default function MyExamsPage() {
                   <Button
                     variant="contained"
                     fullWidth
-                    disabled={!enabled || startingExamId === exam.id}
-                    onClick={() => startExam(exam.id, exam.examType)}
+                    disabled={startingExamId === exam.id}
+                    onClick={() =>
+                      locked
+                        ? router.push("/pricing")
+                        : startExam(exam.id, exam.examType)
+                    }
+                    startIcon={
+                      startingExamId === exam.id ? null : locked ? (
+                        <WorkspacePremiumIcon sx={{ fontSize: 16 }} />
+                      ) : null
+                    }
                     endIcon={
-                      startingExamId === exam.id ? null : actionLabel ===
-                          "Start Now" || actionLabel === "Continue" ? (
+                      startingExamId === exam.id || locked ? null : actionLabel === "Start Now" ||
+                        actionLabel === "Continue" ? (
                         <ArrowForwardIcon fontSize="small" />
                       ) : null
                     }
@@ -792,12 +811,20 @@ export default function MyExamsPage() {
                       borderRadius: 1,
                       fontWeight: 700,
                       fontSize: 13.5,
-                      boxShadow: "none",
-                      background: enabled ? BUTTON_GRADIENT : "#c8ccd2",
+                      boxShadow: locked ? "0 2px 6px rgba(217, 154, 27, 0.3)" : "none",
+                      background: locked
+                        ? "linear-gradient(90deg, #f2b73f 0%, #d99a1b 100%)"
+                        : enabled
+                          ? BUTTON_GRADIENT
+                          : "#c8ccd2",
                       "&:hover": {
-                        background: enabled ? BUTTON_GRADIENT_HOVER : "#c8ccd2",
+                        background: locked
+                          ? "linear-gradient(90deg, #eab030 0%, #c88c17 100%)"
+                          : enabled
+                            ? BUTTON_GRADIENT_HOVER
+                            : "#c8ccd2",
                       },
-                      width: { xs: "100%", md: 130 },
+                      width: { xs: "100%", md: 150 },
                     }}
                   >
                     {startingExamId === exam.id ? (
