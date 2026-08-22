@@ -1081,7 +1081,7 @@ const StudentProgressPage = () => {
 
               {!strongestSubject && !weakestSubject ? (
                 <Typography sx={{ color: "#94a3b8", fontSize: 13 }}>
-                  Complete a practice exam to see your strengths.
+                  Complete a exam to see your strengths.
                 </Typography>
               ) : (
                 <Stack spacing={1.5}>

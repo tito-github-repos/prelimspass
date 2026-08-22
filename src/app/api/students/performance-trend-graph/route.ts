@@ -50,13 +50,18 @@ export async function GET(req: NextRequest) {
             }
           : {}),
 
-        ...(examType && examType !== "all"
-          ? {
-              exam: {
+        // Performance Trend must only reflect regular exams, never PYQ ones -
+        // matching Exam History / My Exams, which already exclude is_pyq
+        // exams. is_pyq: false is applied unconditionally here, with
+        // exam_type layered on top only when a specific type is selected.
+        exam: {
+          is_pyq: false,
+          ...(examType && examType !== "all"
+            ? {
                 exam_type: examType as any,
-              },
-            }
-          : {}),
+              }
+            : {}),
+        },
       },
 
       select: {
