@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { Box, CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import { StudentAuthProvider } from "@/context/StudentAuthContext";
 
 const theme = createTheme({
   palette: {
@@ -54,7 +55,9 @@ export default function StudentDashboardLayout({ children }: { children: React.R
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <StudentAuthProvider>
       <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>{children}</Box>
+      </StudentAuthProvider>
     </ThemeProvider>
   );
 }
