@@ -146,6 +146,17 @@ export default function QuestionBankPage() {
     visibleDeletableIds.includes(id),
   );
 
+  // ---------------------------------------------------------------------
+  // PYQ FILTER: Add/Edit Question modal (individual + bulk) should only
+  // ever offer Non-PYQ subjects/topics for selection. The `subjects`,
+  // `topics`, and `bulkTopics` state arrays themselves stay unfiltered
+  // because they're also used by the top Search & Filter section, which
+  // should still let you browse/search PYQ subjects and topics.
+  // ---------------------------------------------------------------------
+  const addModalSubjects = subjects.filter((s: any) => !s.is_pyq);
+  const addModalTopics = topics.filter((t: any) => !t.is_pyq);
+  const addModalBulkTopics = bulkTopics.filter((t: any) => !t.is_pyq);
+
   const handleRowSelect = (id: number) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
@@ -1610,7 +1621,7 @@ export default function QuestionBankPage() {
                 label="Select Subject"
               >
                 <MenuItem value={0}>Select Subject</MenuItem>
-                {subjects.map((sub) => (
+                {addModalSubjects.map((sub) => (
                   <MenuItem key={sub.subject_id} value={sub.subject_id}>
                     {sub.subject_name}
                   </MenuItem>
@@ -1637,7 +1648,7 @@ export default function QuestionBankPage() {
                 disabled={!newQuestion.subject_id}
               >
                 <MenuItem value={0}>Select Topic</MenuItem>
-                {topics.map((topic: any) => (
+                {addModalTopics.map((topic: any) => (
                   <MenuItem key={topic.topic_id} value={topic.topic_id}>
                     {topic.topic_name}
                   </MenuItem>
@@ -2007,7 +2018,7 @@ export default function QuestionBankPage() {
                     }}
                   >
                     <MenuItem value={0}>Select Subject</MenuItem>
-                    {subjects.map((sub) => (
+                    {addModalSubjects.map((sub) => (
                       <MenuItem key={sub.subject_id} value={sub.subject_id}>
                         {sub.subject_name}
                       </MenuItem>
@@ -2039,7 +2050,7 @@ export default function QuestionBankPage() {
                     disabled={!newQuestion.subject_id}
                   >
                     <MenuItem value={0}>Select Topic</MenuItem>
-                    {topics.map((topic: any) => (
+                    {addModalTopics.map((topic: any) => (
                       <MenuItem key={topic.topic_id} value={topic.topic_id}>
                         {topic.topic_name}
                       </MenuItem>
@@ -2320,7 +2331,7 @@ export default function QuestionBankPage() {
                     label="Select Subject *"
                   >
                     <MenuItem value={0}>Select Subject</MenuItem>
-                    {subjects.map((sub) => (
+                    {addModalSubjects.map((sub) => (
                       <MenuItem key={sub.subject_id} value={sub.subject_id}>
                         {sub.subject_name}
                       </MenuItem>
@@ -2344,7 +2355,7 @@ export default function QuestionBankPage() {
                     label="Select Topic *"
                   >
                     <MenuItem value={0}>Select Topic</MenuItem>
-                    {bulkTopics.map((topic: any) => (
+                    {addModalBulkTopics.map((topic: any) => (
                       <MenuItem key={topic.topic_id} value={topic.topic_id}>
                         {topic.topic_name}
                       </MenuItem>
@@ -2511,7 +2522,7 @@ export default function QuestionBankPage() {
                                   </Tooltip>
                                 </TableCell>
                                 <TableCell>
-                                  {bulkTopics.find(
+                                  {addModalBulkTopics.find(
                                     (t) => t.topic_id === bulkSelectedTopicId,
                                   )?.topic_name || "Selected Topic"}
                                 </TableCell>
