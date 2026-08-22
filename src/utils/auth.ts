@@ -19,6 +19,7 @@ export function verifyToken(token: string) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number; role: string };
     return decoded;
   } catch (error) {
+      console.error("JWT verify failed:", error);
     return null;
   }
 }

@@ -21,11 +21,25 @@ export async function POST(req: Request) {
 
     const exam = await prisma.exams.findUnique({
       where: { exam_id: examId },
-      select: { exam_type: true }
+      select: { exam_type: true, is_pyq: true }
     });
 
     if (!exam) {
       return NextResponse.json({ success: false, message: "Exam not found" });
+    }
+
+    if (!exam.is_pyq) {
+      const studentDetails = await prisma.student_details.findUnique({
+        where: { user_id: user.userId },
+        select: { is_paid_user: true },
+      });
+
+      if (!studentDetails?.is_paid_user) {
+        return NextResponse.json(
+          { success: false, message: "Upgrade to premium to start this exam" },
+          { status: 403 },
+        );
+      }
     }
 
     const existingAttempts = await prisma.student_exam_attempts.count({
