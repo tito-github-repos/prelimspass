@@ -96,10 +96,17 @@ export async function GET(req: Request) {
     }
 
     // Fetch all completed attempts
+    // Exam History (this default list, with no attemptId/examId query param)
+    // must only show regular exams, never PYQ ones - PYQ attempts live in
+    // their own dedicated review flow, matching how the exams list route
+    // already excludes is_pyq exams from "My Exams".
     const attempts = await prisma.student_exam_attempts.findMany({
       where: {
         student_id: studentId,
         status: "completed",
+        exam: {
+          is_pyq: false,
+        },
       },
       include: {
         exam: {
