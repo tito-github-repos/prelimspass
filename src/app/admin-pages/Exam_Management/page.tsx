@@ -773,9 +773,11 @@ const ExamManagement: React.FC = () => {
                                 {/* Assign */}
                                 <Tooltip
                                   title={
-                                    isLiveInactive
-                                      ? "Cannot assign: live exam is inactive"
-                                      : "Assign Exam"
+                                    exam.is_pyq
+                                      ? "PYQ exams are auto-assigned to all students"
+                                      : isLiveInactive
+                                        ? "Cannot assign: live exam is inactive"
+                                        : "Assign Exam"
                                   }
                                   arrow
                                 >
@@ -783,9 +785,10 @@ const ExamManagement: React.FC = () => {
                                     <IconButton
                                       size="small"
                                       color="info"
-                                      disabled={isLiveInactive}
+                                      disabled={isLiveInactive || exam.is_pyq}
                                       onClick={() => {
-                                        if (isLiveInactive) return;
+                                        if (isLiveInactive || exam.is_pyq)
+                                          return;
                                         setAssignExamId(exam.id);
                                         setAssignModalOpen(true);
                                       }}
