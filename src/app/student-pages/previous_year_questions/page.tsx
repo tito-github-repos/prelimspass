@@ -39,160 +39,58 @@ const PRIMARY_GREEN_DARK = "#0f6e40";
 const PRIMARY_GREEN_LIGHT = "#e8f6ee";
 
 /* ----------------------------------------------------------------------- */
-/*  Static selection data                                                   */
+/*  Subject icon/color styling                                              */
 /* ----------------------------------------------------------------------- */
-const SUBJECTS = [
-  { id: 2, name: "Environment", icon: <FaLeaf size={18} />, color: "#1a8a45" },
-  {
-    id: 3,
-    name: "Geography",
-    icon: <PublicIcon sx={{ fontSize: 18 }} />,
-    color: "#1877d1",
-  },
-  {
-    id: 6,
-    name: "Science & Tech.",
+// Keyed by the EXACT subject string as stored in pyq_exam_meta.subject (and
+// therefore returned by /api/students/exams/pyq/filters) - not by an
+// abbreviated tab label. Subjects/topics/difficulties/answer-types are all
+// sourced live from that table now (see fetch effects below), so this map
+// only controls presentation (icon + color); it no longer needs to double
+// as a lookup key for a second, separately-maintained static data set.
+// Any subject the API returns that isn't listed here just falls back to
+// DEFAULT_SUBJECT_META instead of being hidden.
+const SUBJECT_META: Record<string, { icon: React.ReactNode; color: string }> = {
+  Environment: { icon: <FaLeaf size={18} />, color: "#1a8a45" },
+  Geography: { icon: <PublicIcon sx={{ fontSize: 18 }} />, color: "#1877d1" },
+  "Science & Technology": {
     icon: <SchoolIcon sx={{ fontSize: 18 }} />,
     color: "#7c3aed",
   },
-  {
-    id: 4,
-    name: "Polity",
+  Polity: {
     icon: <AccountBalanceIcon sx={{ fontSize: 18 }} />,
     color: "#c9372c",
   },
-  {
-    id: 1,
-    name: "Economics",
-    icon: <FaChartLine size={16} />,
-    color: "#b9791a",
-  },
-  {
-    id: 7,
-    name: "Current Affairs",
-    icon: <FaFlask size={16} />,
-    color: "#0e7490",
-  },
-  { id: 5, name: "History", icon: <FaHistory size={16} />, color: "#a16207" },
-];
-
-// Full subject names map to the keys used by the existing topic/answer-type data
-const SUBJECT_KEY_MAP: Record<string, string> = {
-  "Science & Tech.": "Science & Technology",
-  "Current Affairs": "CURRENT AFFAIRS",
+  Economics: { icon: <FaChartLine size={16} />, color: "#b9791a" },
+  "Current Affairs": { icon: <FaFlask size={16} />, color: "#0e7490" },
+  History: { icon: <FaHistory size={16} />, color: "#a16207" },
+};
+const DEFAULT_SUBJECT_META = {
+  icon: <ClassOutlinedIcon sx={{ fontSize: 18 }} />,
+  color: TEXT_SECONDARY,
 };
 
-const TOPICS_BY_SUBJECT: Record<string, string[]> = {
-  Economics: [
-    "Macroeconomy",
-    "Government Budgeting and Govt. Accounts",
-    "Indian Taxation System",
-    "RBI Functions - Money Supply, Monetary Policy, Forex Mgt & Balance of Payment",
-    "RBI and Indian Banking and Finance System",
-    "Capital Market, Money Market and FDI",
-    "International Trade",
-    "International Economic Organizations",
-    "Population and Demography",
-    "Agriculture",
-    "Corporates and Industries",
-    "Poverty, Development, Health and Education",
-    "Employment and Skill Development",
-    "Economic Institutions, Laws and Policies",
-    "Five Year Plans",
-  ],
-  Environment: [
-    "Ecology & Ecosystem",
-    "Biodiversity in India",
-    "Climate Change and Remedies",
-    "Environmental Pollution and Remedies",
-    "Conservation",
-    "Environmental Agreements",
-    "Disaster Management",
-    "Soil & Land Resources",
-    "Indian Initiatives for Environment Protection",
-    "Renewable and Alternative Energy Sources",
-  ],
-  Geography: [
-    "Physical Geography - Geomorphology",
-    "Physical Geography - Climatology",
-    "Physical Geography - Oceanography",
-    "Indian Geography - Map Based Questions",
-    "Indian Geography - Mountains, Glaciers and Associated Landforms",
-    "Indian Geography - Rocks, Soil, Minerals and Other Natural Resources",
-    "Indian Geography - Rivers, Lakes and Lagoons",
-    "Indian Geography - Location, Climate, Forests etc",
-    "Indian Geography - Agriculture",
-    "Indian Geography - Roads, Railways, Ports and Airports",
-    "Indian Geography - Industries and Other Major Projects",
-    "World Geography - Geographical Features and Natural Resources",
-    "World Geography - Map Based Questions",
-  ],
-  Polity: [
-    "Political Theory",
-    "Indian Political System",
-    "Indian Constitution",
-    "Fundamental Rights",
-    "DPSPs and Fundamental Duties",
-    "Ministers, Ministries and Secretariat",
-    "President, Vice President and Governor",
-    "Union and State Legislature",
-    "Judiciary and Judicial System",
-    "Elections, Election Commission and RPA",
-    "Various Constitutional & Non-Constitutional Posts and Bodies",
-    "Important Acts and Constitutional Amendments",
-    "Panchayati Raj and Local Governance",
-    "Post Independence History",
-    "International Relations",
-  ],
-  History: [
-    "Art and Craft in India",
-    "Indian Culture and Heritage",
-    "Politics and Society",
-    "Architecture",
-    "Literature",
-    "Religion and Philosophy",
-    "Advent of Europeans in India",
-    "Establishment of British Rule (1750-1857)",
-    "The Revolt of 1857",
-    "Events from 1857-1885",
-    "From Establishment to Split of Congress (1885-1907)",
-    "Freedom Struggle Before Gandhi (1908-1917)",
-    "Early Phase of Gandhian Struggle (1917-1925)",
-    "Civil Disobedience Movement and Other Events (1926-1932)",
-    "Events from 1933 to 1939",
-    "Last Phase of British Rule (1940-1950)",
-    "Social Reforms and Reformers",
-    "Revolutionaries and Revolutionary Movement",
-    "Development of Modern Education System",
-    "Tribal and Peasant Movements",
-  ],
-  "Science & Technology": [
-    "Electronics and IT",
-    "Astrophysics and Space Technology",
-    "Biotechnology",
-    "Physics",
-    "Chemistry",
-    "Biology",
-    "Diseases",
-  ],
-  "CURRENT AFFAIRS": [
-    "Defence",
-    "Nuclear Weapons and Treaties",
-    "International Organizations and Treaties",
-  ],
-};
+// The values actually stored in pyq_exam_meta.subject come back with a
+// "PYQ-" prefix (e.g. "PYQ-Environment"), which doesn't match SUBJECT_META's
+// keys and made every subject fall back to the generic icon. This strips
+// that prefix ONLY for icon/label lookup and display - it must NOT be
+// applied to the value used for API calls (dbSubjects / selectedSubject
+// stay as the exact raw DB string), since /filters?subject=X has to match
+// pyq_exam_meta.subject byte-for-byte.
+function normalizeSubjectKey(raw: string): string {
+  return raw.replace(/^pyq[\s-]*/i, "").trim();
+}
 
-const DIFFICULTY_LEVELS = ["Easy", "Medium", "Hard"];
-const ANSWER_TYPES = [
-  "Single Word",
-  "Single Sentence",
-  "Match the Pairs",
-  "Both, Neither",
-  "A & R / Statement - I, II",
-  "Three Statements",
-  "Only I, Only II",
-  "All",
-];
+// Purely cosmetic: shortens a (normalized) subject string for display on
+// the tab/sidebar heading only. The raw DB string (dbSubjects /
+// selectedSubject) is still what's used for API calls - this can be
+// extended freely without touching any matching logic.
+const DISPLAY_LABEL_OVERRIDES: Record<string, string> = {
+  "Science & Technology": "Science & Tech.",
+};
+function getSubjectLabel(subjectName: string): string {
+  const normalized = normalizeSubjectKey(subjectName);
+  return DISPLAY_LABEL_OVERRIDES[normalized] || normalized;
+}
 
 const FILTER_TABS: { key: FilterType; label: string }[] = [
   { key: "topic", label: "Topic Wise" },
@@ -289,11 +187,28 @@ export default function PreviousYearQuestionsPage() {
   const [examsLoading, setExamsLoading] = useState(false);
   const [startingExamId, setStartingExamId] = useState<number | null>(null);
 
-  const [selectedSubject, setSelectedSubject] = useState<string>(
-    SUBJECTS[0].name,
-  );
+  // ---- Subjects: fetched from /api/students/exams/pyq/filters (no
+  // subject param) instead of a hardcoded array, so a subject only ever
+  // appears here if it actually has a live PYQ exam behind it. ----
+  const [subjectsLoading, setSubjectsLoading] = useState(true);
+  const [dbSubjects, setDbSubjects] = useState<string[]>([]);
+  const [selectedSubject, setSelectedSubject] = useState<string>("");
+
   const [activeFilter, setActiveFilter] = useState<FilterType>("topic");
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
+
+  // ---- Topic / difficulty / answer-type options for the current subject -
+  // fetched from the same /filters endpoint (with ?subject=) whenever
+  // selectedSubject changes. Replaces the old static TOPICS_BY_SUBJECT /
+  // DIFFICULTY_LEVELS / ANSWER_TYPES maps. ----
+  const [optionsLoading, setOptionsLoading] = useState(false);
+  const [topicsForSubject, setTopicsForSubject] = useState<string[]>([]);
+  const [difficultiesForSubject, setDifficultiesForSubject] = useState<
+    string[]
+  >([]);
+  const [answerTypesForSubject, setAnswerTypesForSubject] = useState<
+    string[]
+  >([]);
 
   const [exams, setExams] = useState<Exam[]>([]);
   const [page, setPage] = useState(1);
@@ -365,13 +280,12 @@ export default function PreviousYearQuestionsPage() {
   const getAttemptId = (exam: Exam): number | string | null | undefined =>
     attemptedMap[exam.id]?.attemptId ?? exam.apiAttemptId;
 
-  const subjectKey = SUBJECT_KEY_MAP[selectedSubject] || selectedSubject;
   const optionsForFilter =
     activeFilter === "topic"
-      ? TOPICS_BY_SUBJECT[subjectKey] || []
+      ? topicsForSubject
       : activeFilter === "difficulty"
-        ? DIFFICULTY_LEVELS
-        : ANSWER_TYPES;
+        ? difficultiesForSubject
+        : answerTypesForSubject;
 
   const hasMoreOptions = optionsForFilter.length > VISIBLE_OPTIONS_COUNT;
   const displayedOptions = showAllOptions
@@ -384,28 +298,120 @@ export default function PreviousYearQuestionsPage() {
         ? "Difficulty Levels"
         : "Answer Types";
 
-  // Reset selection whenever the subject changes, then auto-select the
-  // first topic so the content area is never left empty (matches design).
+  /* ------------------------------------------------------------------- */
+  /*  Fetch: distinct PYQ subjects (once, on mount)                       */
+  /* ------------------------------------------------------------------- */
   useEffect(() => {
-    setActiveFilter("topic");
-    const firstTopic = (TOPICS_BY_SUBJECT[subjectKey] || [])[0] || null;
-    setSelectedValue(firstTopic);
-    setPage(1);
-    setShowAllOptions(false);
-  }, [selectedSubject]); // eslint-disable-line react-hooks/exhaustive-deps
+    let cancelled = false;
 
-  // When the filter category changes, default to its first option.
+    (async () => {
+      setSubjectsLoading(true);
+      try {
+        const token = getAuthToken();
+        if (!token) {
+          alert("Your session has expired. Please log in again.");
+          router.push("/");
+          return;
+        }
+
+        const res = await fetch("/api/students/exams/pyq/filters", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.status === 401) {
+          alert("Your session has expired. Please log in again.");
+          router.push("/");
+          return;
+        }
+
+        const data = await res.json();
+        if (cancelled) return;
+
+        if (data.success && Array.isArray(data.subjects)) {
+          setDbSubjects(data.subjects);
+          setSelectedSubject((prev) => prev || data.subjects[0] || "");
+        } else {
+          setDbSubjects([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch PYQ subjects:", error);
+        if (!cancelled) setDbSubjects([]);
+      } finally {
+        if (!cancelled) setSubjectsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* ------------------------------------------------------------------- */
+  /*  Fetch: topics/difficulties/answerTypes for the selected subject     */
+  /* ------------------------------------------------------------------- */
+  useEffect(() => {
+    if (!selectedSubject) return;
+    let cancelled = false;
+
+    (async () => {
+      setOptionsLoading(true);
+      try {
+        const token = getAuthToken();
+        if (!token) return;
+
+        const res = await fetch(
+          `/api/students/exams/pyq/filters?subject=${encodeURIComponent(selectedSubject)}`,
+          { headers: { Authorization: `Bearer ${token}` } },
+        );
+        const data = await res.json();
+        if (cancelled) return;
+
+        const topics = data.success ? data.topics || [] : [];
+        const difficulties = data.success ? data.difficulties || [] : [];
+        const answerTypes = data.success ? data.answerTypes || [] : [];
+
+        setTopicsForSubject(topics);
+        setDifficultiesForSubject(difficulties);
+        setAnswerTypesForSubject(answerTypes);
+
+        // Reset selection to the first topic whenever the subject changes,
+        // so the content area is never left empty (matches previous design).
+        setActiveFilter("topic");
+        setSelectedValue(topics[0] || null);
+        setPage(1);
+        setShowAllOptions(false);
+      } catch (error) {
+        console.error("Failed to fetch PYQ filter options:", error);
+        if (!cancelled) {
+          setTopicsForSubject([]);
+          setDifficultiesForSubject([]);
+          setAnswerTypesForSubject([]);
+          setSelectedValue(null);
+        }
+      } finally {
+        if (!cancelled) setOptionsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedSubject]);
+
+  // When the filter category (Topic/Difficulty/Answer Type tab) changes,
+  // default to its first already-loaded option.
   useEffect(() => {
     const list =
       activeFilter === "topic"
-        ? TOPICS_BY_SUBJECT[subjectKey] || []
+        ? topicsForSubject
         : activeFilter === "difficulty"
-          ? DIFFICULTY_LEVELS
-          : ANSWER_TYPES;
+          ? difficultiesForSubject
+          : answerTypesForSubject;
     setSelectedValue(list[0] || null);
     setPage(1);
     setShowAllOptions(false);
-  }, [activeFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeFilter]);
 
   useEffect(() => {
     if (selectedSubject && activeFilter && selectedValue) {
@@ -635,7 +641,8 @@ export default function PreviousYearQuestionsPage() {
     (page - 1) * PAGE_SIZE,
     page * PAGE_SIZE,
   );
-  const activeSubjectMeta = SUBJECTS.find((s) => s.name === selectedSubject);
+  const activeSubjectMeta =
+    SUBJECT_META[normalizeSubjectKey(selectedSubject)] || DEFAULT_SUBJECT_META;
 
   // Exam / Questions / Action / Result. The same template is reused for the
   // header row and every data row so the values line up under the correct
@@ -866,461 +873,529 @@ export default function PreviousYearQuestionsPage() {
       </Card>
 
       {/* ---------------- Subject tabs (equal-width row) ---------------- */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "repeat(2, 1fr)",
-            sm: "repeat(3, 1fr)",
-            md: "repeat(4, 1fr)",
-            lg: `repeat(${SUBJECTS.length}, 1fr)`,
-          },
-          gap: 1.25,
-        }}
-      >
-        {SUBJECTS.map((subject) => {
-          const active = subject.name === selectedSubject;
-          return (
-            <Card
-              key={subject.id}
-              onClick={() => setSelectedSubject(subject.name)}
-              elevation={0}
-              sx={{
-                cursor: "pointer",
-                px: 1.5,
-                py: 1.75,
-                borderRadius: 1,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 0.75,
-                border: `1.5px solid ${active ? PRIMARY_GREEN : BORDER}`,
-                bgcolor: active ? PRIMARY_GREEN_LIGHT : CARD_BG,
-                transition: "0.15s",
-                "&:hover": { borderColor: PRIMARY_GREEN },
-              }}
-            >
-              <Box sx={{ color: subject.color, display: "flex" }}>
-                {subject.icon}
-              </Box>
-              <Typography
+      {subjectsLoading ? (
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "repeat(2, 1fr)",
+              sm: "repeat(3, 1fr)",
+              md: "repeat(4, 1fr)",
+            },
+            gap: 1.25,
+          }}
+        >
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton
+              key={i}
+              variant="rounded"
+              height={78}
+              sx={{ borderRadius: 1 }}
+            />
+          ))}
+        </Box>
+      ) : dbSubjects.length === 0 ? (
+        <Card
+          elevation={0}
+          sx={{
+            border: `1px dashed ${BORDER}`,
+            borderRadius: 1,
+            p: 3,
+            bgcolor: CARD_BG,
+            textAlign: "center",
+          }}
+        >
+          <Typography sx={{ color: TEXT_SECONDARY, fontSize: "0.88rem" }}>
+            No PYQ subjects are available yet. Please check back soon.
+          </Typography>
+        </Card>
+      ) : (
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "repeat(2, 1fr)",
+              sm: "repeat(3, 1fr)",
+              md: "repeat(4, 1fr)",
+              lg: `repeat(${dbSubjects.length}, 1fr)`,
+            },
+            gap: 1.25,
+          }}
+        >
+          {dbSubjects.map((subjectName) => {
+            const active = subjectName === selectedSubject;
+            const meta =
+              SUBJECT_META[normalizeSubjectKey(subjectName)] ||
+              DEFAULT_SUBJECT_META;
+            return (
+              <Card
+                key={subjectName}
+                onClick={() => setSelectedSubject(subjectName)}
+                elevation={0}
                 sx={{
-                  fontWeight: 700,
-                  fontSize: "0.85rem",
-                  color: TEXT_PRIMARY,
-                  textAlign: "center",
-                  whiteSpace: "nowrap",
+                  cursor: "pointer",
+                  px: 1.5,
+                  py: 1.75,
+                  borderRadius: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 0.75,
+                  border: `1.5px solid ${active ? PRIMARY_GREEN : BORDER}`,
+                  bgcolor: active ? PRIMARY_GREEN_LIGHT : CARD_BG,
+                  transition: "0.15s",
+                  "&:hover": { borderColor: PRIMARY_GREEN },
                 }}
               >
-                {subject.name}
-              </Typography>
-            </Card>
-          );
-        })}
-      </Box>
-
-      {/* ---------------- Main 2-column layout ---------------- */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", lg: "260px 1fr" },
-          gap: { xs: 1.5, lg: 2 },
-          alignItems: "start",
-        }}
-      >
-        {/* -------- Sidebar: filter type + topic list -------- */}
-        <Card
-          elevation={0}
-          sx={{
-            border: `1px solid ${BORDER}`,
-            borderRadius: 1,
-            p: 2,
-            bgcolor: CARD_BG,
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.25 }}>
-            <Box sx={{ color: activeSubjectMeta?.color }}>
-              {activeSubjectMeta?.icon}
-            </Box>
-            <Typography
-              sx={{ fontWeight: 700, fontSize: "1rem", color: TEXT_PRIMARY }}
-            >
-              {selectedSubject}
-            </Typography>
-          </Box>
-          <Typography
-            sx={{ color: TEXT_SECONDARY, fontSize: "0.78rem", mb: 2 }}
-          >
-            Choose how you want to practice
-          </Typography>
-
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2.5 }}>
-            {FILTER_TABS.map((tab) => (
-              <Chip
-                key={tab.key}
-                label={tab.label}
-                onClick={() => setActiveFilter(tab.key)}
-                sx={{
-                  fontWeight: 600,
-                  fontSize: "0.75rem",
-                  borderRadius: 1,
-                  bgcolor:
-                    activeFilter === tab.key ? PRIMARY_GREEN_LIGHT : PAGE_BG,
-                  color:
-                    activeFilter === tab.key
-                      ? PRIMARY_GREEN_DARK
-                      : TEXT_SECONDARY,
-                  border: `1px solid ${activeFilter === tab.key ? PRIMARY_GREEN : "transparent"}`,
-                }}
-              />
-            ))}
-          </Box>
-
-          <Typography
-            sx={{
-              fontWeight: 700,
-              fontSize: "0.72rem",
-              letterSpacing: 0.5,
-              color: TEXT_SECONDARY,
-              textTransform: "uppercase",
-              mb: 1,
-            }}
-          >
-            {activeFilter === "topic"
-              ? "Topics"
-              : activeFilter === "difficulty"
-                ? "Difficulty"
-                : "Answer Type"}
-          </Typography>
-
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 0.5,
-              maxHeight: showAllOptions ? 420 : "none",
-              overflowY: showAllOptions ? "auto" : "visible",
-            }}
-          >
-            {displayedOptions.map((option) => {
-              const active = option === selectedValue;
-              const count =
-                activeFilter === "topic" ? topicCounts[option] : undefined;
-              return (
-                <Box
-                  key={option}
-                  onClick={() => setSelectedValue(option)}
+                <Box sx={{ color: meta.color, display: "flex" }}>
+                  {meta.icon}
+                </Box>
+                <Typography
                   sx={{
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 1,
-                    px: 1.5,
-                    py: 1,
-                    borderRadius: 2,
-                    border: `1px solid ${active ? PRIMARY_GREEN : "transparent"}`,
-                    bgcolor: active ? PRIMARY_GREEN_LIGHT : "transparent",
-                    "&:hover": {
-                      bgcolor: active ? PRIMARY_GREEN_LIGHT : PAGE_BG,
-                    },
+                    fontWeight: 700,
+                    fontSize: "0.85rem",
+                    color: TEXT_PRIMARY,
+                    textAlign: "center",
+                    whiteSpace: "nowrap",
                   }}
                 >
-                  <Typography
-                    sx={{
-                      fontSize: "0.85rem",
-                      fontWeight: active ? 700 : 500,
-                      color: active ? PRIMARY_GREEN_DARK : TEXT_PRIMARY,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {option}
-                  </Typography>
-                  {count !== undefined && (
-                    <Typography
-                      sx={{
-                        fontSize: "0.75rem",
-                        color: TEXT_SECONDARY,
-                        flexShrink: 0,
-                      }}
-                    >
-                      {count}
-                    </Typography>
-                  )}
-                </Box>
-              );
-            })}
-          </Box>
+                  {getSubjectLabel(subjectName)}
+                </Typography>
+              </Card>
+            );
+          })}
+        </Box>
+      )}
 
-          {hasMoreOptions && (
-            <Button
-              fullWidth
-              variant="outlined"
-              size="small"
-              onClick={() => setShowAllOptions((prev) => !prev)}
-              sx={{
-                mt: 2,
-                textTransform: "none",
-                borderRadius: 2,
-                borderColor: BORDER,
-                color: TEXT_PRIMARY,
-              }}
-              startIcon={<ClassOutlinedIcon sx={{ fontSize: 16 }} />}
-            >
-              {showAllOptions ? "View Less" : `View All ${optionLabel}`}
-            </Button>
-          )}
-        </Card>
-
-        {/* -------- Content: selected topic + table -------- */}
-        <Card
-          elevation={0}
+      {/* ---------------- Main 2-column layout ---------------- */}
+      {selectedSubject && (
+        <Box
           sx={{
-            border: `1px solid ${BORDER}`,
-            borderRadius: 2.5,
-            p: { xs: 1.75, sm: 2.25 },
-            bgcolor: CARD_BG,
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", lg: "260px 1fr" },
+            gap: { xs: 1.5, lg: 2 },
+            alignItems: "start",
           }}
         >
-          {/* Topic header */}
-          <Box
+          {/* -------- Sidebar: filter type + topic list -------- */}
+          <Card
+            elevation={0}
             sx={{
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-              gap: 1.5,
-              mb: 2,
+              border: `1px solid ${BORDER}`,
+              borderRadius: 1,
+              p: 2,
+              bgcolor: CARD_BG,
             }}
           >
+            <Box
+              sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.25 }}
+            >
+              <Box sx={{ color: activeSubjectMeta.color }}>
+                {activeSubjectMeta.icon}
+              </Box>
+              <Typography
+                sx={{ fontWeight: 700, fontSize: "1rem", color: TEXT_PRIMARY }}
+              >
+                {getSubjectLabel(selectedSubject)}
+              </Typography>
+            </Box>
+            <Typography
+              sx={{ color: TEXT_SECONDARY, fontSize: "0.78rem", mb: 2 }}
+            >
+              Choose how you want to practice
+            </Typography>
+
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2.5 }}>
+              {FILTER_TABS.map((tab) => (
+                <Chip
+                  key={tab.key}
+                  label={tab.label}
+                  onClick={() => setActiveFilter(tab.key)}
+                  sx={{
+                    fontWeight: 600,
+                    fontSize: "0.75rem",
+                    borderRadius: 1,
+                    bgcolor:
+                      activeFilter === tab.key ? PRIMARY_GREEN_LIGHT : PAGE_BG,
+                    color:
+                      activeFilter === tab.key
+                        ? PRIMARY_GREEN_DARK
+                        : TEXT_SECONDARY,
+                    border: `1px solid ${activeFilter === tab.key ? PRIMARY_GREEN : "transparent"}`,
+                  }}
+                />
+              ))}
+            </Box>
+
+            <Typography
+              sx={{
+                fontWeight: 700,
+                fontSize: "0.72rem",
+                letterSpacing: 0.5,
+                color: TEXT_SECONDARY,
+                textTransform: "uppercase",
+                mb: 1,
+              }}
+            >
+              {activeFilter === "topic"
+                ? "Topics"
+                : activeFilter === "difficulty"
+                  ? "Difficulty"
+                  : "Answer Type"}
+            </Typography>
+
+            {optionsLoading ? (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Skeleton
+                    key={i}
+                    variant="rounded"
+                    height={36}
+                    sx={{ borderRadius: 2 }}
+                  />
+                ))}
+              </Box>
+            ) : optionsForFilter.length === 0 ? (
+              <Typography
+                sx={{ color: TEXT_SECONDARY, fontSize: "0.8rem", py: 1 }}
+              >
+                No {optionLabel.toLowerCase()} available for this subject yet.
+              </Typography>
+            ) : (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 0.5,
+                  maxHeight: showAllOptions ? 420 : "none",
+                  overflowY: showAllOptions ? "auto" : "visible",
+                }}
+              >
+                {displayedOptions.map((option) => {
+                  const active = option === selectedValue;
+                  const count =
+                    activeFilter === "topic"
+                      ? topicCounts[option]
+                      : undefined;
+                  return (
+                    <Box
+                      key={option}
+                      onClick={() => setSelectedValue(option)}
+                      sx={{
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 1,
+                        px: 1.5,
+                        py: 1,
+                        borderRadius: 2,
+                        border: `1px solid ${active ? PRIMARY_GREEN : "transparent"}`,
+                        bgcolor: active ? PRIMARY_GREEN_LIGHT : "transparent",
+                        "&:hover": {
+                          bgcolor: active ? PRIMARY_GREEN_LIGHT : PAGE_BG,
+                        },
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontSize: "0.85rem",
+                          fontWeight: active ? 700 : 500,
+                          color: active ? PRIMARY_GREEN_DARK : TEXT_PRIMARY,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {option}
+                      </Typography>
+                      {count !== undefined && (
+                        <Typography
+                          sx={{
+                            fontSize: "0.75rem",
+                            color: TEXT_SECONDARY,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {count}
+                        </Typography>
+                      )}
+                    </Box>
+                  );
+                })}
+              </Box>
+            )}
+
+            {hasMoreOptions && (
+              <Button
+                fullWidth
+                variant="outlined"
+                size="small"
+                onClick={() => setShowAllOptions((prev) => !prev)}
+                sx={{
+                  mt: 2,
+                  textTransform: "none",
+                  borderRadius: 2,
+                  borderColor: BORDER,
+                  color: TEXT_PRIMARY,
+                }}
+                startIcon={<ClassOutlinedIcon sx={{ fontSize: 16 }} />}
+              >
+                {showAllOptions ? "View Less" : `View All ${optionLabel}`}
+              </Button>
+            )}
+          </Card>
+
+          {/* -------- Content: selected topic + table -------- */}
+          <Card
+            elevation={0}
+            sx={{
+              border: `1px solid ${BORDER}`,
+              borderRadius: 2.5,
+              p: { xs: 1.75, sm: 2.25 },
+              bgcolor: CARD_BG,
+            }}
+          >
+            {/* Topic header */}
             <Box
               sx={{
                 display: "flex",
                 alignItems: "flex-start",
-                gap: 1.25,
-                minWidth: 200,
-              }}
-            >
-              <IconButton
-                size="small"
-                onClick={() => setSelectedValue(null)}
-                sx={{
-                  border: `1px solid ${BORDER}`,
-                  borderRadius: 1.5,
-                  mt: 0.25,
-                }}
-              >
-                <ArrowBackIosNewIcon sx={{ fontSize: 13 }} />
-              </IconButton>
-              <Box>
-                <Typography
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: "0.95rem",
-                    color: TEXT_PRIMARY,
-                  }}
-                >
-                  {selectedValue || "Select an option"}
-                </Typography>
-                <Typography sx={{ color: TEXT_SECONDARY, fontSize: "0.76rem" }}>
-                  Practice questions from previous years on{" "}
-                  {selectedValue || "this selection"}
-                </Typography>
-              </Box>
-            </Box>
-
-            {/* Only the counts that matter for this selection - no filter/sort controls */}
-            <Box
-              sx={{
-                display: "flex",
-                gap: { xs: 2, sm: 2.5 },
+                justifyContent: "space-between",
                 flexWrap: "wrap",
+                gap: 1.5,
+                mb: 2,
               }}
             >
-              <StatBlock label="Questions" value={stats.questions} />
-              <StatBlock label="Exams" value={stats.examsCount} />
-            </Box>
-          </Box>
-
-          {/* Table */}
-          {examsLoading ? (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-              {[1, 2, 3].map((i) => (
-                <Skeleton
-                  key={i}
-                  variant="rounded"
-                  height={64}
-                  sx={{ borderRadius: 2 }}
-                />
-              ))}
-            </Box>
-          ) : visibleExams.length > 0 ? (
-            <Box sx={{ display: "flex", flexDirection: "column" }}>
-              {/* header row - desktop only */}
               <Box
                 sx={{
-                  display: { xs: "none", sm: "grid" },
-                  gridTemplateColumns: TABLE_GRID_COLUMNS,
-                  columnGap: 1.5,
-                  px: 1.5,
-                  py: 1,
-                  color: TEXT_SECONDARY,
-                  fontSize: "0.72rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: 0.3,
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 1.25,
+                  minWidth: 200,
                 }}
               >
-                <Box>Exam</Box>
-                <Box>Questions</Box>
-                <Box>Action</Box>
-                <Box>Result</Box>
-              </Box>
-
-              {visibleExams.map((exam) => {
-                const isStarting = startingExamId === exam.id;
-                return (
-                  <Box
-                    key={exam.id}
+                <IconButton
+                  size="small"
+                  onClick={() => setSelectedValue(null)}
+                  sx={{
+                    border: `1px solid ${BORDER}`,
+                    borderRadius: 1.5,
+                    mt: 0.25,
+                  }}
+                >
+                  <ArrowBackIosNewIcon sx={{ fontSize: 13 }} />
+                </IconButton>
+                <Box>
+                  <Typography
                     sx={{
-                      display: "grid",
-                      gridTemplateColumns: TABLE_GRID_COLUMNS,
-                      columnGap: 1.5,
-                      alignItems: { xs: "flex-start", sm: "center" },
-                      gap: { xs: 1, sm: 1.5 },
-                      px: 1.5,
-                      py: 1.5,
-                      borderTop: `1px solid ${BORDER}`,
+                      fontWeight: 700,
+                      fontSize: "0.95rem",
+                      color: TEXT_PRIMARY,
                     }}
                   >
-                    <Box sx={{ minWidth: 0 }}>
-                      <Typography
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: "0.88rem",
-                          color: TEXT_PRIMARY,
-                          overflowWrap: "break-word",
-                          wordBreak: "break-word",
-                        }}
-                      >
-                        {exam.title}
-                      </Typography>
-                      <Typography
-                        sx={{ fontSize: "0.75rem", color: TEXT_SECONDARY }}
-                      >
-                        {exam.examCategory}
-                      </Typography>
-                    </Box>
+                    {selectedValue || "Select an option"}
+                  </Typography>
+                  <Typography
+                    sx={{ color: TEXT_SECONDARY, fontSize: "0.76rem" }}
+                  >
+                    Practice questions from previous years on{" "}
+                    {selectedValue || "this selection"}
+                  </Typography>
+                </Box>
+              </Box>
 
-                    <Typography
-                      sx={{ fontSize: "0.82rem", color: TEXT_PRIMARY }}
-                    >
-                      {exam.totalQuestions} Questions
-                    </Typography>
+              {/* Only the counts that matter for this selection - no filter/sort controls */}
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: { xs: 2, sm: 2.5 },
+                  flexWrap: "wrap",
+                }}
+              >
+                <StatBlock label="Questions" value={stats.questions} />
+                <StatBlock label="Exams" value={stats.examsCount} />
+              </Box>
+            </Box>
 
+            {/* Table */}
+            {examsLoading ? (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                {[1, 2, 3].map((i) => (
+                  <Skeleton
+                    key={i}
+                    variant="rounded"
+                    height={64}
+                    sx={{ borderRadius: 2 }}
+                  />
+                ))}
+              </Box>
+            ) : visibleExams.length > 0 ? (
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
+                {/* header row - desktop only */}
+                <Box
+                  sx={{
+                    display: { xs: "none", sm: "grid" },
+                    gridTemplateColumns: TABLE_GRID_COLUMNS,
+                    columnGap: 1.5,
+                    px: 1.5,
+                    py: 1,
+                    color: TEXT_SECONDARY,
+                    fontSize: "0.72rem",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.3,
+                  }}
+                >
+                  <Box>Exam</Box>
+                  <Box>Questions</Box>
+                  <Box>Action</Box>
+                  <Box>Result</Box>
+                </Box>
+
+                {visibleExams.map((exam) => {
+                  const isStarting = startingExamId === exam.id;
+                  return (
                     <Box
+                      key={exam.id}
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        flexWrap: "wrap",
-                        width: { xs: "100%", sm: "auto" },
+                        display: "grid",
+                        gridTemplateColumns: TABLE_GRID_COLUMNS,
+                        columnGap: 1.5,
+                        alignItems: { xs: "flex-start", sm: "center" },
+                        gap: { xs: 1, sm: 1.5 },
+                        px: 1.5,
+                        py: 1.5,
+                        borderTop: `1px solid ${BORDER}`,
                       }}
                     >
-                      <Button
-                        variant="contained"
-                        size="small"
-                        disabled={isStarting}
-                        onClick={() => handleStartExam(exam.id, "practice")}
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: "0.88rem",
+                            color: TEXT_PRIMARY,
+                            overflowWrap: "break-word",
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {exam.title}
+                        </Typography>
+                        <Typography
+                          sx={{ fontSize: "0.75rem", color: TEXT_SECONDARY }}
+                        >
+                          {exam.examCategory}
+                        </Typography>
+                      </Box>
+
+                      <Typography
+                        sx={{ fontSize: "0.82rem", color: TEXT_PRIMARY }}
+                      >
+                        {exam.totalQuestions} Questions
+                      </Typography>
+
+                      <Box
                         sx={{
-                          bgcolor: PRIMARY_GREEN,
-                          "&:hover": { bgcolor: PRIMARY_GREEN_DARK },
-                          textTransform: "none",
-                          borderRadius: 1,
-                          fontWeight: 600,
-                          px: 2,
-                          whiteSpace: "nowrap",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          flexWrap: "wrap",
+                          width: { xs: "100%", sm: "auto" },
                         }}
                       >
-                        {isStarting
-                          ? "Starting..."
-                          : exam.isAttempted
-                            ? "Retake Exam"
-                            : "Start Exam"}
-                      </Button>
-                    </Box>
-
-                    {/* Result - only shown once the student has attempted this
-                        exam at least once; opens the review page for their
-                        latest attempt (resolved from attemptedMap / apiAttemptId). */}
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      {exam.isAttempted ? (
-                        <Tooltip title="View Result">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleViewResult(exam)}
-                            sx={{
-                              border: `1px solid ${PRIMARY_GREEN}`,
-                              borderRadius: 2,
-                              color: PRIMARY_GREEN_DARK,
-                              "&:hover": { bgcolor: PRIMARY_GREEN_LIGHT },
-                            }}
-                          >
-                            <VisibilityIcon sx={{ fontSize: 17 }} />
-                          </IconButton>
-                        </Tooltip>
-                      ) : (
-                        <Typography
-                          sx={{ fontSize: "0.78rem", color: TEXT_SECONDARY }}
+                        <Button
+                          variant="contained"
+                          size="small"
+                          disabled={isStarting}
+                          onClick={() => handleStartExam(exam.id, "practice")}
+                          sx={{
+                            bgcolor: PRIMARY_GREEN,
+                            "&:hover": { bgcolor: PRIMARY_GREEN_DARK },
+                            textTransform: "none",
+                            borderRadius: 1,
+                            fontWeight: 600,
+                            px: 2,
+                            whiteSpace: "nowrap",
+                          }}
                         >
-                          -
-                        </Typography>
-                      )}
-                    </Box>
-                  </Box>
-                );
-              })}
+                          {isStarting
+                            ? "Starting..."
+                            : exam.isAttempted
+                              ? "Retake Exam"
+                              : "Start Exam"}
+                        </Button>
+                      </Box>
 
-              {totalPages > 1 && (
-                <Box
-                  sx={{ display: "flex", justifyContent: "center", mt: 2.5 }}
-                >
-                  <Pagination
-                    count={totalPages}
-                    page={page}
-                    onChange={(_, value) => setPage(value)}
-                    shape="rounded"
-                    size="small"
-                    sx={{
-                      "& .Mui-selected": {
-                        bgcolor: `${PRIMARY_GREEN} !important`,
-                        color: "#fff",
-                      },
-                    }}
-                  />
-                </Box>
-              )}
-            </Box>
-          ) : (
-            <Box
-              sx={{
-                textAlign: "center",
-                py: 8,
-                borderRadius: 3,
-                border: `1px dashed ${BORDER}`,
-              }}
-            >
-              <Typography sx={{ color: TEXT_SECONDARY, fontSize: "0.9rem" }}>
-                {selectedValue
-                  ? "No papers found for this selection."
-                  : "Please select an option to see papers."}
-              </Typography>
-            </Box>
-          )}
-        </Card>
-      </Box>
+                      {/* Result - only shown once the student has attempted this
+                          exam at least once; opens the review page for their
+                          latest attempt (resolved from attemptedMap / apiAttemptId). */}
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        {exam.isAttempted ? (
+                          <Tooltip title="View Result">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleViewResult(exam)}
+                              sx={{
+                                border: `1px solid ${PRIMARY_GREEN}`,
+                                borderRadius: 2,
+                                color: PRIMARY_GREEN_DARK,
+                                "&:hover": { bgcolor: PRIMARY_GREEN_LIGHT },
+                              }}
+                            >
+                              <VisibilityIcon sx={{ fontSize: 17 }} />
+                            </IconButton>
+                          </Tooltip>
+                        ) : (
+                          <Typography
+                            sx={{ fontSize: "0.78rem", color: TEXT_SECONDARY }}
+                          >
+                            -
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
+                  );
+                })}
+
+                {totalPages > 1 && (
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", mt: 2.5 }}
+                  >
+                    <Pagination
+                      count={totalPages}
+                      page={page}
+                      onChange={(_, value) => setPage(value)}
+                      shape="rounded"
+                      size="small"
+                      sx={{
+                        "& .Mui-selected": {
+                          bgcolor: `${PRIMARY_GREEN} !important`,
+                          color: "#fff",
+                        },
+                      }}
+                    />
+                  </Box>
+                )}
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  textAlign: "center",
+                  py: 8,
+                  borderRadius: 3,
+                  border: `1px dashed ${BORDER}`,
+                }}
+              >
+                <Typography sx={{ color: TEXT_SECONDARY, fontSize: "0.9rem" }}>
+                  {selectedValue
+                    ? "No papers found for this selection."
+                    : "Please select an option to see papers."}
+                </Typography>
+              </Box>
+            )}
+          </Card>
+        </Box>
+      )}
 
       {/* ---------------- Footer strip ---------------- */}
       <Box
