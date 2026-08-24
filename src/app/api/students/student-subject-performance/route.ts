@@ -1,24 +1,33 @@
 // 📁 src/app/api/student/student-subject-performance/route.ts
+
 import { NextResponse } from "next/server";
+
 import { prisma } from "@/lib/db";
+
 import { verifyToken } from "@/utils/auth";
 
 export async function GET(req: Request) {
   try {
     // Get token from headers
+
     const authHeader = req.headers.get("authorization");
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
+
         { status: 401 },
       );
     }
 
     const token = authHeader.substring(7);
+
     const decoded = verifyToken(token);
+
     if (!decoded || decoded.role !== "student") {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
+
         { status: 401 },
       );
     }
@@ -26,35 +35,57 @@ export async function GET(req: Request) {
     const studentId = decoded.userId;
 
     // 1️⃣ Fetch all subjects
+    // is_pyq: false - the subjects table has its own is_pyq flag (separate
+    // from exams.is_pyq below), marking subjects that only exist for the
+    // Previous Year Questions module. Subject Performance must only list
+    // regular subjects, not PYQ-only ones.
+
     const subjects = await prisma.subjects.findMany({
+      where: {
+        is_pyq: false,
+      },
+
       select: {
         subject_id: true,
+
         subject_name: true,
       },
+
       orderBy: {
         subject_name: "asc",
       },
     });
 
     // 2️⃣ Fetch all completed attempts with exam -> subject_configs -> subject relation
+
     // is_pyq: false - subject performance must only reflect regular exams,
+
     // never PYQ ones, matching Exam History / My Exams / Progress trend,
+
     // which already exclude is_pyq exams.
+
     const attempts = await prisma.student_exam_attempts.findMany({
       where: {
         student_id: studentId,
+
         status: "completed",
+
         exam: {
           is_pyq: false,
         },
       },
+
       select: {
         correct_answers: true,
+
         wrong_answers: true,
+
         unanswered: true,
+
         exam: {
           select: {
             exam_id: true,
+
             exam_subject_configs: {
               select: {
                 subject_id: true,
@@ -66,6 +97,7 @@ export async function GET(req: Request) {
     });
 
     // 3️⃣ Calculate subject-wise accuracy
+
     const subjectStats = subjects.map((subject) => {
       const filteredAttempts = attempts.filter((a) =>
         a.exam.exam_subject_configs.some(
@@ -75,14 +107,17 @@ export async function GET(req: Request) {
 
       const totalCorrect = filteredAttempts.reduce(
         (sum, a) => sum + Number(a.correct_answers),
+
         0,
       );
+
       const totalAttempted = filteredAttempts.reduce(
         (sum, a) =>
           sum +
           Number(a.correct_answers) +
           Number(a.wrong_answers) +
           Number(a.unanswered),
+
         0,
       );
 
@@ -93,38 +128,53 @@ export async function GET(req: Request) {
 
       return {
         subject_id: subject.subject_id,
+
         subject_name: subject.subject_name,
+
         totalCorrect,
+
         totalAttempted,
+
         accuracy,
       };
     });
 
     // 4️⃣ Determine strongest & weakest subjects
+
     const nonZeroSubjects = subjectStats.filter((s) => s.totalAttempted > 0);
+
     const strongestSubject = nonZeroSubjects.reduce(
       (prev, curr) => (curr.accuracy > prev.accuracy ? curr : prev),
+
       nonZeroSubjects[0] || { subject_name: "", accuracy: 0 },
     );
+
     const weakestSubject = nonZeroSubjects.reduce(
       (prev, curr) => (curr.accuracy < prev.accuracy ? curr : prev),
+
       nonZeroSubjects[0] || { subject_name: "", accuracy: 0 },
     );
 
     // 5️⃣ Return response
+
     return NextResponse.json({
       success: true,
+
       data: {
         subjects: subjectStats,
+
         strongestSubject: strongestSubject.subject_name
           ? {
               name: strongestSubject.subject_name,
+
               accuracy: strongestSubject.accuracy,
             }
           : null,
+
         weakestSubject: weakestSubject.subject_name
           ? {
               name: weakestSubject.subject_name,
+
               accuracy: weakestSubject.accuracy,
             }
           : null,
@@ -132,8 +182,10 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error("❌ GET /student-subject-performance error:", error);
+
     return NextResponse.json(
       { success: false, message: "Failed to fetch subject performance" },
+
       { status: 500 },
     );
   }
