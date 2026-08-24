@@ -76,8 +76,25 @@ const DEFAULT_SUBJECT_META = {
 // applied to the value used for API calls (dbSubjects / selectedSubject
 // stay as the exact raw DB string), since /filters?subject=X has to match
 // pyq_exam_meta.subject byte-for-byte.
+//
+// Some rows also use a naming variant that doesn't match the curated map's
+// key ("Indian Polity" vs "Polity"), or - in one case - a straight typo
+// that's already sitting in the DB ("Histroy" instead of "History"). This
+// alias table canonicalizes those AFTER the prefix strip, purely for
+// icon/label purposes.
+//
+// The "Histroy" entry is a stopgap for existing data - the durable fix is
+// still to correct pyq_exam_meta.subject at the source (wherever the PYQ
+// exam creation flow writes it), so future rows don't need a new alias
+// added here every time a subject is typed slightly differently.
+const SUBJECT_ALIASES: Record<string, string> = {
+  "Indian Polity": "Polity",
+  Histroy: "History",
+};
+
 function normalizeSubjectKey(raw: string): string {
-  return raw.replace(/^pyq[\s-]*/i, "").trim();
+  const stripped = raw.replace(/^pyq[\s-]*/i, "").trim();
+  return SUBJECT_ALIASES[stripped] || stripped;
 }
 
 // Purely cosmetic: shortens a (normalized) subject string for display on
