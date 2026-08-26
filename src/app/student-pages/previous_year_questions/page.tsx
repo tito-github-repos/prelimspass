@@ -24,6 +24,7 @@ import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import SchoolIcon from "@mui/icons-material/School";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import QuizOutlinedIcon from "@mui/icons-material/QuizOutlined";
 import { FaHistory, FaFlask, FaChartLine, FaLeaf } from "react-icons/fa";
 
 /* ----------------------------------------------------------------------- */
@@ -63,6 +64,14 @@ const SUBJECT_META: Record<string, { icon: React.ReactNode; color: string }> = {
   Economics: { icon: <FaChartLine size={16} />, color: "#b9791a" },
   "Current Affairs": { icon: <FaFlask size={16} />, color: "#0e7490" },
   History: { icon: <FaHistory size={16} />, color: "#a16207" },
+  // NEW - General Knowledge previously had no entry here, so it always fell
+  // back to DEFAULT_SUBJECT_META (the plain gray ClassOutlinedIcon). Key
+  // matches the post-normalizeSubjectKey value (i.e. after the "PYQ-"
+  // prefix, if any, is stripped) - see normalizeSubjectKey() below.
+  "General Knowledge": {
+    icon: <QuizOutlinedIcon sx={{ fontSize: 18 }} />,
+    color: "#0891b2",
+  },
 };
 const DEFAULT_SUBJECT_META = {
   icon: <ClassOutlinedIcon sx={{ fontSize: 18 }} />,
@@ -89,7 +98,7 @@ const DEFAULT_SUBJECT_META = {
 // added here every time a subject is typed slightly differently.
 const SUBJECT_ALIASES: Record<string, string> = {
   "Indian Polity": "Polity",
-  Histroy: "History",
+  Histroy: "History", // fixes the misspelled DB row until it's corrected at the source
 };
 
 function normalizeSubjectKey(raw: string): string {
@@ -223,9 +232,9 @@ export default function PreviousYearQuestionsPage() {
   const [difficultiesForSubject, setDifficultiesForSubject] = useState<
     string[]
   >([]);
-  const [answerTypesForSubject, setAnswerTypesForSubject] = useState<
-    string[]
-  >([]);
+  const [answerTypesForSubject, setAnswerTypesForSubject] = useState<string[]>(
+    [],
+  );
 
   const [exams, setExams] = useState<Exam[]>([]);
   const [page, setPage] = useState(1);
@@ -345,8 +354,25 @@ export default function PreviousYearQuestionsPage() {
         if (cancelled) return;
 
         if (data.success && Array.isArray(data.subjects)) {
-          setDbSubjects(data.subjects);
-          setSelectedSubject((prev) => prev || data.subjects[0] || "");
+          // De-dupe by normalized key (after PYQ- prefix strip + alias
+          // resolution) so a genuine duplicate/misspelled row in the DB
+          // (e.g. two "PYQ-History" rows, or "PYQ-History" + "PYQ-Histroy")
+          // doesn't render as two separate tabs. This is a display-layer
+          // safety net only - the real fix is deduping/correcting the
+          // underlying subjects / pyq_exam_meta rows at the source. Note
+          // that whichever raw variant is encountered first "wins" and is
+          // the one used for subsequent API calls under that tab - if
+          // exams are split across both DB variants, some may not show up
+          // until the DB itself is cleaned up.
+          const seen = new Set<string>();
+          const deduped = data.subjects.filter((s: string) => {
+            const key = normalizeSubjectKey(s).toLowerCase();
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+          setDbSubjects(deduped);
+          setSelectedSubject((prev) => prev || deduped[0] || "");
         } else {
           setDbSubjects([]);
         }
@@ -1091,9 +1117,7 @@ export default function PreviousYearQuestionsPage() {
                 {displayedOptions.map((option) => {
                   const active = option === selectedValue;
                   const count =
-                    activeFilter === "topic"
-                      ? topicCounts[option]
-                      : undefined;
+                    activeFilter === "topic" ? topicCounts[option] : undefined;
                   return (
                     <Box
                       key={option}
