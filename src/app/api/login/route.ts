@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/db";
+import { syncPyqAssignmentsForStudent } from "@/lib/Pyqassignmentsync";
+
 
 export async function POST(req: Request) {
   try {
@@ -60,6 +62,43 @@ export async function POST(req: Request) {
         { error: "Server configuration error" },
         { status: 500 }
       );
+    }
+
+    // ---- Self-heal PYQ exam assignments for students ----
+    // Runs on every successful student login and ensures the student has
+    // an exam_assignment_students row for every existing PYQ exam - this
+    // is what makes PYQ exams "just work" for a student regardless of
+    // when they registered, without needing a one-time registration hook
+    // that could be missed (bulk imports, admin-created accounts, etc.).
+    //
+    // Deliberately isolated in its own try/catch: a sync failure here must
+    // NEVER block a successful login. If this fails, the student simply
+    // won't see brand-new PYQ exams until their next successful sync (next
+    // login, or a manual PATCH /api/exams/pyq resync) - annoying, but not
+    // login-breaking.
+    if (user.role === "student") {
+      try {
+        // TODO: confirm this is the right value for your schema.
+        // exam_assignments.assigned_by is a FK - when this sync runs at
+        // login time there's no admin present, so we need a fixed
+        // "system" user id to attribute these auto-created assignments
+        // to. Set SYSTEM_ASSIGNER_USER_ID in your environment to a real,
+        // existing user_id (e.g. a dedicated system/admin account).
+        const systemUserId = process.env.SYSTEM_ASSIGNER_USER_ID
+          ? Number(process.env.SYSTEM_ASSIGNER_USER_ID)
+          : null;
+
+        if (systemUserId) {
+          await syncPyqAssignmentsForStudent(user.user_id, systemUserId);
+        } else {
+          console.warn(
+            "SYSTEM_ASSIGNER_USER_ID is not set - skipping PYQ assignment sync at login. " +
+              "Set this env var to a valid user_id to enable auto-assignment on login.",
+          );
+        }
+      } catch (syncError) {
+        console.error("PYQ assignment sync failed (login still succeeds):", syncError);
+      }
     }
 
     // Generate JWT token (8 hour expiry)
