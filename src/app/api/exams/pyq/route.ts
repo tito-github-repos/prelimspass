@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import jwt from "jsonwebtoken";
+import { syncPyqAssignmentsForAllStudents } from "@/lib/Pyqassignmentsync";
 
 type FilterType = "topic" | "difficulty" | "answer_type";
 
@@ -15,15 +16,11 @@ interface IncomingQuestion {
   points: number;
   difficulty: "Easy" | "Medium" | "Hard";
   explanation: string;
-  // Present on every row regardless of filter type:
-  // - "topic" mode: same topicId for every row (from the dropdown)
-  // - "difficulty" / "answer_type" mode: client-resolved topic_id, which
-  //   we re-resolve server-side via topic_name below - never trusted as-is
   topic_id?: number;
   topic_name?: string;
 }
 
-const NEGATIVE_MARKS_DEFAULT = 0.66; // matches questions.negative_marks @default
+const NEGATIVE_MARKS_DEFAULT = 0.66;
 
 export async function POST(req: Request) {
   try {
@@ -162,8 +159,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // All is_pyq topics under this subject - used to resolve/validate
-    // every row, regardless of filter type.
     const pyqTopics = await prisma.topics.findMany({
       where: { subject_id: subjectId, is_pyq: true },
     });
@@ -208,12 +203,8 @@ export async function POST(req: Request) {
       let resolvedTopicId: number | undefined;
 
       if (filterType === "topic") {
-        // Every row uses the single dropdown-selected topic - never trust
-        // a client-sent topic_id here, always use the server-validated one.
         resolvedTopicId = topicId!;
       } else {
-        // Difficulty / Answer-Type: re-resolve from topic_name, ignore
-        // any client-sent topic_id.
         const name = q.topic_name?.toLowerCase().trim();
         resolvedTopicId = name ? topicNameToId.get(name) : undefined;
 
@@ -234,7 +225,6 @@ export async function POST(req: Request) {
     /* ---------------- Transaction ---------------- */
     const createdExam = await prisma.$transaction(
       async (tx) => {
-        // ---- Create exam ----
         const exam = await tx.exams.create({
           data: {
             exam_title: examTitle,
@@ -247,14 +237,13 @@ export async function POST(req: Request) {
             scheduled_end:
               examType === "live" && endTime ? new Date(endTime) : null,
             question_count: resolvedQuestions.length,
-            total_marks: 0, // updated after questions are created
+            total_marks: 0,
             is_active: true,
             is_pyq: true,
             created_by: userId,
           },
         });
 
-        // ---- pyq_exam_meta ----
         await tx.pyq_exam_meta.create({
           data: {
             exam_id: exam.exam_id,
@@ -267,7 +256,6 @@ export async function POST(req: Request) {
           },
         });
 
-        // ---- Create question rows ----
         let totalMarks = 0;
         const examQuestionsData: any[] = [];
         let questionOrder = 1;
@@ -312,7 +300,6 @@ export async function POST(req: Request) {
           data: { total_marks: totalMarks },
         });
 
-        // ---- exam_subject_configs (grouped by topic actually used) ----
         const topicCounts = new Map<number, number>();
         for (const q of resolvedQuestions) {
           topicCounts.set(
@@ -332,26 +319,40 @@ export async function POST(req: Request) {
           ),
         });
 
-        // ---- Auto-assign to all students ----
+        // ---- Auto-assign to every student that exists right now ----
+        // This covers "new PYQ exam -> existing students". The other
+        // direction ("new student -> existing PYQ exams") is handled by
+        // the equivalent sync in the student registration route - see
+        // that file for the counterpart logic. Together, every
+        // student/exam pair ends up with a real exam_assignment_students
+        // row, so /api/students/exams/take's assignment check works
+        // correctly for PYQ exams with no special-casing needed there.
         const students = await tx.users.findMany({
           where: { role: "student" },
           select: { user_id: true },
         });
 
         if (students.length > 0) {
-          const assignment = await tx.exam_assignments.create({
-            data: {
-              exam_id: exam.exam_id,
-              assigned_by: userId,
-              mode: "same",
-            },
+          let assignment = await tx.exam_assignments.findFirst({
+            where: { exam_id: exam.exam_id },
           });
+
+          if (!assignment) {
+            assignment = await tx.exam_assignments.create({
+              data: {
+                exam_id: exam.exam_id,
+                assigned_by: userId,
+                mode: "same",
+              },
+            });
+          }
 
           await tx.exam_assignment_students.createMany({
             data: students.map((s) => ({
-              assignment_id: assignment.id,
+              assignment_id: assignment!.id,
               student_id: s.user_id,
             })),
+            skipDuplicates: true,
           });
         }
 
@@ -362,13 +363,69 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "PYQ exam created and assigned to all users",
+      message: "PYQ exam created and is available to all students",
       examId: createdExam.exam_id,
     });
   } catch (error: any) {
     console.error("Error creating PYQ exam:", error);
     return NextResponse.json(
       { success: false, message: error.message || "Failed to create PYQ exam" },
+      { status: 500 },
+    );
+  }
+}
+
+/* ===========================
+   PATCH: Bulk resync PYQ assignments
+   ---------------------------
+   Manual "fix everything right now" utility: ensures EVERY currently
+   registered student has an assignment row for EVERY existing PYQ exam.
+   Useful for:
+     - backfilling students who registered before the login-time sync
+       existed (see /api/students/login, or wherever that sync is wired in)
+     - a manual safety net after a batch of signups or a data issue
+   Safe to call as often as you like - every insert is skipDuplicates, so
+   it never creates a duplicate row. Uses the shared helper so this logic
+   only lives in one place.
+=========================== */
+export async function PATCH(req: Request) {
+  try {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
+    const token = authHeader.split(" ")[1];
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    } catch {
+      return NextResponse.json(
+        { success: false, message: "Invalid token" },
+        { status: 401 },
+      );
+    }
+    const userId = decoded.userId;
+
+    const { examsProcessed, studentsNewlyAssigned } =
+      await syncPyqAssignmentsForAllStudents(userId);
+
+    return NextResponse.json({
+      success: true,
+      message:
+        examsProcessed === 0
+          ? "Nothing to resync"
+          : "PYQ assignment resync complete",
+      examsProcessed,
+      studentsNewlyAssigned,
+    });
+  } catch (error: any) {
+    console.error("Error resyncing PYQ assignments:", error);
+    return NextResponse.json(
+      { success: false, message: error.message || "Failed to resync PYQ assignments" },
       { status: 500 },
     );
   }
