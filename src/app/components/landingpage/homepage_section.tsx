@@ -1,5 +1,6 @@
 "use client";
 import PyqSection from "./PyqSection";
+import PromoPopup from "./PromoPopup";
 import "./website.css";
 import { Box, Typography, Button } from "@mui/material";
 
@@ -526,6 +527,8 @@ const W = "var(--website-font)";
 export default function HomepageSections() {
   return (
     <>
+      <PromoPopup />
+
       {/* ══════════════════════════════════════════════
           §1  WHY CHOOSE
       ══════════════════════════════════════════════ */}
