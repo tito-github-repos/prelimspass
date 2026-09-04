@@ -30,7 +30,7 @@ const prelimsSchedule = [
   { day: "THU", subject: "Polity Questions", count: "100" },
   { day: "FRI", subject: "Economics Questions", count: "100" },
   { day: "SAT", subject: "History Questions", count: "100" },
-  { day: "SUN", subject: "CSAT Questions", count: "80" },
+  { day: "SUN", subject: "CA Questions", count: "100" },
 ];
 
 const mainsSchedule = [
@@ -129,15 +129,15 @@ export default function PricingPage() {
                   </Typography>
 
                   <Typography color="#6B7280" mb={3}>
-                    7 Days Free Access
+                    Free Access
                   </Typography>
 
                   <Box sx={{ borderBottom: "2px dotted #D1D5DB", mb: 3 }} />
 
                   <Stack spacing={2} textAlign="left">
                     {[
-                      "Limited Prelims PYQ Access",
-                      "Limited Daily Practice Questions",
+                      "Prelims PYQ Access",
+                      "FREE for all registered users",
                       "Basic Dashboard Access",
                       "No Payment Required",
                       "Login / Register Required",
@@ -220,7 +220,7 @@ export default function PricingPage() {
                         color: "#6B7280",
                       }}
                     >
-                      Risk free for 7 days
+                      No risk, no cost
                     </Typography>
                   </Box>
 
