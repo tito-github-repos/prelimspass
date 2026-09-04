@@ -380,7 +380,7 @@ const schedule = [
   { day: "Thursday", topic: "Polity" },
   { day: "Friday", topic: "Economy" },
   { day: "Saturday", topic: "History" },
-  { day: "Sunday", topic: "CSAT" },
+  { day: "Sunday", topic: "Current Affairs" },
 ];
 
 const dFeats = [
@@ -754,41 +754,78 @@ export default function HomepageSections() {
                 >
                   {/* Price pills */}
                   <Box sx={{ display: "flex", gap: 1.5, mb: 1.8 }}>
-                    <Box
-                      sx={{
-                        flex: 1,
-                        p: "8px 10px",
-                        borderRadius: "11px",
-                        background: `${o.color}0a`,
-                        border: `1.5px solid ${o.color}25`,
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Typography
-                        sx={{
-                          fontWeight: 900,
-                          fontSize: "1.2rem",
-                          color: o.color,
-                          fontFamily: W,
-                          lineHeight: 1,
-                        }}
-                      >
-                        {o.pm}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: "0.65rem",
-                          color: "#94a3b8",
-                          fontFamily: W,
-                          mt: 0.2,
-                        }}
-                      >
-                        / month
-                      </Typography>
-                    </Box>
                     {o.py ? (
+                      <>
+                        <Box
+                          sx={{
+                            flex: 1,
+                            p: "8px 10px",
+                            borderRadius: "11px",
+                            background: `${o.color}0a`,
+                            border: `1.5px solid ${o.color}25`,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              fontWeight: 900,
+                              fontSize: "1.2rem",
+                              color: o.color,
+                              fontFamily: W,
+                              lineHeight: 1,
+                            }}
+                          >
+                            {o.pm}
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontSize: "0.65rem",
+                              color: "#94a3b8",
+                              fontFamily: W,
+                              mt: 0.2,
+                            }}
+                          >
+                            / month
+                          </Typography>
+                        </Box>
+                        <Box
+                          sx={{
+                            flex: 1,
+                            p: "8px 10px",
+                            borderRadius: "11px",
+                            background: `${o.color}0a`,
+                            border: `1.5px solid ${o.color}25`,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              fontWeight: 900,
+                              fontSize: "1.2rem",
+                              color: o.color,
+                              fontFamily: W,
+                              lineHeight: 1,
+                            }}
+                          >
+                            {o.py}
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontSize: "0.65rem",
+                              color: "#94a3b8",
+                              fontFamily: W,
+                              mt: 0.2,
+                            }}
+                          >
+                            / year
+                          </Typography>
+                        </Box>
+                      </>
+                    ) : (
                       <Box
                         sx={{
                           flex: 1,
@@ -810,7 +847,7 @@ export default function HomepageSections() {
                             lineHeight: 1,
                           }}
                         >
-                          {o.py}
+                          {o.pm}
                         </Typography>
                         <Typography
                           sx={{
@@ -818,29 +855,6 @@ export default function HomepageSections() {
                             color: "#94a3b8",
                             fontFamily: W,
                             mt: 0.2,
-                          }}
-                        >
-                          / year
-                        </Typography>
-                      </Box>
-                    ) : (
-                      <Box
-                        sx={{
-                          flex: 1,
-                          p: "8px 10px",
-                          borderRadius: "11px",
-                          background: "#f8fafc",
-                          border: "1.5px solid #e5e7eb",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Typography
-                          sx={{
-                            fontSize: "0.7rem",
-                            color: "#94a3b8",
-                            fontFamily: W,
                           }}
                         >
                           Per session

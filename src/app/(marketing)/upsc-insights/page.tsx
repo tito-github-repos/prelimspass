@@ -213,7 +213,7 @@ export default function UPSCInsightsSection() {
                   },
                   {
                     icon: <RocketLaunchIcon />,
-                    title: "365+ Tests",
+                    title: "100 Tests",
                     subtitle: "Mock Test Series",
                   },
                 ].map((item, index) => (
