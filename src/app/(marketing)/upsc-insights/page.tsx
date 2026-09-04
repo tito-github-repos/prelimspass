@@ -252,8 +252,13 @@ export default function UPSCInsightsSection() {
             py: { xs: 4, md: 6 },
           }}
         >
-          {/* HEADING */}
-          <Box textAlign="center" mb={5}>
+          {/* HEADING — anchor target for homepage "Subject Weightage" card */}
+          <Box
+            textAlign="center"
+            mb={5}
+            id="subject-weightage"
+            sx={{ scrollMarginTop: { xs: "80px", md: "96px" } }}
+          >
             <Typography
               sx={{
                 fontWeight: 900,
@@ -751,8 +756,12 @@ export default function UPSCInsightsSection() {
         </Box>
 
         {/* ================= CUT OFF TREND SECTION ================= */}
-
-        <Box className="cutoff-section">
+        {/* Anchor target for homepage "Cut-off Trends" card */}
+        <Box
+          className="cutoff-section"
+          id="cutoff-trend"
+          sx={{ scrollMarginTop: { xs: "80px", md: "96px" } }}
+        >
           {/* HEADING */}
           <Box className="cutoff-heading-wrapper">
             <Typography className="cutoff-main-heading">
