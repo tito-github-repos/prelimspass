@@ -831,7 +831,8 @@ export default function PricingPage() {
                       color="text.secondary"
                       sx={{ fontSize: { xs: "0.9rem", md: "1rem" }, mb: 0.5 }}
                     >
-                      Per Month
+                      Valid for the 2027 season
+                      {/* Per Month */}
                     </Typography>
                     <Typography
                       sx={{
