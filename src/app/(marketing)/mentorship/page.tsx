@@ -302,7 +302,7 @@ export default function PricingPage() {
                               flexShrink: 0,
                             }}
                           >
-                            ₹1111
+                            ₹999
                           </Typography>
                         </Box>
 
@@ -368,7 +368,7 @@ export default function PricingPage() {
                               flexShrink: 0,
                             }}
                           >
-                            ₹1111
+                            ₹999
                           </Typography>
                         </Box>
                       </Stack>
@@ -701,7 +701,7 @@ export default function PricingPage() {
                                 flexShrink: 0,
                               }}
                             >
-                              ₹1111
+                              ₹999
                             </Typography>
                           </Box>
                         ))}

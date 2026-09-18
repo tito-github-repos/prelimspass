@@ -269,7 +269,7 @@ const offerings = [
     title: "Prelims Mobile App",
     sub: "For Quick Coverage",
     price: "₹111",
-    priceUnit: "Valid for the 2027 season",
+    priceUnit: "Valid up to Prelims exam, May 2027",
     note: "Available for all paid users from 2 Oct 2026",
     feats: [
       "10,000 facts per subject, added incrementally",
@@ -306,7 +306,9 @@ const offerings = [
     // pm: "₹1,111",
     // py: "₹11,111",
     price: "₹1,111",
-    priceUnit: "/ month",
+    priceUnit: "Valid for the 2027 season",
+    // "/ month",
+
     note: "Free for Mains Practice enrolled students",
     feats: [
       // "Unlimited Subject & Topic Tests",
@@ -378,7 +380,7 @@ const offerings = [
     sub: "Personalized guidance. Focused on your success.",
     //  pm: "₹1,111",
     // py: null,
-    price: "₹1,111",
+    price: "₹999",
     priceUnit: "Per session",
     feats: [
       "1 Hour One-to-One Session",
