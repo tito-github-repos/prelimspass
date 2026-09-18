@@ -229,7 +229,56 @@ const features = [
   },
 ];
 
+/* ══ Featured card: Mains cum Prelims (shown above the 3-col grid) ══ */
+const featuredOffering = {
+  title: "Mains cum Prelims",
+  price: "₹11,111",
+  priceUnit: "Valid for the 2027 season",
+  intro:
+    "Full Mains answer-writing practice — inclusive of Prelims Practice access.",
+  feats: [
+    // "Inclusive of Prelims Practice — no extra fee",
+    "Mains Practice with Prelims Mobile App, Prelims PYQ & Prelims Mock Test — all free, included",
+    "Each answer paper is evaluated, analyzed & discussed one-to-one",
+    "Before 31 Dec 2026: 12 tests per paper — conducted, evaluated & discussed with every enrolled student",
+    "After the Prelims exam: 8 tests per paper — conducted, evaluated & discussed with every enrolled student",
+  ],
+  btn: "Enroll in Mains cum Prelims",
+};
+
 const offerings = [
+  {
+    color: "#ea580c",
+    lightBg: "#fff7ed",
+    borderCol: "#fed7aa",
+    icon: (
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#ea580c"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <rect x="7" y="2" width="10" height="20" rx="2" />
+        <line x1="11" y1="18" x2="13" y2="18" />
+      </svg>
+    ),
+    title: "Prelims Mobile App",
+    sub: "For Quick Coverage",
+    price: "₹111",
+    priceUnit: "Valid for the 2027 season",
+    note: "Available for all paid users from 2 Oct 2026",
+    feats: [
+      "10,000 facts per subject, added incrementally",
+      "New facts added every week",
+      "Daily True / False quiz game",
+      "Revise more, in the shortest possible time",
+    ],
+    btn: "Get the App",
+  },
   {
     color: "#16a34a",
     lightBg: "#f0fdf4",
@@ -252,52 +301,58 @@ const offerings = [
       </svg>
     ),
     title: "Prelims Practice",
-    sub: "Unlimited practice. Unlimited growth. Crack Prelims with confidence.",
-    pm: "₹1,111",
-    py: "₹11,111",
+    sub: "Unlimited practice.",
+    // Unlimited growth. Crack Prelims with confidence.",
+    // pm: "₹1,111",
+    // py: "₹11,111",
+    price: "₹1,111",
+    priceUnit: "/ month",
+    note: "Free for Mains Practice enrolled students",
     feats: [
-      "Unlimited Subject & Topic Tests",
-      "PYQ Practice",
-      "Live Mock Exams",
-      "Performance Analytics",
-      "Progress Tracking",
+      // "Unlimited Subject & Topic Tests",
+      "PYQ Practice and Access",
+      // "Live Mock Exams",
+      "Mock Exams Practice",
+      "Prelims Mobile App included free",
+      "Performance Analytics & Progress Tracking",
     ],
     btn: "Explore Prelims Tests",
   },
-  {
-    color: "#2563eb",
-    lightBg: "#eff6ff",
-    borderCol: "#bfdbfe",
-    icon: (
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#2563eb"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-        <polyline points="14 2 14 8 20 8" />
-        <line x1="16" y1="13" x2="8" y2="13" />
-        <line x1="16" y1="17" x2="8" y2="17" />
-      </svg>
-    ),
-    title: "Mains Evaluation",
-    sub: "Write better. Get better. Detailed evaluation within 24 hours.",
-    pm: "₹1,111",
-    py: "₹11,111",
-    feats: [
-      "Weekly Essay & GS Papers",
-      "24hr Answer Evaluation",
-      "Detailed Feedback",
-      "Improvement Suggestions",
-      "Ethics & Tamil Medium Support",
-    ],
-    btn: "Explore Mains Tests",
-  },
+  // {
+  //   color: "#2563eb",
+  //   lightBg: "#eff6ff",
+  //   borderCol: "#bfdbfe",
+  //   icon: (
+  //     <svg
+  //       width="24"
+  //       height="24"
+  //       viewBox="0 0 24 24"
+  //       fill="none"
+  //       stroke="#2563eb"
+  //       strokeWidth="1.8"
+  //       strokeLinecap="round"
+  //       strokeLinejoin="round"
+  //     >
+  //       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+  //       <polyline points="14 2 14 8 20 8" />
+  //       <line x1="16" y1="13" x2="8" y2="13" />
+  //       <line x1="16" y1="17" x2="8" y2="17" />
+  //     </svg>
+  //   ),
+  //   title: "Mains Evaluation",
+  //   sub: "Write better. Get better. Detailed evaluation within 24 hours.",
+  //   pm: "₹1,111",
+  //   py: "₹11,111",
+  //   feats: [
+  //     "Weekly Essay & GS Papers",
+  //     "24hr Answer Evaluation",
+  //     "Detailed Feedback",
+  //     "Improvement Suggestions",
+  //     "Ethics & Tamil Medium Support",
+  //   ],
+  //   btn: "Explore Mains Tests",
+  // },
+
   {
     color: "#7c3aed",
     lightBg: "#f5f3ff",
@@ -321,8 +376,10 @@ const offerings = [
     ),
     title: "1-to-1 Consultation",
     sub: "Personalized guidance. Focused on your success.",
-    pm: "₹1,111",
-    py: null,
+    //  pm: "₹1,111",
+    // py: null,
+    price: "₹1,111",
+    priceUnit: "Per session",
     feats: [
       "1 Hour One-to-One Session",
       "Prelims Strategy",
@@ -640,6 +697,201 @@ export default function HomepageSections() {
             </Typography>
           </Box>
 
+          {/* ─── Featured card: Mains cum Prelims ─── */}
+          <Box
+            sx={{
+              mb: { xs: 2.5, md: 3 },
+              borderRadius: "20px",
+              overflow: "hidden",
+              background: "linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%)",
+              border: "2px solid #0f766e",
+              position: "relative",
+            }}
+          >
+            {/* Best Value Badge */}
+            <Box
+              sx={{
+                position: "absolute",
+                top: 14,
+                left: { xs: 20, md: 48 },
+                px: 1.4,
+                py: 0.5,
+                borderRadius: "999px",
+                background: "#e0f2f1",
+                border: "1px solid #a7dcd7",
+                zIndex: 1,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: "0.62rem",
+                  fontWeight: 800,
+                  color: "#0f766e",
+                  fontFamily: W,
+                  letterSpacing: "0.03em",
+                }}
+              >
+                Best Value · Season 2027
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                p: {
+                  xs: "38px 20px 22px",
+                  md: "38px 48px 34px",
+                },
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "1.3fr 1fr" },
+                gap: { xs: 2.5, md: 4 },
+                alignItems: "center",
+              }}
+            >
+              {/* Left Content */}
+              <Box>
+                <Typography
+                  sx={{
+                    fontWeight: 800,
+                    fontSize: { xs: "1.2rem", md: "1.5rem" },
+                    color: "#0f172a",
+                    fontFamily: W,
+                    mb: 0.6,
+                  }}
+                >
+                  {featuredOffering.title}
+                </Typography>
+
+                <Typography
+                  sx={{
+                    fontSize: "0.8rem",
+                    color: "#52749a",
+                    fontFamily: W,
+                    mb: 1.8,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {featuredOffering.intro}
+                </Typography>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 1,
+                  }}
+                >
+                  {featuredOffering.feats.map((f, i) => (
+                    <Box
+                      key={i}
+                      sx={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 1,
+                      }}
+                    >
+                      <Tick color="#0f766e" />
+
+                      <Typography
+                        sx={{
+                          fontSize: "0.78rem",
+                          color: "#173b62",
+                          fontFamily: W,
+                          lineHeight: 1.55,
+                        }}
+                      >
+                        {f}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+
+              {/* Right Price + Button */}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 1.6,
+                }}
+              >
+                {/* Price Box */}
+                <Box
+                  sx={{
+                    textAlign: "center",
+                    p: "18px 32px",
+                    borderRadius: "16px",
+                    background: "rgba(15,118,110,0.045)",
+                    border: "1.5px solid #b8deda",
+                    width: "100%",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontWeight: 900,
+                      fontSize: "1.9rem",
+                      color: "#0f766e",
+                      fontFamily: W,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {featuredOffering.price}
+                  </Typography>
+
+                  <Typography
+                    sx={{
+                      fontSize: "0.7rem",
+                      color: "#52749a",
+                      fontFamily: W,
+                      mt: 0.5,
+                    }}
+                  >
+                    {featuredOffering.priceUnit}
+                  </Typography>
+                </Box>
+
+                {/* Enroll Button */}
+                <Button
+                  variant="contained"
+                  fullWidth
+                  endIcon={
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                      <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                  }
+                  sx={{
+                    background: "#0f766e",
+                    color: "#fff",
+                    borderRadius: "10px",
+                    fontWeight: 700,
+                    textTransform: "none",
+                    fontSize: "0.85rem",
+                    py: 1,
+                    fontFamily: W,
+                    boxShadow: "0 8px 24px rgba(15,118,110,0.22)",
+                    "&:hover": {
+                      background: "#115e59",
+                      boxShadow: "0 10px 30px rgba(15,118,110,0.28)",
+                    },
+                  }}
+                >
+                  {featuredOffering.btn}
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+
+          {/* ─── 3-column grid: Prelims Practice / Prelims Mobile App / 1-to-1 Consultation ─── */}
           <Box
             sx={{
               display: "grid",
@@ -727,115 +979,68 @@ export default function HomepageSections() {
                     flex: 1,
                   }}
                 >
-                  {/* Price pills */}
-                  <Box sx={{ display: "flex", gap: 1.5, mb: 1.8 }}>
-                    {o.py ? (
-                      <>
-                        <Box
-                          sx={{
-                            flex: 1,
-                            p: "8px 10px",
-                            borderRadius: "11px",
-                            background: `${o.color}0a`,
-                            border: `1.5px solid ${o.color}25`,
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                          }}
-                        >
-                          <Typography
-                            sx={{
-                              fontWeight: 900,
-                              fontSize: "1.2rem",
-                              color: o.color,
-                              fontFamily: W,
-                              lineHeight: 1,
-                            }}
-                          >
-                            {o.pm}
-                          </Typography>
-                          <Typography
-                            sx={{
-                              fontSize: "0.65rem",
-                              color: "#94a3b8",
-                              fontFamily: W,
-                              mt: 0.2,
-                            }}
-                          >
-                            / month
-                          </Typography>
-                        </Box>
-                        <Box
-                          sx={{
-                            flex: 1,
-                            p: "8px 10px",
-                            borderRadius: "11px",
-                            background: `${o.color}0a`,
-                            border: `1.5px solid ${o.color}25`,
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                          }}
-                        >
-                          <Typography
-                            sx={{
-                              fontWeight: 900,
-                              fontSize: "1.2rem",
-                              color: o.color,
-                              fontFamily: W,
-                              lineHeight: 1,
-                            }}
-                          >
-                            {o.py}
-                          </Typography>
-                          <Typography
-                            sx={{
-                              fontSize: "0.65rem",
-                              color: "#94a3b8",
-                              fontFamily: W,
-                              mt: 0.2,
-                            }}
-                          >
-                            / year
-                          </Typography>
-                        </Box>
-                      </>
-                    ) : (
-                      <Box
+                  {/* Note badge (e.g. "Free for Mains enrolled students") */}
+                  {o.note && (
+                    <Box
+                      sx={{
+                        mb: 1.2,
+                        px: 1.2,
+                        py: 0.6,
+                        borderRadius: "8px",
+                        background: `${o.color}0d`,
+                        border: `1px dashed ${o.color}45`,
+                      }}
+                    >
+                      <Typography
                         sx={{
-                          flex: 1,
-                          p: "8px 10px",
-                          borderRadius: "11px",
-                          background: `${o.color}0a`,
-                          border: `1.5px solid ${o.color}25`,
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
+                          fontSize: "0.68rem",
+                          fontWeight: 600,
+                          color: o.color,
+                          fontFamily: W,
+                          lineHeight: 1.4,
                         }}
                       >
-                        <Typography
-                          sx={{
-                            fontWeight: 900,
-                            fontSize: "1.2rem",
-                            color: o.color,
-                            fontFamily: W,
-                            lineHeight: 1,
-                          }}
-                        >
-                          {o.pm}
-                        </Typography>
-                        <Typography
-                          sx={{
-                            fontSize: "0.65rem",
-                            color: "#94a3b8",
-                            fontFamily: W,
-                            mt: 0.2,
-                          }}
-                        >
-                          Per session
-                        </Typography>
-                      </Box>
-                    )}
+                        {o.note}
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {/* Price */}
+                  <Box sx={{ display: "flex", gap: 1.5, mb: 1.8 }}>
+                    <Box
+                      sx={{
+                        flex: 1,
+                        p: "8px 10px",
+                        borderRadius: "11px",
+                        background: `${o.color}0a`,
+                        border: `1.5px solid ${o.color}25`,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontWeight: 900,
+                          fontSize: "1.2rem",
+                          color: o.color,
+                          fontFamily: W,
+                          lineHeight: 1,
+                        }}
+                      >
+                        {o.price}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: "0.65rem",
+                          color: "#94a3b8",
+                          fontFamily: W,
+                          mt: 0.2,
+                        }}
+                      >
+                        {o.priceUnit}
+                      </Typography>
+                    </Box>
                   </Box>
 
                   <Box sx={{ height: "1px", background: "#f1f5f9", mb: 1.5 }} />
@@ -920,410 +1125,6 @@ export default function HomepageSections() {
         <Box
           sx={{ maxWidth: 1240, mx: "auto", px: { xs: "18px", sm: "24px" } }}
         >
-          <Box sx={{ textAlign: "center", mb: 2.5 }}>
-            <Typography
-              component="h2"
-              sx={{
-                fontSize: { xs: "1.55rem", md: "2rem" },
-                fontWeight: 800,
-                color: "#0f172a",
-                fontFamily: W,
-              }}
-            >
-              Our Test Formats
-            </Typography>
-          </Box>
-
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-              gap: 2,
-              mb: 2,
-            }}
-          >
-            {/* ── Daily Prelims ── */}
-            <Box
-              sx={{
-                borderRadius: "16px",
-                overflow: "hidden",
-                border: "1.5px solid #d1fae5",
-                boxShadow: "0 2px 16px rgba(22,163,74,0.08)",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              {/* Dark header */}
-              <Box
-                sx={{
-                  background: "linear-gradient(135deg,#0f172a,#1a2e1a)",
-                  p: "12px 18px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1.5,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: "9px",
-                    background: "rgba(22,163,74,0.2)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                    <line x1="16" y1="2" x2="16" y2="6" />
-                    <line x1="8" y1="2" x2="8" y2="6" />
-                    <line x1="3" y1="10" x2="21" y2="10" />
-                  </svg>
-                </Box>
-                <Box>
-                  <Typography
-                    sx={{
-                      fontWeight: 800,
-                      fontSize: "0.95rem",
-                      color: "#fff",
-                      fontFamily: W,
-                    }}
-                  >
-                    Daily Tests – Prelims
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: "0.68rem",
-                      color: "rgba(255,255,255,0.5)",
-                      fontFamily: W,
-                    }}
-                  >
-                    Systematic subject-wise schedule
-                  </Typography>
-                </Box>
-              </Box>
-
-              {/* Body */}
-              <Box
-                sx={{
-                  p: { xs: "12px", md: "12px 16px" },
-                  display: "grid",
-                  gridTemplateColumns: { xs: "1fr", sm: "44% 1fr" },
-                  gap: { xs: 1.5, md: 1.5 },
-                  alignItems: "start",
-                }}
-              >
-                {/* Schedule table */}
-                <Box sx={{ minWidth: 0 }}>
-                  <Box
-                    sx={{
-                      borderRadius: "10px",
-                      overflow: "hidden",
-                      border: "1px solid #e8f5e9",
-                    }}
-                  >
-                    {schedule.map((row, i) => (
-                      <Box
-                        key={i}
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          px: 1.2,
-                          py: { xs: "4px", sm: "5px" },
-                          background: i % 2 === 0 ? "#fafafa" : "#fff",
-                          borderBottom:
-                            i < schedule.length - 1
-                              ? "1px solid #f1f5f9"
-                              : "none",
-                          transition: "background 0.15s ease",
-                          "&:hover": { background: "rgba(22,163,74,0.04)" },
-                        }}
-                      >
-                        <Typography
-                          sx={{
-                            fontSize: { xs: "0.7rem", sm: "0.72rem" },
-                            fontWeight: 500,
-                            color: "#374151",
-                            fontFamily: W,
-                          }}
-                        >
-                          {row.day}
-                        </Typography>
-                        <Box
-                          sx={{
-                            px: 1,
-                            py: "2px",
-                            borderRadius: "5px",
-                            background: "rgba(22,163,74,0.07)",
-                            border: "1px solid rgba(22,163,74,0.14)",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <Typography
-                            sx={{
-                              fontSize: "0.65rem",
-                              fontWeight: 600,
-                              color: "#15803d",
-                              fontFamily: W,
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {row.topic}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    ))}
-                  </Box>
-                </Box>
-
-                {/* Right — features + illustration pinned to bottom-right */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    height: "100%",
-                  }}
-                >
-                  <Box
-                    sx={{ display: "flex", flexDirection: "column", gap: 0.7 }}
-                  >
-                    {dFeats.map((f, i) => (
-                      <Box
-                        key={i}
-                        sx={{
-                          display: "flex",
-                          alignItems: "flex-start",
-                          gap: 0.8,
-                        }}
-                      >
-                        <Tick color="#16a34a" />
-                        <Typography
-                          sx={{
-                            fontSize: { xs: "0.62rem", sm: "0.72rem" },
-                            color: "#374151",
-                            fontFamily: W,
-                            lineHeight: 1.4,
-                          }}
-                        >
-                          {f}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                  <Box
-                    component="img"
-                    src="/Images/prelims.png"
-                    alt="Prelims illustration"
-                    sx={{
-                      display: { xs: "none", sm: "block" },
-                      width: 110,
-                      height: 110,
-                      objectFit: "contain",
-                      filter: "drop-shadow(0 4px 16px rgba(22,163,74,0.22))",
-                      alignSelf: "flex-end",
-                      mt: "auto",
-                      ml: "auto",
-                    }}
-                  />
-                </Box>
-              </Box>
-            </Box>
-
-            {/* ── Weekly Mains ── */}
-            <Box
-              sx={{
-                borderRadius: "16px",
-                overflow: "hidden",
-                border: "1.5px solid #bfdbfe",
-                boxShadow: "0 2px 16px rgba(37,99,235,0.07)",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              {/* Dark header */}
-              <Box
-                sx={{
-                  background: "linear-gradient(135deg,#0f172a,#0f1f3a)",
-                  p: "12px 18px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1.5,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: "9px",
-                    background: "rgba(37,99,235,0.25)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#93c5fd"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <polyline points="12 6 12 12 16 14" />
-                  </svg>
-                </Box>
-                <Box>
-                  <Typography
-                    sx={{
-                      fontWeight: 800,
-                      fontSize: "0.95rem",
-                      color: "#fff",
-                      fontFamily: W,
-                    }}
-                  >
-                    Weekly Tests – Mains
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: "0.68rem",
-                      color: "rgba(255,255,255,0.5)",
-                      fontFamily: W,
-                    }}
-                  >
-                    Essay & GS answer writing practice
-                  </Typography>
-                </Box>
-              </Box>
-
-              {/* Body */}
-              <Box
-                sx={{
-                  p: "12px 16px",
-                  display: "grid",
-                  gridTemplateColumns: { xs: "1fr", sm: "1fr 120px" },
-                  gap: 1.5,
-                  flex: 1,
-                  alignItems: "start",
-                }}
-              >
-                {/* Left — pills + features */}
-                <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                  {/* 3 stat pills */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      gap: 1,
-                      mb: 1.5,
-                      flexWrap: { xs: "nowrap", sm: "wrap" },
-                      overflowX: { xs: "auto", sm: "visible" },
-                      pb: { xs: 1, sm: 0 },
-                      "&::-webkit-scrollbar": { display: "none" },
-                    }}
-                  >
-                    {[
-                      ["Every Weekend", "Tests", "#16a34a"],
-                      ["24 Hours", "Evaluation", "#2563eb"],
-                      ["Model Answers", "Provided", "#7c3aed"],
-                    ].map(([v, l, c], i) => (
-                      <Box
-                        key={i}
-                        sx={{
-                          flex: 1,
-                          minWidth: 72,
-                          p: "7px 10px",
-                          borderRadius: "9px",
-                          background: `${c}09`,
-                          border: `1.5px solid ${c}20`,
-                          textAlign: "center",
-                        }}
-                      >
-                        <Typography
-                          sx={{
-                            fontWeight: 800,
-                            fontSize: { xs: "0.62rem", sm: "0.72rem" },
-                            color: c,
-                            fontFamily: W,
-                            lineHeight: 1.2,
-                          }}
-                        >
-                          {v}
-                        </Typography>
-                        <Typography
-                          sx={{
-                            fontSize: "0.58rem",
-                            color: "#6b7280",
-                            fontFamily: W,
-                          }}
-                        >
-                          {l}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-
-                  {/* Features */}
-                  <Box
-                    sx={{ display: "flex", flexDirection: "column", gap: 0.7 }}
-                  >
-                    {wFeats.map((f, i) => (
-                      <Box
-                        key={i}
-                        sx={{
-                          display: "flex",
-                          alignItems: "flex-start",
-                          gap: 0.8,
-                        }}
-                      >
-                        <Tick color="#2563eb" />
-                        <Typography
-                          sx={{
-                            fontSize: { xs: "0.62rem", sm: "0.72rem" },
-                            color: "#374151",
-                            fontFamily: W,
-                            lineHeight: 1.4,
-                          }}
-                        >
-                          {f}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                </Box>
-
-                <Box
-                  component="img"
-                  src="/Images/mains.png"
-                  alt="Mains illustration"
-                  sx={{
-                    display: { xs: "none", sm: "block" },
-                    width: 110,
-                    height: 110,
-                    objectFit: "contain",
-                    filter: "drop-shadow(0 4px 16px rgba(37,99,235,0.22))",
-                    alignSelf: "flex-end",
-                    mt: "auto",
-                  }}
-                />
-              </Box>
-            </Box>
-          </Box>
-
           {/* ══════════════════════════════════════════
               Data Insights Panel
               — Trend Analysis card removed (duplicate of
@@ -1429,7 +1230,13 @@ export default function HomepageSections() {
               }}
             >
               {/* Performance Analytics */}
-              <Box sx={insightCardSx("linear-gradient(135deg,#eff6ff,#fff)", "#bfdbfe", "rgba(37,99,235,0.1)")}>
+              <Box
+                sx={insightCardSx(
+                  "linear-gradient(135deg,#eff6ff,#fff)",
+                  "#bfdbfe",
+                  "rgba(37,99,235,0.1)",
+                )}
+              >
                 <MiniBar
                   heights={[38, 55, 45, 70, 52, 82, 65, 90]}
                   color="#2563eb"
@@ -1486,7 +1293,13 @@ export default function HomepageSections() {
                 href="/upsc-insights#subject-weightage"
                 style={{ textDecoration: "none" }}
               >
-                <Box sx={insightCardSx("linear-gradient(135deg,#f5f3ff,#fff)", "#ddd6fe", "rgba(124,58,237,0.1)")}>
+                <Box
+                  sx={insightCardSx(
+                    "linear-gradient(135deg,#f5f3ff,#fff)",
+                    "#ddd6fe",
+                    "rgba(124,58,237,0.1)",
+                  )}
+                >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
                     <Donut pct={56} color="#7c3aed" />
                     <Box>
@@ -1549,7 +1362,11 @@ export default function HomepageSections() {
                     Subject Weightage
                   </Typography>
                   <Typography
-                    sx={{ fontSize: "0.68rem", color: "#6b7280", fontFamily: W }}
+                    sx={{
+                      fontSize: "0.68rem",
+                      color: "#6b7280",
+                      fontFamily: W,
+                    }}
                   >
                     Top subjects, 2011 – 2025
                   </Typography>
@@ -1561,7 +1378,13 @@ export default function HomepageSections() {
                 href="/upsc-insights#cutoff-trend"
                 style={{ textDecoration: "none" }}
               >
-                <Box sx={insightCardSx("linear-gradient(135deg,#fff7ed,#fff)", "#fed7aa", "rgba(234,88,12,0.1)")}>
+                <Box
+                  sx={insightCardSx(
+                    "linear-gradient(135deg,#fff7ed,#fff)",
+                    "#fed7aa",
+                    "rgba(234,88,12,0.1)",
+                  )}
+                >
                   <MiniBar
                     heights={[70, 66, 74, 68, 80, 72, 84, 78]}
                     color="#ea580c"
@@ -1579,7 +1402,11 @@ export default function HomepageSections() {
                     Cut-off Trends
                   </Typography>
                   <Typography
-                    sx={{ fontSize: "0.68rem", color: "#6b7280", fontFamily: W }}
+                    sx={{
+                      fontSize: "0.68rem",
+                      color: "#6b7280",
+                      fontFamily: W,
+                    }}
                   >
                     Category-wise analysis (2020–2025)
                   </Typography>

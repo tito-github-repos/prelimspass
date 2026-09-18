@@ -136,7 +136,7 @@ export default function PricingPage() {
 
                   <Stack spacing={2} textAlign="left">
                     {[
-                      "Prelims PYQ Access",
+                      "Prelims PYQ Access and Practice",
                       "FREE for all registered users",
                       "Basic Dashboard Access",
                       "No Payment Required",
@@ -171,8 +171,8 @@ export default function PricingPage() {
                   {/* Gift Section */}
                   <Box
                     sx={{
-                      mt: { xs: 4, md: 10 },
-                      mb: { xs: 2, md: 35 },
+                      mt: { xs: 4, md: 13 },
+                      mb: { xs: 2, md: 10 },
                       textAlign: "center",
                       px: 2,
                     }}
@@ -252,8 +252,323 @@ export default function PricingPage() {
               </Card>
             </Grid>
 
-            {/* ── PRELIMS PLAN ── */}
+            {/* ── MAINS PLAN ── */}
             <Grid size={{ xs: 12, lg: 4 }}>
+              <Card
+                sx={{
+                  borderRadius: { xs: "20px", md: "30px" },
+                  height: "100%",
+                  border: "2px solid #534AB7",
+                  position: "relative",
+                  overflow: "visible",
+                  pt: 3,
+                }}
+              >
+                <Chip
+                  label="BEST VALUE · SEASON 2027"
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    background: "#534AB7",
+                    color: "white",
+                    fontWeight: 700,
+                    px: 1,
+                    borderRadius: "0 0 14px 14px",
+                    whiteSpace: "nowrap",
+                  }}
+                />
+
+                <CardContent sx={{ p: { xs: 2.5, md: 4 } }}>
+                  <Box
+                    sx={{
+                      width: 64,
+                      height: 64,
+                      borderRadius: "18px",
+                      background: "#EEEDFE",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mx: "auto",
+                      mb: 2,
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      src="/Icons/writing-icon.svg"
+                      alt="Mains cum Prelims Icon"
+                      sx={{
+                        width: 34,
+                        height: 34,
+                        filter:
+                          "invert(32%) sepia(78%) saturate(748%) hue-rotate(232deg) brightness(91%) contrast(92%)",
+                      }}
+                    />
+                  </Box>
+
+                  <Box textAlign="center" mb={3}>
+                    <Typography
+                      variant="h4"
+                      fontWeight={800}
+                      mb={2}
+                      sx={{ fontSize: { xs: "1.6rem", md: "2.125rem" } }}
+                    >
+                      {/* Mains Plan */}
+                      Mains cum Prelims
+                    </Typography>
+                    <Typography
+                      color="text.secondary"
+                      mb={4}
+                      sx={{ fontSize: { xs: "0.9rem", md: "1rem" } }}
+                    >
+                      {/* Weekly 4 Tests - Mains */}
+                      Full Mains answer-writing practice — inclusive of Prelims
+                      Practice access
+                    </Typography>
+                  </Box>
+
+                  <Stack spacing={2} mb={4}>
+                    {[
+                      // "Essay and Ethics paper practice",
+                      // "GS paper practice",
+                      // "Answer writing evaluation",
+                      // "Feedback within 24 hours",
+                      // "Email-based test submission",
+                      // "Performance review",
+                      "Mains Practice with Prelims Mobile App, Prelims PYQ & Prelims Mock Test — all free, included",
+                      "Feedback within 24 hours",
+                      "Each answer paper is evaluated, analyzed & discussed one-to-one",
+                      "Before 31 Dec 2026: 12 tests per paper — conducted, evaluated & discussed with every enrolled student",
+                      "After the Prelims exam: 8 tests per paper — conducted, evaluated & discussed with every enrolled student",
+                    ].map((item) => (
+                      <Stack
+                        key={item}
+                        direction="row"
+                        spacing={1}
+                        alignItems="flex-start"
+                      >
+                        <CheckCircleOutlinedIcon
+                          sx={{
+                            color: "#534AB7",
+                            fontSize: 20,
+                            flexShrink: 0,
+                            mt: "2px",
+                          }}
+                        />
+                        <Typography
+                          sx={{ fontSize: { xs: "0.9rem", md: "1rem" } }}
+                        >
+                          {item}
+                        </Typography>
+                      </Stack>
+                    ))}
+                  </Stack>
+
+                  {/* 
+                   <Typography
+                    variant="h6"
+                    fontWeight={700}
+                    mb={2}
+                    sx={{ fontSize: { xs: "1rem", md: "1.25rem" } }}
+                  >
+                    Weekly Schedule
+                  </Typography>
+
+                  <Stack spacing={1}>
+                    {mainsSchedule.map((item) => (
+                      <Box
+                        key={item.day}
+                        sx={{ display: "flex", alignItems: "center", py: 0.5 }}
+                      >
+                        <Box
+                          sx={{
+                            width: { xs: 46, md: 56 },
+                            height: 34,
+                            borderRadius: "8px",
+                            background: "#EEEDFE",
+                            color: "#534AB7",
+                            fontWeight: 700,
+                            fontSize: "13px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {item.day}
+                        </Box>
+                        <Typography
+                          sx={{
+                            ml: { xs: 1.5, md: 2 },
+                            fontSize: { xs: "13px", md: "15px" },
+                            color: "#374151",
+                            fontWeight: 500,
+                          }}
+                        >
+                          {item.subject}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Stack> */}
+
+                  {/* <Typography
+                    variant="h6"
+                    fontWeight={700}
+                    mt={4}
+                    mb={2}
+                    sx={{ fontSize: { xs: "1rem", md: "1.25rem" } }}
+                  >
+                    How It Works
+                  </Typography> */}
+
+                  {/* <Stack spacing={2}>
+                    {[
+                      "Test papers sent to your registered email",
+                      "Submit answer sheets to prelimspass@gmail.com",
+                      "Answer sheets evaluated within 24 hours",
+                    ].map((item) => (
+                      <Stack
+                        key={item}
+                        direction="row"
+                        spacing={1}
+                        alignItems="flex-start"
+                      >
+                        <CheckCircleOutlinedIcon
+                          sx={{
+                            color: "#534AB7",
+                            fontSize: 20,
+                            flexShrink: 0,
+                            mt: "2px",
+                          }}
+                        />
+                        <Typography
+                          sx={{ fontSize: { xs: "0.9rem", md: "1rem" } }}
+                        >
+                          {item}
+                        </Typography>
+                      </Stack>
+                    ))}
+                  </Stack> */}
+
+                  {/* PRICING */}
+                  {/* <Grid container spacing={{ xs: 2, md: 2 }} mt={4}>
+                    <Grid size={6}>
+                      <Typography
+                        variant="h4"
+                        fontWeight={800}
+                        sx={{ fontSize: { xs: "1.4rem", md: "2.125rem" } }}
+                      >
+                        ₹1,111
+                      </Typography>
+                      <Typography
+                        color="text.secondary"
+                        sx={{ fontSize: { xs: "0.85rem", md: "1rem" } }}
+                      >
+                        Per Month
+                      </Typography>
+                      <Button
+                        component={Link}
+                        href="/register?plan=mains-monthly"
+                        fullWidth
+                        variant="outlined"
+                        sx={{
+                          mt: 2,
+                          py: { xs: 1.2, md: 1.5 },
+                          borderRadius: "14px",
+                          borderColor: "#534AB7",
+                          color: "#534AB7",
+                          fontWeight: 700,
+                          textTransform: "none",
+                          fontSize: { xs: "0.85rem", md: "1rem" },
+                        }}
+                      >
+                        Monthly
+                      </Button>
+                    </Grid>
+
+                    <Grid size={6}>
+                      <Typography
+                        variant="h4"
+                        fontWeight={800}
+                        sx={{ fontSize: { xs: "1.4rem", md: "2.125rem" } }}
+                      >
+                        ₹11,111
+                      </Typography>
+                      <Typography
+                        color="text.secondary"
+                        sx={{ fontSize: { xs: "0.85rem", md: "1rem" } }}
+                      >
+                        Per Year
+                      </Typography>
+                      <Button
+                        component={Link}
+                        href="/register?plan=mains-yearly"
+                        fullWidth
+                        variant="contained"
+                        sx={{
+                          mt: 2,
+                          py: { xs: 1.2, md: 1.5 },
+                          borderRadius: "14px",
+                          background: "#534AB7",
+                          fontWeight: 700,
+                          textTransform: "none",
+                          fontSize: { xs: "0.85rem", md: "1rem" },
+                          "&:hover": {
+                            background: "#403d82",
+                          },
+                        }}
+                      >
+                        Yearly
+                      </Button>
+                    </Grid>
+                  </Grid> */}
+
+                  {/* PRICING */}
+                  <Box textAlign="center" mt={4}>
+                    <Typography
+                      variant="h3"
+                      fontWeight={800}
+                      sx={{ fontSize: { xs: "2rem", md: "2.5rem" } }}
+                    >
+                      ₹11,111
+                    </Typography>
+                    <Typography
+                      color="text.secondary"
+                      sx={{ fontSize: { xs: "0.9rem", md: "1rem" }, mb: 2 }}
+                    >
+                      Valid for the 2027 season
+                    </Typography>
+
+                    <Button
+                      component={Link}
+                      href="/register?plan=mains-cum-prelims"
+                      fullWidth
+                      variant="contained"
+                      endIcon={<ArrowForwardRoundedIcon />}
+                      sx={{
+                        py: { xs: 1.2, md: 1.5 },
+                        borderRadius: "14px",
+                        background: "#534AB7",
+                        fontWeight: 700,
+                        textTransform: "none",
+                        boxShadow: "none",
+                        fontSize: { xs: "0.9rem", md: "1rem" },
+                        "&:hover": {
+                          background: "#403d82",
+                          boxShadow: "none",
+                        },
+                      }}
+                    >
+                      Enroll in Mains cum Prelims
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* ── PRELIMS PLAN ── */}
+            <Grid size={{ xs: 12, lg: 4 }} sx={{ mt: { lg: 5 } }}>
               <Card
                 sx={{
                   borderRadius: { xs: "20px", md: "30px" },
@@ -264,7 +579,7 @@ export default function PricingPage() {
                   pt: 3,
                 }}
               >
-                <Chip
+                {/* <Chip
                   icon={
                     <StarIcon
                       sx={{ color: "white !important", fontSize: "18px" }}
@@ -283,7 +598,7 @@ export default function PricingPage() {
                     borderRadius: "0 0 14px 14px",
                     whiteSpace: "nowrap",
                   }}
-                />
+                /> */}
 
                 <CardContent sx={{ p: { xs: 2.5, md: 4 } }}>
                   <Box
@@ -332,13 +647,13 @@ export default function PricingPage() {
 
                   <Stack spacing={2} mb={4}>
                     {[
-                      "36,500+ questions practice in a year",
-                      "100 mock tests before prelims",
+                      "Prelims PYQ Access and Practice",
+                      "100 mock tests start from 3 Feb 2027",
                       "Unlimited retakes",
                       "Detailed analytics",
                       "Real UPSC pattern (+2 / -0.66)",
                       "Performance tracking",
-                      "PYQ-based questions",
+                      "Prelims Mobile App included free",
                     ].map((item) => (
                       <Stack
                         key={item}
@@ -363,7 +678,8 @@ export default function PricingPage() {
                     ))}
                   </Stack>
 
-                  <Typography
+                  {/* 
+                   <Typography
                     variant="h6"
                     fontWeight={700}
                     mb={1.5}
@@ -378,7 +694,6 @@ export default function PricingPage() {
                         key={item.day}
                         sx={{ display: "flex", alignItems: "center", py: 0.5 }}
                       >
-                        {/* DAY */}
                         <Box
                           sx={{
                             width: { xs: 46, md: 56 },
@@ -397,7 +712,6 @@ export default function PricingPage() {
                           {item.day}
                         </Box>
 
-                        {/* COUNT */}
                         <Typography
                           sx={{
                             width: { xs: 34, md: 42 },
@@ -411,7 +725,6 @@ export default function PricingPage() {
                           {item.count}
                         </Typography>
 
-                        {/* SUBJECT */}
                         <Typography
                           sx={{
                             ml: { xs: 1, md: 2 },
@@ -426,7 +739,6 @@ export default function PricingPage() {
                     ))}
                   </Stack>
 
-                  {/* PRICING */}
                   <Grid container spacing={{ xs: 2, md: 3 }} mt={4}>
                     <Grid size={6}>
                       <Typography
@@ -498,253 +810,62 @@ export default function PricingPage() {
                       </Button>
                     </Grid>
                   </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
+                   */}
 
-            {/* ── MAINS PLAN ── */}
-            <Grid size={{ xs: 12, lg: 4 }} sx={{ mt: { lg: 5 } }}>
-              <Card
-                sx={{
-                  borderRadius: { xs: "20px", md: "30px" },
-                  height: "100%",
-                  border: "2px solid #534AB7",
-                }}
-              >
-                <CardContent sx={{ p: { xs: 2.5, md: 4 } }}>
+                  {/* PRICING */}
                   <Box
+                    textAlign="center"
+                    mt={4}
                     sx={{
-                      width: 64,
-                      height: 64,
-                      borderRadius: "18px",
-                      background: "#EEEDFE",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mx: "auto",
-                      mb: 2,
+                      mt: { xs: 4, md: 16 },
                     }}
                   >
-                    <Box
-                      component="img"
-                      src="/Icons/writing-icon.svg"
-                      alt="Mains Icon"
-                      sx={{
-                        width: 34,
-                        height: 34,
-                        filter:
-                          "invert(32%) sepia(78%) saturate(748%) hue-rotate(232deg) brightness(91%) contrast(92%)",
-                      }}
-                    />
-                  </Box>
-
-                  <Box textAlign="center" mb={3}>
                     <Typography
-                      variant="h4"
+                      variant="h3"
                       fontWeight={800}
-                      mb={2}
-                      sx={{ fontSize: { xs: "1.6rem", md: "2.125rem" } }}
+                      sx={{ fontSize: { xs: "2rem", md: "2.5rem" } }}
                     >
-                      Mains Plan
+                      ₹1,111
                     </Typography>
                     <Typography
                       color="text.secondary"
-                      mb={4}
-                      sx={{ fontSize: { xs: "0.9rem", md: "1rem" } }}
+                      sx={{ fontSize: { xs: "0.9rem", md: "1rem" }, mb: 0.5 }}
                     >
-                      Weekly 4 Tests - Mains
+                      Per Month
                     </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: "13px",
+                        color: "#6B7280",
+                        mb: 2,
+                      }}
+                    >
+                      Free with a Mains cum Prelims enrolment
+                    </Typography>
+
+                    <Button
+                      component={Link}
+                      href="/register?plan=prelims-monthly"
+                      fullWidth
+                      variant="contained"
+                      endIcon={<ArrowForwardRoundedIcon />}
+                      sx={{
+                        py: { xs: 1.2, md: 1.5 },
+                        borderRadius: "14px",
+                        background: "#16a34a",
+                        fontWeight: 700,
+                        textTransform: "none",
+                        boxShadow: "none",
+                        fontSize: { xs: "0.9rem", md: "1rem" },
+                        "&:hover": {
+                          background: "#15803d",
+                          boxShadow: "none",
+                        },
+                      }}
+                    >
+                      Register for Prelims Plan
+                    </Button>
                   </Box>
-
-                  <Stack spacing={2} mb={4}>
-                    {[
-                      "Essay and Ethics paper practice",
-                      "GS paper practice",
-                      "Answer writing evaluation",
-                      "Feedback within 24 hours",
-                      "Email-based test submission",
-                      "Performance review",
-                    ].map((item) => (
-                      <Stack
-                        key={item}
-                        direction="row"
-                        spacing={1}
-                        alignItems="flex-start"
-                      >
-                        <CheckCircleOutlinedIcon
-                          sx={{
-                            color: "#534AB7",
-                            fontSize: 20,
-                            flexShrink: 0,
-                            mt: "2px",
-                          }}
-                        />
-                        <Typography
-                          sx={{ fontSize: { xs: "0.9rem", md: "1rem" } }}
-                        >
-                          {item}
-                        </Typography>
-                      </Stack>
-                    ))}
-                  </Stack>
-
-                  <Typography
-                    variant="h6"
-                    fontWeight={700}
-                    mb={2}
-                    sx={{ fontSize: { xs: "1rem", md: "1.25rem" } }}
-                  >
-                    Weekly Schedule
-                  </Typography>
-
-                  <Stack spacing={1}>
-                    {mainsSchedule.map((item) => (
-                      <Box
-                        key={item.day}
-                        sx={{ display: "flex", alignItems: "center", py: 0.5 }}
-                      >
-                        <Box
-                          sx={{
-                            width: { xs: 46, md: 56 },
-                            height: 34,
-                            borderRadius: "8px",
-                            background: "#EEEDFE",
-                            color: "#534AB7",
-                            fontWeight: 700,
-                            fontSize: "13px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexShrink: 0,
-                          }}
-                        >
-                          {item.day}
-                        </Box>
-                        <Typography
-                          sx={{
-                            ml: { xs: 1.5, md: 2 },
-                            fontSize: { xs: "13px", md: "15px" },
-                            color: "#374151",
-                            fontWeight: 500,
-                          }}
-                        >
-                          {item.subject}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Stack>
-
-                  <Typography
-                    variant="h6"
-                    fontWeight={700}
-                    mt={4}
-                    mb={2}
-                    sx={{ fontSize: { xs: "1rem", md: "1.25rem" } }}
-                  >
-                    How It Works
-                  </Typography>
-
-                  <Stack spacing={2}>
-                    {[
-                      "Test papers sent to your registered email",
-                      "Submit answer sheets to prelimspass@gmail.com",
-                      "Answer sheets evaluated within 24 hours",
-                    ].map((item) => (
-                      <Stack
-                        key={item}
-                        direction="row"
-                        spacing={1}
-                        alignItems="flex-start"
-                      >
-                        <CheckCircleOutlinedIcon
-                          sx={{
-                            color: "#534AB7",
-                            fontSize: 20,
-                            flexShrink: 0,
-                            mt: "2px",
-                          }}
-                        />
-                        <Typography
-                          sx={{ fontSize: { xs: "0.9rem", md: "1rem" } }}
-                        >
-                          {item}
-                        </Typography>
-                      </Stack>
-                    ))}
-                  </Stack>
-
-                  {/* PRICING */}
-                  <Grid container spacing={{ xs: 2, md: 2 }} mt={4}>
-                    <Grid size={6}>
-                      <Typography
-                        variant="h4"
-                        fontWeight={800}
-                        sx={{ fontSize: { xs: "1.4rem", md: "2.125rem" } }}
-                      >
-                        ₹1,111
-                      </Typography>
-                      <Typography
-                        color="text.secondary"
-                        sx={{ fontSize: { xs: "0.85rem", md: "1rem" } }}
-                      >
-                        Per Month
-                      </Typography>
-                      <Button
-                        component={Link}
-                        href="/register?plan=mains-monthly"
-                        fullWidth
-                        variant="outlined"
-                        sx={{
-                          mt: 2,
-                          py: { xs: 1.2, md: 1.5 },
-                          borderRadius: "14px",
-                          borderColor: "#534AB7",
-                          color: "#534AB7",
-                          fontWeight: 700,
-                          textTransform: "none",
-                          fontSize: { xs: "0.85rem", md: "1rem" },
-                        }}
-                      >
-                        Monthly
-                      </Button>
-                    </Grid>
-
-                    <Grid size={6}>
-                      <Typography
-                        variant="h4"
-                        fontWeight={800}
-                        sx={{ fontSize: { xs: "1.4rem", md: "2.125rem" } }}
-                      >
-                        ₹11,111
-                      </Typography>
-                      <Typography
-                        color="text.secondary"
-                        sx={{ fontSize: { xs: "0.85rem", md: "1rem" } }}
-                      >
-                        Per Year
-                      </Typography>
-                      <Button
-                        component={Link}
-                        href="/register?plan=mains-yearly"
-                        fullWidth
-                        variant="contained"
-                        sx={{
-                          mt: 2,
-                          py: { xs: 1.2, md: 1.5 },
-                          borderRadius: "14px",
-                          background: "#534AB7",
-                          fontWeight: 700,
-                          textTransform: "none",
-                          fontSize: { xs: "0.85rem", md: "1rem" },
-                          "&:hover": {
-                            background: "#403d82",
-                          },
-                        }}
-                      >
-                        Yearly
-                      </Button>
-                    </Grid>
-                  </Grid>
                 </CardContent>
               </Card>
             </Grid>
