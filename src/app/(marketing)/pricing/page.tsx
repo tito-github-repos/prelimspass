@@ -890,7 +890,7 @@ export default function PricingPage() {
                       <Stack spacing={1}>
                         {[
                           "Mains cum Prelims plan students",
-                          "Silver & Gold batch users of the Prelims Mobile App",
+                          "Silver & Gold badge users of the Prelims Mobile App",
                           
                         ].map((item) => (
                           <Stack
