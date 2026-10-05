@@ -306,7 +306,7 @@ const offerings = [
     // pm: "₹1,111",
     // py: "₹11,111",
     price: "Free",
-    priceUnit: "For silver & gold batch users of Prelims Mobile App · Valid for the 2027 season",
+    priceUnit: "For silver & gold badge users of Prelims Mobile App · Valid for the 2027 season",
     // "/ month",
     note: "Free for Mains Practice enrolled students",
     feats: [
