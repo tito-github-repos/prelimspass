@@ -130,7 +130,7 @@ const features = [
     ),
   },
   {
-    title: "Live Mock Exams",
+    title: "Mock Exams",
     desc: "Real UPSC pattern mock tests with ranking and analysis.",
     icon: (
       <svg
@@ -238,7 +238,7 @@ const featuredOffering = {
     "Full Mains answer-writing practice — inclusive of Prelims Practice access.",
   feats: [
     // "Inclusive of Prelims Practice — no extra fee",
-    "Mains Practice with Prelims Mobile App, Prelims PYQ & Prelims Mock Test — all free, included",
+    // "Mains Practice with Prelims Mobile App, Prelims PYQ & Prelims Mock Test — all free, included",
     "Each answer paper is evaluated, analyzed & discussed one-to-one",
     "Before 31 Dec 2026: 12 tests per paper — conducted, evaluated & discussed with every enrolled student",
     "After the Prelims exam: 8 tests per paper — conducted, evaluated & discussed with every enrolled student",
@@ -268,13 +268,13 @@ const offerings = [
     ),
     title: "Prelims Mobile App",
     sub: "For Quick Coverage",
-    price: "₹111",
+    price: "₹999",
     priceUnit: "Valid up to Prelims exam, May 2027",
-    note: "Available for all paid users from 2 Oct 2026",
+    note: "Available for all paid users",
     feats: [
-      "10,000 facts per subject, added incrementally",
+      "Facts per subject added incrementally",
       "New facts added every week",
-      "Daily True / False quiz game",
+      // "Daily True / False quiz game",
       "Revise more, in the shortest possible time",
     ],
     btn: "Get the App",
@@ -305,10 +305,9 @@ const offerings = [
     // Unlimited growth. Crack Prelims with confidence.",
     // pm: "₹1,111",
     // py: "₹11,111",
-    price: "₹1,111",
-    priceUnit: "Valid for the 2027 season",
+    price: "Free",
+    priceUnit: "For silver & gold batch users of Prelims Mobile App · Valid for the 2027 season",
     // "/ month",
-
     note: "Free for Mains Practice enrolled students",
     feats: [
       // "Unlimited Subject & Topic Tests",
@@ -355,42 +354,42 @@ const offerings = [
   //   btn: "Explore Mains Tests",
   // },
 
-  {
-    color: "#7c3aed",
-    lightBg: "#f5f3ff",
-    borderCol: "#ddd6fe",
-    icon: (
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#7c3aed"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-        <circle cx="9" cy="7" r="4" />
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-      </svg>
-    ),
-    title: "1-to-1 Consultation",
-    sub: "Personalized guidance. Focused on your success.",
-    //  pm: "₹1,111",
-    // py: null,
-    price: "₹999",
-    priceUnit: "Per session",
-    feats: [
-      "1 Hour One-to-One Session",
-      "Prelims Strategy",
-      "Mains Guidance",
-      "Optional & Faculty Guidance",
-      "Tamil Medium Support",
-    ],
-    btn: "Book a Session",
-  },
+  // {
+  //   color: "#7c3aed",
+  //   lightBg: "#f5f3ff",
+  //   borderCol: "#ddd6fe",
+  //   icon: (
+  //     <svg
+  //       width="24"
+  //       height="24"
+  //       viewBox="0 0 24 24"
+  //       fill="none"
+  //       stroke="#7c3aed"
+  //       strokeWidth="1.8"
+  //       strokeLinecap="round"
+  //       strokeLinejoin="round"
+  //     >
+  //       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+  //       <circle cx="9" cy="7" r="4" />
+  //       <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+  //       <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  //     </svg>
+  //   ),
+  //   title: "1-to-1 Consultation",
+  //   sub: "Personalized guidance. Focused on your success.",
+  //   //  pm: "₹1,111",
+  //   // py: null,
+  //   price: "₹999",
+  //   priceUnit: "Per session",
+  //   feats: [
+  //     "1 Hour One-to-One Session",
+  //     "Prelims Strategy",
+  //     "Mains Guidance",
+  //     "Optional & Faculty Guidance",
+  //     "Tamil Medium Support",
+  //   ],
+  //   btn: "Book a Session",
+  // },
 ];
 
 const schedule = [
@@ -483,8 +482,8 @@ const steps = [
   },
   {
     n: "4",
-    title: "Attend Live Mocks",
-    desc: "Participate in live mock exams",
+    title: "Attend Mocks",
+    desc: "Participate in mock exams",
     icon: (
       <svg
         width="20"
@@ -897,7 +896,7 @@ export default function HomepageSections() {
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "repeat(3,1fr)" },
+              gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
               gap: { xs: 2, md: 2 },
               alignItems: "stretch",
             }}
@@ -1037,7 +1036,9 @@ export default function HomepageSections() {
                           fontSize: "0.65rem",
                           color: "#94a3b8",
                           fontFamily: W,
-                          mt: 0.2,
+                          mt: 0.4,
+                          textAlign: "center",
+                          lineHeight: 1.4,
                         }}
                       >
                         {o.priceUnit}

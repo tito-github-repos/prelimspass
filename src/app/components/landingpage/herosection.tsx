@@ -191,24 +191,9 @@ export default function HeroSection() {
           </Box>
 
           {/* heading */}
-          <Typography
-            className="homepage-heading"
-            component="h1"
-            sx={{
-              fontSize: "1.45rem",
-              fontWeight: 800,
-              lineHeight: 1.2,
-              letterSpacing: "-0.3px",
-              color: "#0f172a",
-              mb: "6px",
-              wordBreak: "break-word",
-            }}
-          >
-            Stop Guessing.{" "}
-            <Box component="span" sx={{ color: "#16a34a" }}>Start Cracking.</Box>
-            <Box component="span" sx={{ display: "block" }}>UPSC Practice, Mock &amp; Live Tests</Box>
-          </Typography>
-
+          
+          {/* heading */}
+          
           {/* description */}
           <Typography
             sx={{
@@ -218,7 +203,7 @@ export default function HeroSection() {
               mb: "12px",
             }}
           >
-            Focused preparation, measurable progress — daily mock tests,
+            Focused preparation, measurable progress — 
             smart analytics and personal mentorship to help you crack UPSC 2027.
           </Typography>
 
@@ -389,7 +374,7 @@ export default function HeroSection() {
               }}
             >
               <Box sx={{ width: 6, height: 6, borderRadius: "50%", background: "#16a34a", flexShrink: 0 }} />
-              <Box component="span" sx={{ whiteSpace: "nowrap" }}>Your Journey to UPSC Success Starts Here</Box>
+              <Box component="span" sx={{ whiteSpace: "nowrap" }}>Consistency, Coverage, Completeness</Box>
             </Box>
 
             {/* heading */}
@@ -397,18 +382,41 @@ export default function HeroSection() {
               className="homepage-heading"
               component="h1"
               sx={{
-                fontSize: { md: "2.15rem", lg: "2.3rem" },
+                display: "grid",
+                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                columnGap: { xs: "14px", md: "28px" },
+                rowGap: "8px",
+                fontSize: { xs: "0.95rem", sm: "1.15rem", md: "1.45rem" },
                 fontWeight: 800,
-                lineHeight: 1.2,
+                lineHeight: 1.25,
                 letterSpacing: "-0.3px",
                 color: "#0f172a",
                 mb: "10px",
                 wordBreak: "break-word",
               }}
             >
-              Stop Guessing.{" "}
-              <Box component="span" sx={{ color: "#16a34a" }}>Start Cracking.</Box>
-              <Box component="span" sx={{ display: "block" }}>UPSC Practice, Mock &amp; Live Tests</Box>
+              {/* Left column: Prelims */}
+              <Box component="span" sx={{ display: "block" }}>
+                Prelims <Box component="span" sx={{ color: "#16a34a" }}>PYQs</Box> Practice
+              </Box>
+              {/* Right column: Mains */}
+              <Box component="span" sx={{ display: "block" }}>
+                Mains <Box component="span" sx={{ color: "#16a34a" }}>PYQs</Box> Practice
+              </Box>
+
+              <Box component="span" sx={{ display: "block" }}>
+                Prelims <Box component="span" sx={{ color: "#16a34a" }}>Mock</Box> Practice
+              </Box>
+              <Box component="span" sx={{ display: "block" }}>
+                Mains <Box component="span" sx={{ color: "#16a34a" }}>Mock</Box> Practice
+              </Box>
+
+              <Box component="span" sx={{ display: "block" }}>
+                Prelims <Box component="span" sx={{ color: "#16a34a" }}>Subjects Coverage</Box> Practice
+              </Box>
+              <Box component="span" sx={{ display: "block" }}>
+                Mains <Box component="span" sx={{ color: "#16a34a" }}>Subjects Coverage</Box> Practice
+              </Box>
             </Typography>
 
             {/* description */}
@@ -421,12 +429,12 @@ export default function HeroSection() {
                 maxWidth: "440px",
               }}
             >
-              Focused preparation, measurable progress — daily mock tests,
+              Focused preparation, measurable progress — 
               smart analytics and personal mentorship to help you crack UPSC 2027.
             </Typography>
 
             {/* stats */}
-            <Box sx={{ mb: "18px" }}>
+            {/* <Box sx={{ mb: "18px" }}>
               <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "20px", overflowX: "auto", "&::-webkit-scrollbar": { display: "none" } }}>
                 {stats.map((s, i) => (
                   <Box key={i} sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "8px", flexShrink: 0 }}>
@@ -452,10 +460,10 @@ export default function HeroSection() {
                   </Box>
                 ))}
               </Box>
-            </Box>
+            </Box> */}
 
             {/* buttons */}
-            <Box sx={{ display: "flex", flexDirection: "row", gap: "10px", width: "100%" }}>
+            {/* <Box sx={{ display: "flex", flexDirection: "row", gap: "10px", width: "100%" }}>
               <Button
                 variant="contained"
                 className="homepage-primary-btn"
@@ -496,7 +504,7 @@ export default function HeroSection() {
               >
                 View Test Plan
               </Button>
-            </Box>
+            </Box> */}
           </Box>
         </Box>
       </Box>
