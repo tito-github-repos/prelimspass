@@ -60,17 +60,17 @@ const features = [
   {
     icon: <TrackChangesOutlinedIcon />,
     label: "Lens Focus",
-    sub: "Laser-sharp attention, zero distractions",
+    // sub: "Laser-sharp attention, zero distractions",
   },
   {
     icon: <PsychologyOutlinedIcon />,
     label: "Elephant Memory",
-    sub: "Remember more, forget less",
+    // sub: "Remember more, forget less",
   },
   {
     icon: <BoltOutlinedIcon />,
     label: "Razor Sharp",
-    sub: "Quick thinking, faster solving",
+    // sub: "Quick thinking, faster solving",
   },
 ];
 
@@ -991,16 +991,17 @@ export default function PricingPage() {
                       key={f.label}
                       sx={{
                         display: "flex",
+                        alignItems: "center",
                         gap: 1.5,
-                        p: { xs: 1.5, md: 2 },
-                        borderRadius: "14px",
-                        border: "1px solid #e5e7eb",
-                        bgcolor: "#fff",
-                        transition: "transform 0.2s, box-shadow 0.2s",
-                        "&:hover": {
-                          transform: "translateY(-3px)",
-                          boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
-                        },
+                        // p: { xs: 1.5, md: 2 },
+                        // borderRadius: "14px",
+                        // border: "1px solid #e5e7eb",
+                        // bgcolor: "#fff",
+                        // transition: "transform 0.2s, box-shadow 0.2s",
+                        // "&:hover": {
+                        //   transform: "translateY(-3px)",
+                        //   boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
+                        // },
                       }}
                     >
                       <Box
@@ -1026,7 +1027,7 @@ export default function PricingPage() {
                         >
                           {f.label}
                         </Typography>
-                        <Typography
+                        {/* <Typography
                           sx={{
                             fontSize: { xs: "0.78rem", md: "0.85rem" },
                             color: "#6b7280",
@@ -1034,7 +1035,7 @@ export default function PricingPage() {
                           }}
                         >
                           {f.sub}
-                        </Typography>
+                        </Typography> */}
                       </Box>
                     </Box>
                   ))}
@@ -1079,7 +1080,7 @@ export default function PricingPage() {
                     width: "100%",
                     maxWidth: 400,
                     height: "400px",
-                    maxHeight: 460,
+                    maxHeight: 360,
                     objectFit: "cover",
                     borderRadius: "20px",
                     display: "block",
