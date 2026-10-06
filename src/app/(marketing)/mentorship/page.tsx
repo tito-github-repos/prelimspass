@@ -962,7 +962,7 @@ export default function PricingPage() {
                   <Box
                     component="img"
                     // {/* Replace src with your actual image path e.g. /images/mental-calisthenics-book.png */}
-                    src="/Images/mental_1.png"
+                    src="/Images/Mental_1.png"
                     alt="Mental Calisthenics Practice Book"
                     sx={{
                       width: "100%",
@@ -1073,7 +1073,7 @@ export default function PricingPage() {
               >
                 <Box
                   component="img"
-                  src="/Images/mental_1.png"
+                  src="/Images/Mental_1.png"
                   alt="Mental Calisthenics Practice Book"
                   sx={{
                     width: "100%",
