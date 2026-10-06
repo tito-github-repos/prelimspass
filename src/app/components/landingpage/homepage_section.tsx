@@ -109,6 +109,25 @@ function Tick({ color }: { color: string }) {
 /* ══ DATA ══ */
 const features = [
   {
+    title: "UPSC Pattern",
+    desc: "All tests strictly follow UPSC exam pattern and difficulty level.",
+    icon: (
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+    ),
+  },
+  {
     title: "Unlimited Practice",
     desc: "Topic-wise & subject-wise questions with unlimited retakes.",
     icon: (
@@ -126,46 +145,6 @@ const features = [
         <rect x="14" y="3" width="7" height="7" rx="1" />
         <rect x="3" y="14" width="7" height="7" rx="1" />
         <rect x="14" y="14" width="7" height="7" rx="1" />
-      </svg>
-    ),
-  },
-  {
-    title: "Mock Exams",
-    desc: "Real UPSC pattern mock tests with ranking and analysis.",
-    icon: (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <rect x="2" y="3" width="20" height="14" rx="2" />
-        <path d="M8 21h8M12 17v4" />
-      </svg>
-    ),
-  },
-  {
-    title: "Detailed Analytics",
-    desc: "Track accuracy, speed, strengths and topic performance.",
-    icon: (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <line x1="18" y1="20" x2="18" y2="10" />
-        <line x1="12" y1="20" x2="12" y2="4" />
-        <line x1="6" y1="20" x2="6" y2="14" />
-        <polyline points="2 20 22 20" />
       </svg>
     ),
   },
@@ -191,8 +170,8 @@ const features = [
     ),
   },
   {
-    title: "UPSC Pattern",
-    desc: "All tests strictly follow UPSC exam pattern and difficulty level.",
+    title: "Mock Exams",
+    desc: "Real UPSC pattern mock tests.",
     icon: (
       <svg
         width="20"
@@ -204,8 +183,8 @@ const features = [
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <circle cx="12" cy="12" r="10" />
-        <polyline points="12 6 12 12 16 14" />
+        <rect x="2" y="3" width="20" height="14" rx="2" />
+        <path d="M8 21h8M12 17v4" />
       </svg>
     ),
   },
@@ -224,6 +203,27 @@ const features = [
         strokeLinejoin="round"
       >
         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+      </svg>
+    ),
+  },
+  {
+    title: "Detailed Analytics",
+    desc: "Track accuracy, speed, strengths and topic performance.",
+    icon: (
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <line x1="18" y1="20" x2="18" y2="10" />
+        <line x1="12" y1="20" x2="12" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="14" />
+        <polyline points="2 20 22 20" />
       </svg>
     ),
   },
@@ -306,7 +306,8 @@ const offerings = [
     // pm: "₹1,111",
     // py: "₹11,111",
     price: "Free",
-    priceUnit: "For silver & gold badge users of Prelims Mobile App · Valid for the 2027 season",
+    priceUnit:
+      "For silver & gold badge users of Prelims Mobile App · Valid for the 2027 season",
     // "/ month",
     note: "Free for Mains Practice enrolled students",
     feats: [
@@ -314,7 +315,7 @@ const offerings = [
       "PYQ Practice and Access",
       // "Live Mock Exams",
       "Mock Exams Practice",
-      "Prelims Mobile App included free",
+      // "Prelims Mobile App included free",
       "Performance Analytics & Progress Tracking",
     ],
     btn: "Explore Prelims Tests",
@@ -460,6 +461,26 @@ const steps = [
   },
   {
     n: "3",
+    title: "Attend Mocks",
+    desc: "Participate in mock exams",
+    icon: (
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <rect x="2" y="3" width="20" height="14" rx="2" />
+        <path d="M8 21h8M12 17v4" />
+      </svg>
+    ),
+  },
+  {
+    n: "4",
     title: "Analyze Results",
     desc: "Get detailed analysis and performance report",
     icon: (
@@ -477,26 +498,6 @@ const steps = [
         <line x1="12" y1="20" x2="12" y2="4" />
         <line x1="6" y1="20" x2="6" y2="14" />
         <polyline points="2 20 22 20" />
-      </svg>
-    ),
-  },
-  {
-    n: "4",
-    title: "Attend Mocks",
-    desc: "Participate in mock exams",
-    icon: (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <rect x="2" y="3" width="20" height="14" rx="2" />
-        <path d="M8 21h8M12 17v4" />
       </svg>
     ),
   },
@@ -896,7 +897,10 @@ export default function HomepageSections() {
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
+              gridTemplateColumns: {
+                xs: "1fr",
+                md: "repeat(2, minmax(0, 1fr))",
+              },
               gap: { xs: 2, md: 2 },
               alignItems: "stretch",
             }}
@@ -1232,65 +1236,6 @@ export default function HomepageSections() {
                 gap: 1.5,
               }}
             >
-              {/* Performance Analytics */}
-              <Box
-                sx={insightCardSx(
-                  "linear-gradient(135deg,#eff6ff,#fff)",
-                  "#bfdbfe",
-                  "rgba(37,99,235,0.1)",
-                )}
-              >
-                <MiniBar
-                  heights={[38, 55, 45, 70, 52, 82, 65, 90]}
-                  color="#2563eb"
-                />
-                <Typography
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: "0.82rem",
-                    color: "#111827",
-                    fontFamily: W,
-                    mt: 1,
-                    mb: 0.2,
-                  }}
-                >
-                  Performance Analytics
-                </Typography>
-                <Typography
-                  sx={{ fontSize: "0.68rem", color: "#6b7280", fontFamily: W }}
-                >
-                  Excel-style detailed reports
-                </Typography>
-                <Box
-                  sx={{
-                    mt: 0.6,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 0.5,
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontSize: "0.65rem",
-                      color: "#2563eb",
-                      fontWeight: 700,
-                      fontFamily: W,
-                    }}
-                  >
-                    90%
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: "0.63rem",
-                      color: "#94a3b8",
-                      fontFamily: W,
-                    }}
-                  >
-                    top score
-                  </Typography>
-                </Box>
-              </Box>
-
               {/* Subject Weightage — linked to Insights page */}
               <Link
                 href="/upsc-insights#subject-weightage"
@@ -1443,6 +1388,65 @@ export default function HomepageSections() {
                   </Box>
                 </Box>
               </Link>
+
+              {/* Performance Analytics */}
+              <Box
+                sx={insightCardSx(
+                  "linear-gradient(135deg,#eff6ff,#fff)",
+                  "#bfdbfe",
+                  "rgba(37,99,235,0.1)",
+                )}
+              >
+                <MiniBar
+                  heights={[38, 55, 45, 70, 52, 82, 65, 90]}
+                  color="#2563eb"
+                />
+                <Typography
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: "0.82rem",
+                    color: "#111827",
+                    fontFamily: W,
+                    mt: 1,
+                    mb: 0.2,
+                  }}
+                >
+                  Performance Analytics
+                </Typography>
+                <Typography
+                  sx={{ fontSize: "0.68rem", color: "#6b7280", fontFamily: W }}
+                >
+                  Excel-style detailed reports
+                </Typography>
+                <Box
+                  sx={{
+                    mt: 0.6,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.5,
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: "0.65rem",
+                      color: "#2563eb",
+                      fontWeight: 700,
+                      fontFamily: W,
+                    }}
+                  >
+                    90%
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: "0.63rem",
+                      color: "#94a3b8",
+                      fontFamily: W,
+                    }}
+                  >
+                    top score
+                  </Typography>
+                </Box>
+              </Box>
             </Box>
           </Box>
         </Box>

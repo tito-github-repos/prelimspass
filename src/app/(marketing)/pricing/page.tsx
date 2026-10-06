@@ -67,7 +67,7 @@ export default function PricingPage() {
                 color: "#0b1b2b",
               }}
             >
-              Simple Pricing.
+              Minimum Pricing.
               <br />
               <Box component="span">
                 <Box component="span" sx={{ color: "#16a34a" }}>
@@ -164,7 +164,9 @@ export default function PricingPage() {
                               flexShrink: 0,
                             }}
                           />
-                          <Typography sx={{ ...LIST_TEXT_SX, color: "#374151" }}>
+                          <Typography
+                            sx={{ ...LIST_TEXT_SX, color: "#374151" }}
+                          >
                             {item}
                           </Typography>
                         </Stack>
@@ -891,7 +893,6 @@ export default function PricingPage() {
                         {[
                           "Mains cum Prelims plan students",
                           "Silver & Gold badge users of the Prelims Mobile App",
-                          
                         ].map((item) => (
                           <Stack
                             key={item}
@@ -958,32 +959,48 @@ export default function PricingPage() {
           <Grid container sx={{ mt: { xs: 1, md: 0 } }}>
             {[
               {
-                icon: <SecurityRoundedIcon sx={{ fontSize: { xs: 22, md: 28 } }} />,
+                icon: (
+                  <SecurityRoundedIcon sx={{ fontSize: { xs: 22, md: 28 } }} />
+                ),
                 title: "Real",
                 subtitle: "UPSC Standard",
               },
               {
-                icon: <AllInclusiveRoundedIcon sx={{ fontSize: { xs: 22, md: 28 } }} />,
+                icon: (
+                  <AllInclusiveRoundedIcon
+                    sx={{ fontSize: { xs: 22, md: 28 } }}
+                  />
+                ),
                 title: "Unlimited",
                 subtitle: "Practice",
               },
               {
-                icon: <BarChartRoundedIcon sx={{ fontSize: { xs: 22, md: 28 } }} />,
-                title: "Data-Driven",
-                subtitle: "Analytics",
-              },
-              {
-                icon: <AutorenewRoundedIcon sx={{ fontSize: { xs: 22, md: 28 } }} />,
+                icon: (
+                  <AutorenewRoundedIcon sx={{ fontSize: { xs: 22, md: 28 } }} />
+                ),
                 title: "24hr",
                 subtitle: "Evaluation",
               },
               {
-                icon: <CurrencyRupeeRoundedIcon sx={{ fontSize: { xs: 22, md: 28 } }} />,
+                icon: (
+                  <BarChartRoundedIcon sx={{ fontSize: { xs: 22, md: 28 } }} />
+                ),
+                title: "Data-Driven",
+                subtitle: "Analytics",
+              },
+              {
+                icon: (
+                  <CurrencyRupeeRoundedIcon
+                    sx={{ fontSize: { xs: 22, md: 28 } }}
+                  />
+                ),
                 title: "Affordable",
                 subtitle: "Pricing",
               },
               {
-                icon: <Groups2RoundedIcon sx={{ fontSize: { xs: 22, md: 28 } }} />,
+                icon: (
+                  <Groups2RoundedIcon sx={{ fontSize: { xs: 22, md: 28 } }} />
+                ),
                 title: "Trusted by",
                 subtitle: "Aspirants",
               },
