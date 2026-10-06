@@ -6,7 +6,6 @@ export default function HomePage() {
     <main>
       <HeroSection />
       <HomepageSection />
-      <TissPopup />
     </main>
   );
 }
