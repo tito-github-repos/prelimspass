@@ -23,34 +23,54 @@ import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
 import TrackChangesOutlinedIcon from "@mui/icons-material/TrackChangesOutlined";
 import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
+import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
+import BoltOutlinedIcon from "@mui/icons-material/BoltOutlined";
+
+// const features = [
+//   {
+//     icon: <TrackChangesOutlinedIcon />,
+//     label: "Lens Focus",
+//     sub: "Build better concentration and accuracy",
+//   },
+//   {
+//     icon: <LightbulbOutlinedIcon />,
+//     label: "Practice Smart",
+//     sub: "Daily practice worksheets to boost your skills",
+//   },
+//   {
+//     icon: (
+//       <Box
+//         component="img"
+//         src="/Icons/innovative-brain-icon.svg"
+//         alt="Brain Icon"
+//         sx={{
+//           width: 22,
+//           height: 22,
+//           filter:
+//             "invert(35%) sepia(12%) saturate(778%) hue-rotate(176deg) brightness(92%) contrast(86%)",
+//         }}
+//       />
+//     ),
+//     label: "Improve Mental Agility",
+//     sub: "Strengthen your brain with targeted exercises",
+//   },
+// ];
 
 const features = [
   {
     icon: <TrackChangesOutlinedIcon />,
-    label: "Sharpen Focus",
-    sub: "Build better concentration and accuracy",
+    label: "Lens Focus",
+    sub: "Laser-sharp attention, zero distractions",
   },
   {
-    icon: <LightbulbOutlinedIcon />,
-    label: "Practice Smart",
-    sub: "Daily practice worksheets to boost your skills",
+    icon: <PsychologyOutlinedIcon />,
+    label: "Elephant Memory",
+    sub: "Remember more, forget less",
   },
   {
-    icon: (
-      <Box
-        component="img"
-        src="/Icons/innovative-brain-icon.svg"
-        alt="Brain Icon"
-        sx={{
-          width: 22,
-          height: 22,
-          filter:
-            "invert(35%) sepia(12%) saturate(778%) hue-rotate(176deg) brightness(92%) contrast(86%)",
-        }}
-      />
-    ),
-    label: "Improve Mental Agility",
-    sub: "Strengthen your brain with targeted exercises",
+    icon: <BoltOutlinedIcon />,
+    label: "Razor Sharp",
+    sub: "Quick thinking, faster solving",
   },
 ];
 
@@ -942,7 +962,7 @@ export default function PricingPage() {
                   <Box
                     component="img"
                     // {/* Replace src with your actual image path e.g. /images/mental-calisthenics-book.png */}
-                    src="/Images/mental.png"
+                    src="/Images/mental_1.png"
                     alt="Mental Calisthenics Practice Book"
                     sx={{
                       width: "100%",
@@ -1053,7 +1073,7 @@ export default function PricingPage() {
               >
                 <Box
                   component="img"
-                  src="/Images/mental.png"
+                  src="/Images/mental_1.png"
                   alt="Mental Calisthenics Practice Book"
                   sx={{
                     width: "100%",
