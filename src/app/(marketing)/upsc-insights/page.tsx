@@ -15,7 +15,12 @@ import {
   useMediaQuery,
 } from "@mui/material";
 
-import { AutoGraph, Insights, Psychology, TrendingUp } from "@mui/icons-material";
+import {
+  AutoGraph,
+  Insights,
+  Psychology,
+  TrendingUp,
+} from "@mui/icons-material";
 import InsightsIcon from "@mui/icons-material/Insights";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import QuizIcon from "@mui/icons-material/Quiz";
@@ -31,18 +36,59 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 
 const years = [
-  "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018",
-  "2019", "2020", "2021", "2022", "2023", "2024", "2025",
+  "2011",
+  "2012",
+  "2013",
+  "2014",
+  "2015",
+  "2016",
+  "2017",
+  "2018",
+  "2019",
+  "2020",
+  "2021",
+  "2022",
+  "2023",
+  "2024",
+  "2025",
 ];
 
 const subjectData = [
-  { subject: "Environment", values: [19, 20, 17, 24, 19, 17, 14, 12, 18, 18, 15, 17, 18, 19, 19], color: "#19c880" },
-  { subject: "Geography", values: [13, 12, 13, 11, 11, 3, 8, 7, 10, 10, 12, 10, 15, 17, 13], color: "#3b82f6" },
-  { subject: "Science & Tech.", values: [15, 10, 15, 10, 7, 7, 8, 13, 12, 11, 11, 14, 9, 7, 9], color: "#8b5cf6" },
-  { subject: "Polity", values: [7, 18, 15, 11, 13, 12, 23, 16, 15, 18, 17, 11, 15, 16, 18], color: "#f97316" },
-  { subject: "Economics", values: [29, 17, 23, 11, 20, 28, 27, 25, 27, 20, 15, 20, 16, 16, 17], color: "#ef4444" },
-  { subject: "History", values: [12, 21, 17, 24, 14, 17, 13, 21, 16, 19, 23, 15, 13, 11, 16], color: "#eab308" },
-  { subject: "Current Affairs", values: [5, 2, 0, 9, 16, 16, 7, 6, 2, 4, 7, 13, 14, 14, 8], color: "#06b6d4" },
+  {
+    subject: "Environment",
+    values: [19, 20, 17, 24, 19, 17, 14, 12, 18, 18, 15, 17, 18, 19, 19],
+    color: "#19c880",
+  },
+  {
+    subject: "Geography",
+    values: [13, 12, 13, 11, 11, 3, 8, 7, 10, 10, 12, 10, 15, 17, 13],
+    color: "#3b82f6",
+  },
+  {
+    subject: "Science & Tech.",
+    values: [15, 10, 15, 10, 7, 7, 8, 13, 12, 11, 11, 14, 9, 7, 9],
+    color: "#8b5cf6",
+  },
+  {
+    subject: "Polity",
+    values: [7, 18, 15, 11, 13, 12, 23, 16, 15, 18, 17, 11, 15, 16, 18],
+    color: "#f97316",
+  },
+  {
+    subject: "Economics",
+    values: [29, 17, 23, 11, 20, 28, 27, 25, 27, 20, 15, 20, 16, 16, 17],
+    color: "#ef4444",
+  },
+  {
+    subject: "History",
+    values: [12, 21, 17, 24, 14, 17, 13, 21, 16, 19, 23, 15, 13, 11, 16],
+    color: "#eab308",
+  },
+  {
+    subject: "Current Affairs",
+    values: [5, 2, 0, 9, 16, 16, 7, 6, 2, 4, 7, 13, 14, 14, 8],
+    color: "#06b6d4",
+  },
 ];
 
 const insightCards = [
@@ -119,16 +165,36 @@ export default function UPSCInsightsSection() {
             {/* STATS */}
             <Box className="hero-stats-grid">
               {[
-                { icon: <InsightsIcon />, title: "15 Years", subtitle: "Question Analysis" },
-                { icon: <MenuBookIcon />, title: "7 Subjects", subtitle: "UPSC Coverage" },
-                { icon: <QuizIcon />, title: "100 Questions", subtitle: "Real UPSC Pattern" },
-                { icon: <RocketLaunchIcon />, title: "100 Tests", subtitle: "Mock Test Series" },
+                {
+                  icon: <InsightsIcon />,
+                  title: "15 Years",
+                  subtitle: "Question Analysis",
+                },
+                {
+                  icon: <MenuBookIcon />,
+                  title: "7 Subjects",
+                  subtitle: "UPSC Coverage",
+                },
+                {
+                  icon: <QuizIcon />,
+                  title: "100 Questions",
+                  subtitle: "Real UPSC Pattern",
+                },
+                {
+                  icon: <RocketLaunchIcon />,
+                  title: "100 Tests",
+                  subtitle: "Mock Test Series",
+                },
               ].map((item, index) => (
                 <Card key={index} elevation={0} className="hero-mini-card">
                   <Box className="hero-mini-icon">{item.icon}</Box>
                   <Box>
-                    <Typography className="hero-mini-title">{item.title}</Typography>
-                    <Typography className="hero-mini-subtitle">{item.subtitle}</Typography>
+                    <Typography className="hero-mini-title">
+                      {item.title}
+                    </Typography>
+                    <Typography className="hero-mini-subtitle">
+                      {item.subtitle}
+                    </Typography>
                   </Box>
                 </Card>
               ))}
@@ -137,7 +203,11 @@ export default function UPSCInsightsSection() {
 
           {/* RIGHT IMAGE */}
           <Box className="hero-image-wrapper">
-            <img src="/Images/UPSC_img-1.png" alt="UPSC Insights" className="hero-image" />
+            <img
+              src="/Images/UPSC_img-1.png"
+              alt="UPSC Insights"
+              className="hero-image"
+            />
           </Box>
         </Stack>
       </Box>
@@ -165,7 +235,13 @@ export default function UPSCInsightsSection() {
             </Box>
           </Typography>
 
-          <Typography sx={{ mt: 1, color: "#64748b", fontSize: { xs: "0.85rem", md: "0.92rem" } }}>
+          <Typography
+            sx={{
+              mt: 1,
+              color: "#64748b",
+              fontSize: { xs: "0.85rem", md: "0.92rem" },
+            }}
+          >
             Subject-wise question distribution analysis
           </Typography>
         </Box>
@@ -258,7 +334,9 @@ export default function UPSCInsightsSection() {
                   {selectedSubject.subject}
                 </Typography>
 
-                <Typography sx={{ color: "#64748b", mt: 0.5, fontSize: "0.85rem" }}>
+                <Typography
+                  sx={{ color: "#64748b", mt: 0.5, fontSize: "0.85rem" }}
+                >
                   UPSC Subject-wise Question Trend
                 </Typography>
               </Box>
@@ -297,7 +375,12 @@ export default function UPSCInsightsSection() {
                   }}
                 >
                   <Typography
-                    sx={{ mb: 1, fontWeight: 700, fontSize: "0.7rem", color: "#334155" }}
+                    sx={{
+                      mb: 1,
+                      fontWeight: 700,
+                      fontSize: "0.7rem",
+                      color: "#334155",
+                    }}
                   >
                     {value}
                   </Typography>
@@ -311,7 +394,9 @@ export default function UPSCInsightsSection() {
                     }}
                   />
 
-                  <Typography sx={{ mt: 1, fontSize: "0.64rem", color: "#64748b" }}>
+                  <Typography
+                    sx={{ mt: 1, fontSize: "0.64rem", color: "#64748b" }}
+                  >
                     {years[index]}
                   </Typography>
                 </Box>
@@ -338,7 +423,10 @@ export default function UPSCInsightsSection() {
               <tbody>
                 {subjectData.map((item, index) => (
                   <tr key={index}>
-                    <td className="table-cell subject-cell" style={{ color: item.color }}>
+                    <td
+                      className="table-cell subject-cell"
+                      style={{ color: item.color }}
+                    >
                       {item.subject}
                     </td>
                     {item.values.map((value, idx) => (
@@ -352,7 +440,11 @@ export default function UPSCInsightsSection() {
                 <tr className="total-row">
                   <td className="table-cell total-cell">Total</td>
                   {years.map((year, index) => (
-                    <td key={index} className="table-cell" style={{ fontWeight: 700 }}>
+                    <td
+                      key={index}
+                      className="table-cell"
+                      style={{ fontWeight: 700 }}
+                    >
                       100
                     </td>
                   ))}
@@ -361,134 +453,6 @@ export default function UPSCInsightsSection() {
             </table>
           </Box>
         )}
-      </Box>
-
-      {/* MOCK TEST SECTION */}
-      <Box className="mock-test-section" px={4} pb={3}>
-        <Box textAlign="center" mb={2.5}>
-          <Typography
-            sx={{
-              fontWeight: 800,
-              color: "#0f172a",
-              fontSize: { xs: "1.35rem", md: "1.9rem" },
-            }}
-          >
-            Mock Test Format
-          </Typography>
-
-          <Typography sx={{ mt: 1, color: "#64748b", fontSize: { xs: "0.85rem", md: "0.92rem" } }}>
-            Designed based on real UPSC Prelims examination pattern
-          </Typography>
-        </Box>
-
-        <Box className="mock-card-grid">
-          {[
-            { title: "Duration", value: "2 Hours", icon: <AccessTimeIcon /> },
-            { title: "Total Questions", value: "100", icon: <QuizIcon /> },
-            { title: "Negative Marking", value: "1/3rd", icon: <TrackChangesIcon /> },
-            { title: "Difficulty", value: "Real UPSC Standard", icon: <InsightsIcon /> },
-            {
-              title: "Includes",
-              value: "Solutions, Review & Performance Tracking",
-              icon: <DescriptionIcon />,
-            },
-          ].map((item, index) => (
-            <Card key={index} elevation={0} className="mock-card">
-              <Box className="mock-icon">{item.icon}</Box>
-
-              <Typography sx={{ fontWeight: 700, color: "#0f172a", fontSize: "0.88rem", mb: 0.75 }}>
-                {item.title}
-              </Typography>
-
-              <Typography
-                sx={{
-                  color: "#19c880",
-                  fontWeight: 800,
-                  fontSize: { xs: "0.95rem", md: "1.05rem" },
-                  lineHeight: 1.45,
-                }}
-              >
-                {item.value}
-              </Typography>
-            </Card>
-          ))}
-        </Box>
-
-        {/* ================= TEST PLAN SECTION ================= */}
-        {/* <Box className="upsc-plan-section">
-          <Box className="plan-heading-wrapper">
-            <Typography className="plan-main-heading">
-              UPSC 2026–2027
-              <span className="green-text"> Test Plan</span>
-            </Typography>
-
-            <Typography className="plan-sub-heading">
-              Day-wise subject allocation (June–May)
-            </Typography>
-          </Box>
-
-          <Box className="test-plan-wrapper">
-            <Box className="test-plan-inner">
-              <Box className="month-grid">
-                <Box className="empty-cell" />
-                {["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"].map(
-                  (month) => (
-                    <Box key={month} className="month-box">
-                      {month}
-                    </Box>
-                  )
-                )}
-              </Box>
-
-              {[
-                { day: "Mon", subject: "Environment", className: "env-box" },
-                { day: "Tue", subject: "Geography", className: "geo-box" },
-                { day: "Wed", subject: "Science & Tech", className: "sci-box" },
-                { day: "Thu", subject: "Polity", className: "polity-box" },
-                { day: "Fri", subject: "Economics", className: "eco-box" },
-                { day: "Sat", subject: "History", className: "history-box" },
-                { day: "Sun", subject: "CSAT", className: "csat-box" },
-              ].map((row, rowIndex) => (
-                <Box key={rowIndex} className="plan-row">
-                  <Box className="day-label">{row.day}</Box>
-
-                  {Array.from({ length: 12 }).map((_, index) => (
-                    <Box
-                      key={index}
-                      className={index >= 8 ? "mock-test-box" : `subject-box ${row.className}`}
-                    >
-                      {index >= 8 ? "Mock Test" : row.subject}
-                    </Box>
-                  ))}
-                </Box>
-              ))}
-
-              <Box className="mains-section">
-                <Typography className="mains-heading">MAINS TEST PLAN</Typography>
-
-                <Box className="plan-row">
-                  <Box className="day-label">Saturday</Box>
-                  {Array.from({ length: 12 }).map((_, index) => (
-                    <Box key={index} className="essay-box">
-                      Essay & Ethics
-                    </Box>
-                  ))}
-                </Box>
-
-                <Box className="plan-row">
-                  <Box className="day-label">Sunday</Box>
-                  {["GS1", "GS1", "GS1", "GS2", "GS2", "GS2", "GS3", "GS3", "GS3", "GS4", "GS4", "Revision"].map(
-                    (item, index) => (
-                      <Box key={index} className="gs-box">
-                        {item}
-                      </Box>
-                    )
-                  )}
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-        </Box> */}
       </Box>
 
       {/* ================= CUT OFF TREND SECTION ================= */}
@@ -610,6 +574,155 @@ export default function UPSCInsightsSection() {
         </Box>
       </Box>
 
+      {/* MOCK TEST SECTION */}
+      <Box className="mock-test-section" px={4} pb={3}>
+        <Box textAlign="center" mb={2.5}>
+          <Typography
+            sx={{
+              fontWeight: 800,
+              color: "#0f172a",
+              fontSize: { xs: "1.35rem", md: "1.9rem" },
+            }}
+          >
+            Mock Test Format
+          </Typography>
+
+          <Typography
+            sx={{
+              mt: 1,
+              color: "#64748b",
+              fontSize: { xs: "0.85rem", md: "0.92rem" },
+            }}
+          >
+            Designed based on real UPSC Prelims examination pattern
+          </Typography>
+        </Box>
+
+        <Box className="mock-card-grid">
+          {[
+            { title: "Duration", value: "2 Hours", icon: <AccessTimeIcon /> },
+            { title: "Total Questions", value: "100", icon: <QuizIcon /> },
+            {
+              title: "Negative Marking",
+              value: "1/3rd",
+              icon: <TrackChangesIcon />,
+            },
+            {
+              title: "Difficulty",
+              value: "Real UPSC Standard",
+              icon: <InsightsIcon />,
+            },
+            {
+              title: "Includes",
+              value: "Solutions, Review & Performance Tracking",
+              icon: <DescriptionIcon />,
+            },
+          ].map((item, index) => (
+            <Card key={index} elevation={0} className="mock-card">
+              <Box className="mock-icon">{item.icon}</Box>
+
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  color: "#0f172a",
+                  fontSize: "0.88rem",
+                  mb: 0.75,
+                }}
+              >
+                {item.title}
+              </Typography>
+
+              <Typography
+                sx={{
+                  color: "#19c880",
+                  fontWeight: 800,
+                  fontSize: { xs: "0.95rem", md: "1.05rem" },
+                  lineHeight: 1.45,
+                }}
+              >
+                {item.value}
+              </Typography>
+            </Card>
+          ))}
+        </Box>
+
+        {/* ================= TEST PLAN SECTION ================= */}
+        {/* <Box className="upsc-plan-section">
+          <Box className="plan-heading-wrapper">
+            <Typography className="plan-main-heading">
+              UPSC 2026–2027
+              <span className="green-text"> Test Plan</span>
+            </Typography>
+
+            <Typography className="plan-sub-heading">
+              Day-wise subject allocation (June–May)
+            </Typography>
+          </Box>
+
+          <Box className="test-plan-wrapper">
+            <Box className="test-plan-inner">
+              <Box className="month-grid">
+                <Box className="empty-cell" />
+                {["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"].map(
+                  (month) => (
+                    <Box key={month} className="month-box">
+                      {month}
+                    </Box>
+                  )
+                )}
+              </Box>
+
+              {[
+                { day: "Mon", subject: "Environment", className: "env-box" },
+                { day: "Tue", subject: "Geography", className: "geo-box" },
+                { day: "Wed", subject: "Science & Tech", className: "sci-box" },
+                { day: "Thu", subject: "Polity", className: "polity-box" },
+                { day: "Fri", subject: "Economics", className: "eco-box" },
+                { day: "Sat", subject: "History", className: "history-box" },
+                { day: "Sun", subject: "CSAT", className: "csat-box" },
+              ].map((row, rowIndex) => (
+                <Box key={rowIndex} className="plan-row">
+                  <Box className="day-label">{row.day}</Box>
+
+                  {Array.from({ length: 12 }).map((_, index) => (
+                    <Box
+                      key={index}
+                      className={index >= 8 ? "mock-test-box" : `subject-box ${row.className}`}
+                    >
+                      {index >= 8 ? "Mock Test" : row.subject}
+                    </Box>
+                  ))}
+                </Box>
+              ))}
+
+              <Box className="mains-section">
+                <Typography className="mains-heading">MAINS TEST PLAN</Typography>
+
+                <Box className="plan-row">
+                  <Box className="day-label">Saturday</Box>
+                  {Array.from({ length: 12 }).map((_, index) => (
+                    <Box key={index} className="essay-box">
+                      Essay & Ethics
+                    </Box>
+                  ))}
+                </Box>
+
+                <Box className="plan-row">
+                  <Box className="day-label">Sunday</Box>
+                  {["GS1", "GS1", "GS1", "GS2", "GS2", "GS2", "GS3", "GS3", "GS3", "GS4", "GS4", "Revision"].map(
+                    (item, index) => (
+                      <Box key={index} className="gs-box">
+                        {item}
+                      </Box>
+                    )
+                  )}
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Box> */}
+      </Box>
+
       {/* ================= SMART ANALYSIS SECTION ================= */}
       <Box className="smart-analysis-section">
         <Box className="smart-analysis-grid">
@@ -627,13 +740,15 @@ export default function UPSCInsightsSection() {
             <Box className="feature-strip">
               {[
                 { icon: <TrackChangesIcon />, text: "Understand Exam Trends" },
+                { icon: <TrendingUpIcon />, text: "Plan Your Strategy" },
                 { icon: <AnalyticsIcon />, text: "Analyze Your Performance" },
-                { icon: <TrendingUpIcon />, text: "Improve Your Strategy" },
                 { icon: <EmojiEventsIcon />, text: "Achieve Your UPSC Dream" },
               ].map((item, index) => (
                 <Box key={index} className="feature-strip-item">
                   <Box className="feature-strip-icon">{item.icon}</Box>
-                  <Typography className="feature-strip-text">{item.text}</Typography>
+                  <Typography className="feature-strip-text">
+                    {item.text}
+                  </Typography>
                 </Box>
               ))}
             </Box>
@@ -652,6 +767,11 @@ export default function UPSCInsightsSection() {
         <Box className="bottom-feature-container">
           {[
             {
+              icon: <PsychologyIcon />,
+              title: "Smart Preparation",
+              subtitle: "Focus on important topics based on real data.",
+            },
+            {
               icon: <InsightsIcon />,
               title: "Data-Driven Insights",
               subtitle: "Get accurate analysis of exam trends and patterns.",
@@ -662,11 +782,6 @@ export default function UPSCInsightsSection() {
               subtitle: "Identify strengths and weaknesses to improve.",
             },
             {
-              icon: <PsychologyIcon />,
-              title: "Smart Preparation",
-              subtitle: "Focus on important topics based on real data.",
-            },
-            {
               icon: <EmojiEventsIcon />,
               title: "Success Strategy",
               subtitle: "Prepare strategically and achieve your UPSC dream.",
@@ -675,8 +790,12 @@ export default function UPSCInsightsSection() {
             <Box key={index} className="bottom-feature-card">
               <Box className="bottom-feature-icon">{item.icon}</Box>
               <Box>
-                <Typography className="bottom-feature-title">{item.title}</Typography>
-                <Typography className="bottom-feature-subtitle">{item.subtitle}</Typography>
+                <Typography className="bottom-feature-title">
+                  {item.title}
+                </Typography>
+                <Typography className="bottom-feature-subtitle">
+                  {item.subtitle}
+                </Typography>
               </Box>
             </Box>
           ))}
