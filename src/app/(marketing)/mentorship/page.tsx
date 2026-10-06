@@ -26,6 +26,16 @@ import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 
 const features = [
   {
+    icon: <TrackChangesOutlinedIcon />,
+    label: "Sharpen Focus",
+    sub: "Build better concentration and accuracy",
+  },
+  {
+    icon: <LightbulbOutlinedIcon />,
+    label: "Practice Smart",
+    sub: "Daily practice worksheets to boost your skills",
+  },
+  {
     icon: (
       <Box
         component="img"
@@ -41,16 +51,6 @@ const features = [
     ),
     label: "Improve Mental Agility",
     sub: "Strengthen your brain with targeted exercises",
-  },
-  {
-    icon: <TrackChangesOutlinedIcon />,
-    label: "Sharpen Focus",
-    sub: "Build better concentration and accuracy",
-  },
-  {
-    icon: <LightbulbOutlinedIcon />,
-    label: "Practice Smart",
-    sub: "Daily practice worksheets to boost your skills",
   },
 ];
 
@@ -605,6 +605,11 @@ export default function PricingPage() {
                       <Stack spacing={0.75}>
                         {[
                           {
+                            label:
+                              "MAINS HOW TO CHOOSE OPTIONAL PAPER & FACULTY",
+                            boldWords: [""],
+                          },
+                          {
                             label: "MAINS COMPULSORY ENGLISH PAPER",
                             boldWords: ["COMPULSORY", "ENGLISH"],
                           },
@@ -612,19 +617,14 @@ export default function PricingPage() {
                             label: "MAINS COMPULSORY TAMIL PAPER",
                             boldWords: ["COMPULSORY", "TAMIL"],
                           },
-                          { label: "MAINS ESSAY PAPER", boldWords: ["ESSAY"] },
                           {
                             label: "MAINS ETHICS PAPER",
                             boldWords: ["ETHICS"],
                           },
+                          { label: "MAINS ESSAY PAPER", boldWords: ["ESSAY"] },
                           { label: "MAINS GS-1 PAPER", boldWords: ["GS-1"] },
                           { label: "MAINS GS-2 PAPER", boldWords: ["GS-2"] },
                           { label: "MAINS GS-3 PAPER", boldWords: ["GS-3"] },
-                          {
-                            label:
-                              "MAINS HOW TO CHOOSE OPTIONAL PAPER & FACULTY",
-                            boldWords: [""],
-                          },
                         ].map(({ label, boldWords }) => (
                           <Box
                             key={label}
@@ -807,7 +807,7 @@ export default function PricingPage() {
                             "Personalized answer writing guidance",
                             "Paper-specific strategy & structure",
                             "Improve content presentation",
-                            "Ethics & essay framework building",
+                            "Ethics & Essay framework building",
                             "Evaluation tips from mentors",
                             "Doubt clarification & expert insights",
                           ].map((item) => (
