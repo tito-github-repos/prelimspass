@@ -99,6 +99,9 @@ export default function Login() {
   const handleLogin = async () => {
     if (loading) return; // prevent multiple submissions
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
+
     try {
       setLoading(true);
       setErrors({});
@@ -109,9 +112,11 @@ export default function Login() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        signal: controller.signal,
       });
 
-      const data = await res.json();
+      // Server may return a non-JSON body on crashes; don't let that throw
+      const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
         setAlert({
@@ -160,6 +165,12 @@ export default function Login() {
           fieldErrors[e.path] = e.message;
         });
         setErrors(fieldErrors);
+      } else if (err.name === "AbortError") {
+        setAlert({
+          open: true,
+          message: "Login is taking too long. Please try again.",
+          severity: "error",
+        });
       } else {
         console.error("Login Error:", err);
         setAlert({
@@ -169,6 +180,7 @@ export default function Login() {
         });
       }
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   };
