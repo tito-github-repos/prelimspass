@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/db";
 import { syncPyqAssignmentsForStudent } from "@/lib/Pyqassignmentsync";
 
-
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -66,38 +65,37 @@ export async function POST(req: Request) {
 
     // ---- Self-heal PYQ exam assignments for students ----
     // Runs on every successful student login and ensures the student has
-    // an exam_assignment_students row for every existing PYQ exam - this
-    // is what makes PYQ exams "just work" for a student regardless of
-    // when they registered, without needing a one-time registration hook
-    // that could be missed (bulk imports, admin-created accounts, etc.).
+    // an exam_assignment_students row for every existing PYQ exam.
     //
-    // Deliberately isolated in its own try/catch: a sync failure here must
-    // NEVER block a successful login. If this fails, the student simply
-    // won't see brand-new PYQ exams until their next successful sync (next
-    // login, or a manual PATCH /api/exams/pyq resync) - annoying, but not
-    // login-breaking.
+    // Fire-and-forget: login does NOT wait for this sync, and a sync
+    // failure can never block or break a successful login.
+    //
+    // NOTE: if you deploy to serverless hosting (e.g. Vercel), background
+    // work may be cut off after the response is sent. In that case replace
+    // the `void ...catch(...)` call below with:
+    //   await syncPyqAssignmentsForStudent(user.user_id, systemUserId);
+    // inside a try/catch (this is fast now that the sync is set-based).
     if (user.role === "student") {
-      try {
-        // TODO: confirm this is the right value for your schema.
-        // exam_assignments.assigned_by is a FK - when this sync runs at
-        // login time there's no admin present, so we need a fixed
-        // "system" user id to attribute these auto-created assignments
-        // to. Set SYSTEM_ASSIGNER_USER_ID in your environment to a real,
-        // existing user_id (e.g. a dedicated system/admin account).
-        const systemUserId = process.env.SYSTEM_ASSIGNER_USER_ID
-          ? Number(process.env.SYSTEM_ASSIGNER_USER_ID)
-          : null;
+      // exam_assignments.assigned_by is a FK - set SYSTEM_ASSIGNER_USER_ID
+      // in your environment to a real, existing user_id (e.g. a dedicated
+      // system/admin account).
+      const systemUserId = process.env.SYSTEM_ASSIGNER_USER_ID
+        ? Number(process.env.SYSTEM_ASSIGNER_USER_ID)
+        : null;
 
-        if (systemUserId) {
-          await syncPyqAssignmentsForStudent(user.user_id, systemUserId);
-        } else {
-          console.warn(
-            "SYSTEM_ASSIGNER_USER_ID is not set - skipping PYQ assignment sync at login. " +
-              "Set this env var to a valid user_id to enable auto-assignment on login.",
-          );
-        }
-      } catch (syncError) {
-        console.error("PYQ assignment sync failed (login still succeeds):", syncError);
+      if (systemUserId) {
+        void syncPyqAssignmentsForStudent(user.user_id, systemUserId).catch(
+          (syncError) =>
+            console.error(
+              "PYQ assignment sync failed (login still succeeds):",
+              syncError
+            )
+        );
+      } else {
+        console.warn(
+          "SYSTEM_ASSIGNER_USER_ID is not set - skipping PYQ assignment sync at login. " +
+            "Set this env var to a valid user_id to enable auto-assignment on login."
+        );
       }
     }
 
