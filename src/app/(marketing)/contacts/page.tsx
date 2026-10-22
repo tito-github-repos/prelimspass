@@ -150,7 +150,7 @@ const ContactPage = () => {
                     </Typography>
 
                     <Typography className="info-text">
-                      +91 9499953256
+                      +91 9499953257
                     </Typography>
                   </Box>
                 </Box> */}
@@ -165,7 +165,7 @@ const ContactPage = () => {
                     </Typography>
 
                     <Typography className="info-text">
-                      +91 9499953256 , +91 9344271134
+                      +91 9499953257 , +91 9344271134
                     </Typography>
                   </Box>
                 </Box>
