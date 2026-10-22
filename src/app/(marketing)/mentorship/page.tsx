@@ -60,18 +60,58 @@ const features = [
   {
     icon: <TrackChangesOutlinedIcon />,
     label: "Lens Focus",
-    // sub: "Laser-sharp attention, zero distractions",
   },
   {
     icon: <PsychologyOutlinedIcon />,
     label: "Elephant Memory",
-    // sub: "Remember more, forget less",
   },
   {
     icon: <BoltOutlinedIcon />,
     label: "Razor Sharp",
-    // sub: "Quick thinking, faster solving",
   },
+];
+
+const agendaItems = [
+  {
+    title: "Strategies, Tactics & Techniques",
+    sub: "For GS and CSAT.",
+  },
+  {
+    title: "Customised Preparation Planner",
+    sub: "Built around the aspirant's available time, strengths and weaknesses.",
+  },
+  {
+    title: "Silver Streak Achievers only",
+    sub: "A free benefit for PP users who reach Silver Streak status.",
+  },
+];
+
+const howItHelps = [
+  "Understand exam pattern & question trends",
+  "Improve speed, accuracy & time management",
+  "Personalized preparation roadmap",
+  "Focused strategy for weak areas",
+  "Expert mentorship & doubt clarification",
+];
+
+// DRAFT copy for Prelims: confirm with the client
+const whatYouGet = [
+  "Personalized strategy for GS and CSAT",
+  "Customised preparation planner",
+  "Review of your current preparation",
+  "Tips to handle tricky questions & negative marking",
+  "Doubt clarification & expert insights",
+];
+
+const streakTiers = [
+  { code: "SS-25", reward: "CSAT Online Classes" },
+  { code: "SS-50", reward: "Prelims One-to-One Consulting" },
+  { code: "SS-100", reward: "Mains One-to-One Consulting" },
+];
+
+const streakSchedule = [
+  { days: "Monday – Thursday", note: "CSAT classes for SS-25 achievers" },
+  { days: "Friday – Sunday", note: "Sessions for SS-50 and SS-100 achievers" },
 ];
 
 function BannerImage({
@@ -115,6 +155,79 @@ function BannerImage({
           pointerEvents: "none",
         }}
       />
+    </Box>
+  );
+}
+
+/* Shared card for "How It Helps" and "What You Get" */
+function CheckListCard({
+  title,
+  icon,
+  items,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  items: string[];
+}) {
+  return (
+    <Box
+      sx={{
+        borderRadius: "18px",
+        background: "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)",
+        border: "1px solid #dcfce7",
+        p: { xs: 2, md: 3 },
+        height: "100%",
+      }}
+    >
+      <Stack direction="row" spacing={1.5} alignItems="center" mb={2.5}>
+        <Box
+          sx={{
+            width: { xs: 40, md: 50 },
+            height: { xs: 40, md: 50 },
+            borderRadius: "12px",
+            border: "1px solid #16a34a",
+            color: "#16a34a",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          {icon}
+        </Box>
+        <Typography
+          variant="h6"
+          fontWeight={800}
+          color="#166534"
+          sx={{ fontSize: { xs: "1rem", md: "1.25rem" } }}
+        >
+          {title}
+        </Typography>
+      </Stack>
+
+      <Stack spacing={1.8}>
+        {items.map((item) => (
+          <Stack key={item} direction="row" spacing={1.5} alignItems="flex-start">
+            <CheckCircleRoundedIcon
+              sx={{
+                color: "#16a34a",
+                mt: "2px",
+                fontSize: { xs: 17, md: 20 },
+                flexShrink: 0,
+              }}
+            />
+            <Typography
+              sx={{
+                color: "#374151",
+                lineHeight: 1.65,
+                fontSize: { xs: "0.83rem", md: "0.96rem" },
+              }}
+            >
+              {item}
+            </Typography>
+          </Stack>
+        ))}
+      </Stack>
     </Box>
   );
 }
@@ -165,6 +278,7 @@ export default function PricingPage() {
           </Box>
 
           <Grid container spacing={{ xs: 2.5, md: 4 }}>
+            {/* ═══════════════ PRELIMS CARD ═══════════════ */}
             <Grid size={{ xs: 12 }}>
               <Box
                 sx={{
@@ -257,271 +371,342 @@ export default function PricingPage() {
                 {/* ── CARD BODY ── */}
                 <Box sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
                   <Grid container spacing={{ xs: 2, md: 3 }}>
-                    {/* Subject list */}
-                    <Grid size={{ xs: 12, md: 7 }}>
-                      <Stack spacing={1}>
-                        {/* CSAT */}
-                        <Box
-                          sx={{
-                            border: "1px solid #e5e7eb",
-                            borderRadius: "14px",
-                            bgcolor: "#fff",
-                            px: { xs: 1.5, md: 1.5 },
-                            py: { xs: 1.2, md: 1 },
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            gap: 1,
-                          }}
-                        >
-                          <Stack
-                            direction="row"
-                            spacing={1.5}
-                            alignItems="center"
-                            sx={{ flex: 1, minWidth: 0 }}
-                          >
-                            <Box
-                              sx={{
-                                width: { xs: 36, md: 42 },
-                                height: { xs: 36, md: 42 },
-                                borderRadius: "50%",
-                                bgcolor: "#ecfdf3",
-                                color: "#16a34a",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                flexShrink: 0,
-                              }}
-                            >
-                              <QuizOutlinedIcon
-                                sx={{ fontSize: { xs: 16, md: 20 } }}
-                              />
-                            </Box>
-                            <Typography
-                              fontWeight={500}
-                              sx={{
-                                fontSize: {
-                                  xs: "0.82rem",
-                                  sm: "0.92rem",
-                                  md: "1rem",
-                                },
-                              }}
-                            >
-                              PRELIMS{" "}
-                              <Box component="span" fontWeight={900}>
-                                CSAT
-                              </Box>{" "}
-                              PAPER
-                            </Typography>
-                          </Stack>
-                          <Typography
-                            sx={{
-                              fontWeight: 800,
-                              color: "#16a34a",
-                              fontSize: { xs: "1rem", md: "1.3rem" },
-                              flexShrink: 0,
-                            }}
-                          >
-                            ₹999
-                          </Typography>
-                        </Box>
-
-                        {/* GS */}
-                        <Box
-                          sx={{
-                            border: "1px solid #e5e7eb",
-                            borderRadius: "14px",
-                            bgcolor: "#fff",
-                            px: { xs: 1.5, md: 1.5 },
-                            py: { xs: 1.2, md: 1 },
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            gap: 1,
-                          }}
-                        >
-                          <Stack
-                            direction="row"
-                            spacing={1.5}
-                            alignItems="center"
-                            sx={{ flex: 1, minWidth: 0 }}
-                          >
-                            <Box
-                              sx={{
-                                width: { xs: 36, md: 42 },
-                                height: { xs: 36, md: 42 },
-                                borderRadius: "50%",
-                                bgcolor: "#ecfdf3",
-                                color: "#16a34a",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                flexShrink: 0,
-                              }}
-                            >
-                              <MenuBookOutlinedIcon
-                                sx={{ fontSize: { xs: 16, md: 20 } }}
-                              />
-                            </Box>
-                            <Typography
-                              fontWeight={500}
-                              sx={{
-                                fontSize: {
-                                  xs: "0.82rem",
-                                  sm: "0.92rem",
-                                  md: "1rem",
-                                },
-                              }}
-                            >
-                              PRELIMS{" "}
-                              <Box component="span" fontWeight={900}>
-                                GS
-                              </Box>{" "}
-                              PAPER
-                            </Typography>
-                          </Stack>
-                          <Typography
-                            sx={{
-                              fontWeight: 800,
-                              color: "#16a34a",
-                              fontSize: { xs: "1rem", md: "1.3rem" },
-                              flexShrink: 0,
-                            }}
-                          >
-                            ₹999
-                          </Typography>
-                        </Box>
-                      </Stack>
-
-                      {/* Session badge */}
+                    {/* ── CONSULTATION AGENDA ── */}
+                    <Grid size={{ xs: 12, md: 7 }} sx={{ order: { xs: 1, md: 0 } }}>
                       <Box
                         sx={{
-                          mt: 2,
-                          borderRadius: "12px",
-                          bgcolor: "#ecfdf3",
-                          border: "1px solid #d1fae5",
-                          p: { xs: 1.2, md: 1.8 },
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: 1,
-                        }}
-                      >
-                        <AccessTimeOutlinedIcon
-                          sx={{
-                            color: "#16a34a",
-                            fontSize: { xs: 17, md: 20 },
-                          }}
-                        />
-                        <Typography
-                          fontWeight={700}
-                          color="#16a34a"
-                          sx={{ fontSize: { xs: "0.82rem", md: "1rem" } }}
-                        >
-                          One-time session — 1 Hour
-                        </Typography>
-                      </Box>
-
-                      {/* CTA */}
-                      <Button
-                        fullWidth
-                        size="large"
-                        endIcon={<ArrowForwardRoundedIcon />}
-                        sx={{
-                          mt: 1.5,
-                          py: { xs: 1.3, md: 1.6 },
-                          borderRadius: "14px",
-                          background: "#16a34a",
-                          color: "#fff",
-                          fontWeight: 700,
-                          textTransform: "none",
-                          fontSize: { xs: "0.9rem", md: "1rem" },
-                          "&:hover": { background: "#15803d" },
-                        }}
-                      >
-                        Book Consultation
-                      </Button>
-                    </Grid>
-
-                    {/* How It Helps */}
-                    <Grid size={{ xs: 12, md: 5 }}>
-                      <Box
-                        sx={{
+                          border: "1px solid #e5e7eb",
                           borderRadius: "18px",
-                          background:
-                            "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)",
-                          border: "1px solid #dcfce7",
+                          bgcolor: "#fff",
                           p: { xs: 2, md: 3 },
                           height: "100%",
                         }}
                       >
-                        <Stack
-                          direction="row"
-                          spacing={1.5}
-                          alignItems="center"
-                          mb={2.5}
+                        <Typography
+                          sx={{
+                            fontSize: { xs: "0.72rem", md: "0.8rem" },
+                            fontWeight: 800,
+                            letterSpacing: "0.14em",
+                            color: "#15803d",
+                            pb: 1.5,
+                            borderBottom: "1px solid #f0f2f4",
+                          }}
+                        >
+                          CONSULTATION AGENDA
+                        </Typography>
+
+                        {agendaItems.map((item, i, arr) => (
+                          <Stack
+                            key={item.title}
+                            direction="row"
+                            spacing={{ xs: 1.5, md: 2 }}
+                            alignItems="center"
+                            sx={{
+                              py: { xs: 1.5, md: 1.8 },
+                              borderBottom:
+                                i < arr.length - 1
+                                  ? "1px solid #f0f2f4"
+                                  : "none",
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                width: { xs: 34, md: 40 },
+                                height: { xs: 34, md: 40 },
+                                borderRadius: "10px",
+                                bgcolor: "#16a34a",
+                                color: "#fff",
+                                fontWeight: 800,
+                                fontSize: { xs: "0.9rem", md: "1rem" },
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                flexShrink: 0,
+                              }}
+                            >
+                              {i + 1}
+                            </Box>
+                            <Box>
+                              <Typography
+                                fontWeight={700}
+                                sx={{
+                                  fontSize: { xs: "0.92rem", md: "1.1rem" },
+                                  color: "#0b1b2b",
+                                  lineHeight: 1.3,
+                                }}
+                              >
+                                {item.title}
+                              </Typography>
+                              <Typography
+                                sx={{
+                                  fontSize: { xs: "0.8rem", md: "0.95rem" },
+                                  color: "#6b7280",
+                                  lineHeight: 1.5,
+                                }}
+                              >
+                                {item.sub}
+                              </Typography>
+                            </Box>
+                          </Stack>
+                        ))}
+                      </Box>
+                    </Grid>
+
+                    {/* ── HOW IT HELPS ── */}
+                    <Grid size={{ xs: 12, md: 5 }} sx={{ order: { xs: 2, md: 0 } }}>
+                      <CheckListCard
+                        title="How It Helps"
+                        icon={
+                          <TipsAndUpdatesOutlinedIcon
+                            sx={{ fontSize: { xs: 20, md: 24 } }}
+                          />
+                        }
+                        items={howItHelps}
+                      />
+                    </Grid>
+
+                    {/* ── WHAT IS SILVER STREAK? ── */}
+                    <Grid size={{ xs: 12, md: 7 }} sx={{ order: { xs: 4, md: 0 } }}>
+                      <Box
+                        sx={{
+                          bgcolor: "#fff",
+                          p: { xs: 2, md: 2 },
+                        }}
+                      >
+                        <Typography
+                          component="h3"
+                          fontWeight={800}
+                          sx={{
+                            fontSize: { xs: "1.2rem", md: "1.7rem" },
+                            color: "#0b1b2b",
+                            lineHeight: 1.25,
+                          }}
+                        >
+                          What is Silver Streak?
+                        </Typography>
+                        {/* TODO: confirm "SAMI App" with the client */}
+                        <Typography
+                          sx={{
+                            mt: 0.8,
+                            fontSize: { xs: "0.85rem", md: "1rem" },
+                            color: "#6b7280",
+                            lineHeight: 1.6,
+                          }}
+                        >
+                          Silver Streak is for SAMI App users - PP Mobile App
+                          users, who use the app daily for 25, 50 or 100 days.
+                          Achiever get this additional benefits from PP.
+                        </Typography>
+
+                        {/* Tiers */}
+                        <Box
+                          sx={{
+                            mt: { xs: 2, md: 3 },
+                            display: "grid",
+                            gridTemplateColumns: {
+                              xs: "1fr",
+                              md: "repeat(3, 1fr)",
+                            },
+                            gap: { xs: 1.5, md: 2 },
+                          }}
+                        >
+                          {streakTiers.map((t) => (
+                            <Box
+                              key={t.code}
+                              sx={{
+                                borderRadius: "16px",
+                                bgcolor: "#f3f8f4",
+                                p: { xs: 2, md: 2.5 },
+                              }}
+                            >
+                              <Typography
+                                fontWeight={800}
+                                sx={{
+                                  color: "#15803d",
+                                  fontSize: { xs: "0.95rem", md: "1.1rem" },
+                                }}
+                              >
+                                {t.code}
+                              </Typography>
+                              <Typography
+                                fontWeight={600}
+                                sx={{
+                                  mt: 0.3,
+                                  color: "#0b1b2b",
+                                  fontSize: { xs: "0.9rem", md: "1.02rem" },
+                                }}
+                              >
+                                {t.reward}
+                              </Typography>
+                              <Chip
+                                label="FREE"
+                                size="small"
+                                sx={{
+                                  mt: 1.5,
+                                  bgcolor: "#16a34a",
+                                  color: "#fff",
+                                  fontWeight: 800,
+                                  letterSpacing: "0.04em",
+                                  height: 26,
+                                }}
+                              />
+                            </Box>
+                          ))}
+                        </Box>
+                      </Box>
+                    </Grid>
+
+                    {/* ── WHAT YOU GET ── */}
+                    <Grid size={{ xs: 12, md: 5 }} sx={{ order: { xs: 3, md: 0 } }}>
+                      <CheckListCard
+                        title="What You Get"
+                        icon={
+                          <AutoAwesomeOutlinedIcon
+                            sx={{ fontSize: { xs: 20, md: 24 } }}
+                          />
+                        }
+                        items={whatYouGet}
+                      />
+                    </Grid>
+
+                    {/* ── SILVER STREAK TIMING & DAYS (one row) ── */}
+                    <Grid size={{ xs: 12 }} sx={{ order: { xs: 5, md: 0 } }}>
+                        
+                        <Box
+                          sx={{
+                                                        display: "grid",
+                            gridTemplateColumns: {
+                              xs: "1fr",
+                              md: "1fr 1.6fr 1.6fr",
+                            },
+                            gap: { xs: 1.5, md: 2 },
+                          }}
                         >
                           <Box
                             sx={{
-                              width: { xs: 40, md: 50 },
-                              height: { xs: 40, md: 50 },
-                              borderRadius: "12px",
-                              border: "1px solid #16a34a",
-                              color: "#16a34a",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              flexShrink: 0,
+                              borderRadius: "16px",
+                              bgcolor: "#0a3d2e",
+                              color: "#fff",
+                              px: { xs: 2, md: 2.5 },
+                              py: { xs: 1.8, md: 2 },
                             }}
                           >
-                            <TipsAndUpdatesOutlinedIcon
-                              sx={{ fontSize: { xs: 20, md: 24 } }}
-                            />
-                          </Box>
-                          <Typography
-                            variant="h6"
-                            fontWeight={800}
-                            color="#166534"
-                            sx={{ fontSize: { xs: "1rem", md: "1.25rem" } }}
-                          >
-                            How It Helps
-                          </Typography>
-                        </Stack>
-
-                        <Stack spacing={1.8}>
-                          {[
-                            "Understand exam pattern & question trends",
-                            "Improve speed, accuracy & time management",
-                            "Personalized preparation roadmap",
-                            "Focused strategy for weak areas",
-                            "Expert mentorship & doubt clarification",
-                          ].map((item) => (
-                            <Stack
-                              key={item}
-                              direction="row"
-                              spacing={1.5}
-                              alignItems="flex-start"
+                            <Typography
+                              sx={{
+                                fontSize: { xs: "0.75rem", md: "0.82rem" },
+                                opacity: 0.9,
+                              }}
                             >
-                              <CheckCircleRoundedIcon
-                                sx={{
-                                  color: "#16a34a",
-                                  mt: "2px",
-                                  fontSize: { xs: 17, md: 20 },
-                                  flexShrink: 0,
-                                }}
-                              />
+                              SILVER STREAK SESSIONS
+                            </Typography>
+                            <Typography
+                              fontWeight={800}
+                              sx={{
+                                fontSize: { xs: "1.5rem", md: "1.5rem" },
+                                lineHeight: 1.2,
+                              }}
+                            >
+                              5 AM – 6 AM
+                            </Typography>
+                            <Typography
+                              sx={{
+                                fontSize: { xs: "0.8rem", md: "0.88rem" },
+                                opacity: 0.9,
+                              }}
+                            >
+                              Daily
+                            </Typography>
+                          </Box>
+
+                          {streakSchedule.map((s) => (
+                            <Box
+                              key={s.days}
+                              sx={{
+                                borderRadius: "16px",
+                                border: "1px solid #e5e7eb",
+                                bgcolor: "#fff",
+                                px: { xs: 2, md: 2.5 },
+                                py: { xs: 1.8, md: 2 },
+                              }}
+                            >
                               <Typography
+                                fontWeight={700}
                                 sx={{
-                                  color: "#374151",
-                                  lineHeight: 1.65,
-                                  fontSize: { xs: "0.83rem", md: "0.96rem" },
+                                  color: "#0b1b2b",
+                                  fontSize: { xs: "0.95rem", md: "1.05rem" },
                                 }}
                               >
-                                {item}
+                                {s.days}
                               </Typography>
-                            </Stack>
+                              <Typography
+                                sx={{
+                                  mt: 0.3,
+                                  color: "#6b7280",
+                                  fontSize: { xs: "0.82rem", md: "0.92rem" },
+                                }}
+                              >
+                                {s.note}
+                              </Typography>
+                            </Box>
                           ))}
-                        </Stack>
+                        </Box>
+                    </Grid>
+
+                    {/* ── SESSION + CTA BAR ── */}
+                    <Grid size={{ xs: 12 }} sx={{ order: { xs: 6, md: 0 } }}>
+                      <Box
+                        sx={{
+                          borderRadius: "18px",
+                          bgcolor: "#ecfdf3",
+                          border: "1px solid #d1fae5",
+                          px: { xs: 2, md: 3 },
+                          py: { xs: 2, md: 2.2 },
+                          display: "flex",
+                          flexDirection: { xs: "column", sm: "row" },
+                          alignItems: { xs: "stretch", sm: "center" },
+                          justifyContent: "space-between",
+                          gap: { xs: 1.5, sm: 2 },
+                        }}
+                      >
+                        <Box>
+                          <Typography
+                            fontWeight={700}
+                            sx={{
+                              color: "#166534",
+                              fontSize: { xs: "1rem", md: "1.3rem" },
+                              lineHeight: 1.3,
+                            }}
+                          >
+                            One-time session — 1 Hour
+                          </Typography>
+                          <Typography
+                            sx={{
+                              color: "#6b7280",
+                              fontSize: { xs: "0.8rem", md: "0.95rem" },
+                            }}
+                          >
+                            Available to Silver Streak achievers
+                          </Typography>
+                        </Box>
+
+                        {/* TODO: add link / onClick for booking */}
+                        <Button
+                          endIcon={<ArrowForwardRoundedIcon />}
+                          sx={{
+                            px: { xs: 3, md: 4 },
+                            py: { xs: 1.3, md: 1.5 },
+                            borderRadius: "12px",
+                            background: "#16a34a",
+                            color: "#fff",
+                            fontWeight: 700,
+                            textTransform: "none",
+                            fontSize: { xs: "0.9rem", md: "1.05rem" },
+                            whiteSpace: "nowrap",
+                            "&:hover": { background: "#15803d" },
+                          }}
+                        >
+                          Book Consultation
+                        </Button>
                       </Box>
                     </Grid>
                   </Grid>
@@ -529,7 +714,8 @@ export default function PricingPage() {
               </Box>
             </Grid>
 
-            <Grid size={{ xs: 12 }}>
+            {/* ═══════════════ MAINS CARD (commented out for now) ═══════════════ */}
+            {/* <Grid size={{ xs: 12 }}>
               <Box
                 sx={{
                   borderRadius: { xs: "16px", md: "28px" },
@@ -538,8 +724,6 @@ export default function PricingPage() {
                   border: "1px solid #e5e7eb",
                 }}
               >
-                {/* ── BANNER IMAGE ── */}
-                {/* Desktop Image */}
                 <Box
                   component="img"
                   src="/Images/mains1.png"
@@ -551,7 +735,6 @@ export default function PricingPage() {
                   }}
                 />
 
-                {/* Mobile Image */}
                 <Box
                   component="img"
                   src="/Images/mains2.png"
@@ -564,7 +747,6 @@ export default function PricingPage() {
                   }}
                 />
 
-                {/* ── CARD HEADER ── */}
                 <Box
                   sx={{
                     px: { xs: 2, md: 4 },
@@ -617,10 +799,8 @@ export default function PricingPage() {
                   </Box>
                 </Box>
 
-                {/* ── CARD BODY ── */}
                 <Box sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
                   <Grid container spacing={{ xs: 2, md: 3 }}>
-                    {/* Subject list */}
                     <Grid size={{ xs: 12, md: 7 }}>
                       <Stack spacing={0.75}>
                         {[
@@ -727,7 +907,6 @@ export default function PricingPage() {
                         ))}
                       </Stack>
 
-                      {/* Session badge */}
                       <Box
                         sx={{
                           mt: 2,
@@ -756,7 +935,6 @@ export default function PricingPage() {
                         </Typography>
                       </Box>
 
-                      {/* CTA */}
                       <Button
                         fullWidth
                         size="large"
@@ -777,7 +955,6 @@ export default function PricingPage() {
                       </Button>
                     </Grid>
 
-                    {/* What You Get */}
                     <Grid size={{ xs: 12, md: 5 }}>
                       <Box
                         sx={{
@@ -862,10 +1039,11 @@ export default function PricingPage() {
                   </Grid>
                 </Box>
               </Box>
-            </Grid>
+            </Grid> */}
           </Grid>
         </Container>
 
+        {/* ═══════════════ MENTAL CALISTHENICS ═══════════════ */}
         <Box
           sx={{
             mt: { xs: 5, md: 10 },
@@ -949,7 +1127,7 @@ export default function PricingPage() {
                   problem solver with our specially curated exercises.
                 </Typography>
 
-                {/* Mobile-only image — shown between description and features on small screens */}
+                {/* Mobile-only image */}
                 <Box
                   sx={{
                     display: { xs: "block", md: "none" },
@@ -961,7 +1139,6 @@ export default function PricingPage() {
                 >
                   <Box
                     component="img"
-                    // {/* Replace src with your actual image path e.g. /images/mental-calisthenics-book.png */}
                     src="/Images/Mental_1.png"
                     alt="Mental Calisthenics Practice Book"
                     sx={{
@@ -993,15 +1170,6 @@ export default function PricingPage() {
                         display: "flex",
                         alignItems: "center",
                         gap: 1.5,
-                        // p: { xs: 1.5, md: 2 },
-                        // borderRadius: "14px",
-                        // border: "1px solid #e5e7eb",
-                        // bgcolor: "#fff",
-                        // transition: "transform 0.2s, box-shadow 0.2s",
-                        // "&:hover": {
-                        //   transform: "translateY(-3px)",
-                        //   boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
-                        // },
                       }}
                     >
                       <Box
@@ -1027,15 +1195,6 @@ export default function PricingPage() {
                         >
                           {f.label}
                         </Typography>
-                        {/* <Typography
-                          sx={{
-                            fontSize: { xs: "0.78rem", md: "0.85rem" },
-                            color: "#6b7280",
-                            mt: 0.3,
-                          }}
-                        >
-                          {f.sub}
-                        </Typography> */}
                       </Box>
                     </Box>
                   ))}
@@ -1063,8 +1222,7 @@ export default function PricingPage() {
                 </Box>
               </Box>
 
-              {/* ── RIGHT: book image — desktop only ── */}
-              {/* Replace src with your actual image path e.g. /images/mental-calisthenics-book.png */}
+              {/* ── RIGHT: book image, desktop only ── */}
               <Box
                 sx={{
                   display: { xs: "none", md: "flex" },
