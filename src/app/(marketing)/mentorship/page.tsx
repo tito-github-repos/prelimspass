@@ -293,11 +293,11 @@ export default function PricingPage() {
                 {/* Desktop Image */}
                 <Box
                   component="img"
-                  src="/Images/pprelims.png"
+                  src="/Images/prelims_1.png"
                   alt="Prelims Desktop Banner"
                   sx={{
                     width: "100%",
-                    height: { md: 230 },
+                    height: { md: 280 },
                     display: { xs: "none", md: "block" },
                   }}
                 />
@@ -305,7 +305,7 @@ export default function PricingPage() {
                 {/* Mobile Image */}
                 <Box
                   component="img"
-                  src="/Images/prelims2.png"
+                  src="/Images/prelims_2.png"
                   alt="Prelims Mobile Banner"
                   sx={{
                     width: "100%",

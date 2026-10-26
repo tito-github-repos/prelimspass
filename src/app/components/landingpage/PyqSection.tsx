@@ -152,7 +152,7 @@ export default function PyqSection() {
               sx={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: 1,
+                gap: 1.25,
                 background: "linear-gradient(135deg,#16a34a,#15803d)",
                 borderRadius: "12px",
                 px: "14px",
@@ -160,18 +160,33 @@ export default function PyqSection() {
                 boxShadow: "0 8px 22px rgba(22,163,74,0.28)",
               }}
             >
-              <VerifiedRoundedIcon sx={{ color: "#fff", fontSize: 20 }} />
-              <Typography
-                sx={{
-                  fontSize: "0.78rem",
-                  fontWeight: 700,
-                  color: "#fff",
-                  fontFamily: W,
-                  lineHeight: 1.3,
-                }}
-              >
-                Completely FREE for all registered users
-              </Typography>
+              <VerifiedRoundedIcon sx={{ color: "#fff", fontSize: 22 }} />
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: "0.8rem",
+                    fontWeight: 700,
+                    color: "#fff",
+                    fontFamily: W,
+                    lineHeight: 1.3,
+                  }}
+                >
+                  Completely FREE for all registered users
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "0.72rem",
+                    fontWeight: 800,
+                    color: "#fff",
+                    fontFamily: W,
+                    lineHeight: 1.3,
+                    letterSpacing: "0.04em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  for one Day
+                </Typography>
+              </Box>
             </Box>
           </Box>
 

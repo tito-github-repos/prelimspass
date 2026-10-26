@@ -5,77 +5,6 @@ import "./website.css";
 import Link from "next/link";
 import { Box, Typography, Button } from "@mui/material";
 
-/* ══ MINI CHARTS ══ */
-function MiniBar({ heights, color }: { heights: number[]; color: string }) {
-  return (
-    <Box
-      sx={{ display: "flex", alignItems: "flex-end", gap: "3px", height: 36 }}
-    >
-      {heights.map((h, i) => (
-        <Box
-          key={i}
-          sx={{
-            flex: 1,
-            height: `${h}%`,
-            background: i === heights.length - 1 ? color : `${color}88`,
-            borderRadius: "2px 2px 0 0",
-          }}
-        />
-      ))}
-    </Box>
-  );
-}
-
-function Donut({ pct, color }: { pct: number; color: string }) {
-  const r = 16,
-    circ = 2 * Math.PI * r;
-  return (
-    <Box sx={{ position: "relative", width: 40, height: 40 }}>
-      <svg width="40" height="40" viewBox="0 0 40 40">
-        <circle
-          cx="20"
-          cy="20"
-          r={r}
-          fill="none"
-          stroke="#f1f5f9"
-          strokeWidth="5"
-        />
-        <circle
-          cx="20"
-          cy="20"
-          r={r}
-          fill="none"
-          stroke={color}
-          strokeWidth="5"
-          strokeDasharray={`${(pct / 100) * circ} ${circ}`}
-          strokeDashoffset={circ * 0.25}
-          strokeLinecap="round"
-        />
-      </svg>
-      <Box
-        sx={{
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Typography
-          sx={{
-            fontSize: "0.5rem",
-            fontWeight: 800,
-            color,
-            fontFamily: "var(--website-font)",
-          }}
-        >
-          {pct}%
-        </Typography>
-      </Box>
-    </Box>
-  );
-}
-
 function Tick({ color }: { color: string }) {
   return (
     <Box
@@ -102,6 +31,31 @@ function Tick({ color }: { color: string }) {
       >
         <polyline points="20 6 9 17 4 12" />
       </svg>
+    </Box>
+  );
+}
+
+/* Numbered point badge (used in the new product cards) */
+function NumBadge({ n, color }: { n: number; color: string }) {
+  return (
+    <Box
+      sx={{
+        width: 20,
+        height: 20,
+        borderRadius: "50%",
+        background: `${color}18`,
+        color,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+        fontSize: "0.65rem",
+        fontWeight: 800,
+        fontFamily: "var(--website-font)",
+        mt: "1px",
+      }}
+    >
+      {n}
     </Box>
   );
 }
@@ -145,27 +99,6 @@ const features = [
         <rect x="14" y="3" width="7" height="7" rx="1" />
         <rect x="3" y="14" width="7" height="7" rx="1" />
         <rect x="14" y="14" width="7" height="7" rx="1" />
-      </svg>
-    ),
-  },
-  {
-    title: "Mains Evaluation",
-    desc: "Submit answers and get evaluated within 24 hours.",
-    icon: (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-        <polyline points="14 2 14 8 20 8" />
-        <line x1="16" y1="13" x2="8" y2="13" />
-        <line x1="16" y1="17" x2="8" y2="17" />
       </svg>
     ),
   },
@@ -229,7 +162,94 @@ const features = [
   },
 ];
 
-/* ══ Featured card: Mains cum Prelims (shown above the 3-col grid) ══ */
+const products = [
+  {
+    color: "#16a34a",
+    lightBg: "#f0fdf4",
+    borderCol: "#bbf7d0",
+    // Poll icon: MCQs (from /public/Icons/poll-icon.svg)
+    icon: (
+      <Box
+        component="span"
+        sx={{
+          display: "block",
+          width: 26,
+          height: 26,
+          backgroundColor: "#16a34a",
+          WebkitMask: "url(/Icons/poll-icon.svg) center / contain no-repeat",
+          mask: "url(/Icons/poll-icon.svg) center / contain no-repeat",
+        }}
+      />
+    ),
+    title: "EzeeExams - EE",
+    sub: "Eases GS Prelims",
+    intro:
+      "Two applications, Mobile App and Web App, eases GS prelims preparation.",
+    points: [
+      {
+        text: "Mobile app addresses syllabus coverage, by providing facts in an easy format, incrementally.",
+        subs: [
+          { text: "Facts per subject added incrementally" },
+          { text: "New facts added every week" },
+          { text: "Revise more, in the shortest possible time", bold: true },
+        ],
+      },
+      {
+        text: "Web app addresses prelims patterns practice mock tests, in the recent trends format.",
+      },
+      {
+        text: "After registration, the mobile app link is sent to your registered email.",
+      },
+      {
+        text: "Completely FREE for all registered users for one day.",
+      },
+    ],
+    highlight: "Sixty mock tests practice before the 2027 prelims examination.",
+    btn: "Buy Now",
+    href: "/pricing",
+  },
+  {
+    color: "#ea580c",
+    lightBg: "#fff7ed",
+    borderCol: "#fed7aa",
+    // Edit document icon: descriptive answers (from /public/Icons/edit-document-icon.svg)
+    icon: (
+      <Box
+        component="span"
+        sx={{
+          display: "block",
+          width: 26,
+          height: 26,
+          backgroundColor: "#ea580c",
+          WebkitMask:
+            "url(/Icons/edit-document-icon.svg) center / contain no-repeat",
+          mask: "url(/Icons/edit-document-icon.svg) center / contain no-repeat",
+        }}
+      />
+    ),
+    title: "MagicMains - MM",
+    sub: "Eases GS Mains",
+    intro:
+      "MM is a mobile application addresses mains answer writing practice, by providing pyqs and mock questions in an answer booklet format- paper wise ,syllabus wise, subject wise and topic wise.",
+    points: [
+      { text: "Aspirants can download the answer booklets." },
+      {
+        text: "Write answers and share it with Magic Mocks team for evaluation and one to one feedback.",
+      },
+      {
+        text: "After registration, the MagicMains mobile app link is sent to your registered email.",
+      },
+      {
+        text: "Completely FREE for all registered users for one day.",
+      },
+    ],
+    highlight: "",
+    btn: "Buy Now",
+    href: "/pricing",
+  },
+];
+
+/* ══ OLD (kept for reference, currently unused) ══ */
 const featuredOffering = {
   title: "Mains cum Prelims",
   price: "₹11,111",
@@ -320,77 +340,6 @@ const offerings = [
     ],
     btn: "Explore Prelims Tests",
   },
-  // {
-  //   color: "#2563eb",
-  //   lightBg: "#eff6ff",
-  //   borderCol: "#bfdbfe",
-  //   icon: (
-  //     <svg
-  //       width="24"
-  //       height="24"
-  //       viewBox="0 0 24 24"
-  //       fill="none"
-  //       stroke="#2563eb"
-  //       strokeWidth="1.8"
-  //       strokeLinecap="round"
-  //       strokeLinejoin="round"
-  //     >
-  //       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-  //       <polyline points="14 2 14 8 20 8" />
-  //       <line x1="16" y1="13" x2="8" y2="13" />
-  //       <line x1="16" y1="17" x2="8" y2="17" />
-  //     </svg>
-  //   ),
-  //   title: "Mains Evaluation",
-  //   sub: "Write better. Get better. Detailed evaluation within 24 hours.",
-  //   pm: "₹1,111",
-  //   py: "₹11,111",
-  //   feats: [
-  //     "Weekly Essay & GS Papers",
-  //     "24hr Answer Evaluation",
-  //     "Detailed Feedback",
-  //     "Improvement Suggestions",
-  //     "Ethics & Tamil Medium Support",
-  //   ],
-  //   btn: "Explore Mains Tests",
-  // },
-
-  // {
-  //   color: "#7c3aed",
-  //   lightBg: "#f5f3ff",
-  //   borderCol: "#ddd6fe",
-  //   icon: (
-  //     <svg
-  //       width="24"
-  //       height="24"
-  //       viewBox="0 0 24 24"
-  //       fill="none"
-  //       stroke="#7c3aed"
-  //       strokeWidth="1.8"
-  //       strokeLinecap="round"
-  //       strokeLinejoin="round"
-  //     >
-  //       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-  //       <circle cx="9" cy="7" r="4" />
-  //       <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-  //       <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-  //     </svg>
-  //   ),
-  //   title: "1-to-1 Consultation",
-  //   sub: "Personalized guidance. Focused on your success.",
-  //   //  pm: "₹1,111",
-  //   // py: null,
-  //   price: "₹999",
-  //   priceUnit: "Per session",
-  //   feats: [
-  //     "1 Hour One-to-One Session",
-  //     "Prelims Strategy",
-  //     "Mains Guidance",
-  //     "Optional & Faculty Guidance",
-  //     "Tamil Medium Support",
-  //   ],
-  //   btn: "Book a Session",
-  // },
 ];
 
 const schedule = [
@@ -418,15 +367,18 @@ const wFeats = [
   "Improve writing skills consistently",
 ];
 
+/* ══ HOW IT WORKS: 6 steps (EzeeExams flow)
+   Phone icons = Mobile App steps · Monitor icons = Web App steps ══ */
 const steps = [
   {
     n: "1",
-    title: "Choose Subject",
-    desc: "Select a subject or topic to practice",
+    title: "Register in EzeeExams",
+    desc: "To access the mobile app",
+    // Phone with a user (register)
     icon: (
       <svg
-        width="20"
-        height="20"
+        width="24"
+        height="24"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -434,19 +386,22 @@ const steps = [
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+        <rect x="5" y="1.5" width="14" height="21" rx="2.5" />
+        <circle cx="12" cy="9" r="2.2" />
+        <path d="M8.2 16c0-2 1.7-3.3 3.8-3.3s3.8 1.3 3.8 3.3" />
+        <line x1="11" y1="19.5" x2="13" y2="19.5" />
       </svg>
     ),
   },
   {
     n: "2",
-    title: "Practice Questions",
-    desc: "Attempt questions with unlimited retakes",
+    title: "Practice PYQs",
+    desc: "For coverage",
+    // Phone with question lines
     icon: (
       <svg
-        width="20"
-        height="20"
+        width="24"
+        height="24"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -454,19 +409,23 @@ const steps = [
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+        <rect x="5" y="1.5" width="14" height="21" rx="2.5" />
+        <line x1="8.5" y1="7.5" x2="15.5" y2="7.5" />
+        <line x1="8.5" y1="11" x2="15.5" y2="11" />
+        <line x1="8.5" y1="14.5" x2="13" y2="14.5" />
+        <line x1="11" y1="19.5" x2="13" y2="19.5" />
       </svg>
     ),
   },
   {
     n: "3",
-    title: "Attend Mocks",
-    desc: "Participate in mock exams",
+    title: "Register in Web App",
+    desc: "Practice PYQ mocks",
+    // Monitor with a user
     icon: (
       <svg
-        width="20"
-        height="20"
+        width="24"
+        height="24"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -475,18 +434,22 @@ const steps = [
         strokeLinejoin="round"
       >
         <rect x="2" y="3" width="20" height="14" rx="2" />
-        <path d="M8 21h8M12 17v4" />
+        <line x1="8" y1="21" x2="16" y2="21" />
+        <line x1="12" y1="17" x2="12" y2="21" />
+        <circle cx="12" cy="8" r="2" />
+        <path d="M8.5 14c0-1.9 1.6-3 3.5-3s3.5 1.1 3.5 3" />
       </svg>
     ),
   },
   {
     n: "4",
-    title: "Analyze Results",
-    desc: "Get detailed analysis and performance report",
+    title: "Practice Non-PYQs",
+    desc: "For 2027 coverage in EE",
+    // Phone with stacked layers
     icon: (
       <svg
-        width="20"
-        height="20"
+        width="24"
+        height="24"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -494,21 +457,22 @@ const steps = [
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <line x1="18" y1="20" x2="18" y2="10" />
-        <line x1="12" y1="20" x2="12" y2="4" />
-        <line x1="6" y1="20" x2="6" y2="14" />
-        <polyline points="2 20 22 20" />
+        <rect x="5" y="1.5" width="14" height="21" rx="2.5" />
+        <polygon points="12 6 8 8 12 10 16 8 12 6" />
+        <polyline points="8 11.5 12 13.5 16 11.5" />
+        <polyline points="8 15 12 17 16 15" />
       </svg>
     ),
   },
   {
     n: "5",
-    title: "Get Mentor Feedback",
-    desc: "Receive evaluation & mentor feedback",
+    title: "Practice 2027 Mocks",
+    desc: "Be exam-ready for Prelims 2027",
+    // Monitor with a check mark
     icon: (
       <svg
-        width="20"
-        height="20"
+        width="24"
+        height="24"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -516,18 +480,22 @@ const steps = [
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        <rect x="2" y="3" width="20" height="14" rx="2" />
+        <line x1="8" y1="21" x2="16" y2="21" />
+        <line x1="12" y1="17" x2="12" y2="21" />
+        <polyline points="8.5 10 11 12.5 15.5 7.5" />
       </svg>
     ),
   },
   {
     n: "6",
-    title: "Improve Consistently",
-    desc: "Work on weak areas and improve steadily",
+    title: "Revise Again & Again",
+    desc: "Build speed & memory retention",
+    // Repeat arrows
     icon: (
       <svg
-        width="20"
-        height="20"
+        width="24"
+        height="24"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -535,28 +503,16 @@ const steps = [
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-        <polyline points="22 4 12 14.01 9 11.01" />
+        <polyline points="17 1 21 5 17 9" />
+        <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+        <polyline points="7 23 3 19 7 15" />
+        <path d="M21 13v2a4 4 0 0 1-4 4H3" />
       </svg>
     ),
   },
 ];
 
 const W = "var(--website-font)";
-
-/* ══ Data Insights: shared card style ══ */
-const insightCardSx = (bg: string, border: string, glow: string) => ({
-  p: "14px",
-  borderRadius: "13px",
-  background: bg,
-  border: `1.5px solid ${border}`,
-  cursor: "pointer",
-  transition: "all 0.2s",
-  "&:hover": {
-    transform: "translateY(-3px)",
-    boxShadow: `0 6px 20px ${glow}`,
-  },
-});
 
 export default function HomepageSections() {
   return (
@@ -591,21 +547,26 @@ export default function HomepageSections() {
               ?
             </Typography>
           </Box>
+
+          {/* Centered flex-wrap: works for 5 cards at every screen size */}
           <Box
             sx={{
-              display: "grid",
-              gridTemplateColumns: {
-                xs: "1fr 1fr",
-                sm: "repeat(3,1fr)",
-                lg: "repeat(6,1fr)",
-              },
-              gap: { xs: 1.5, md: 2 },
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: "14px",
             }}
           >
             {features.map((f, i) => (
               <Box
                 key={i}
                 sx={{
+                  width: {
+                    xs: "calc((100% - 14px) / 2)",
+                    sm: "calc((100% - 28px) / 3)",
+                    lg: "calc((100% - 56px) / 5)",
+                  },
+                  boxSizing: "border-box",
                   background: "#fff",
                   border: "1.5px solid #e5e7eb",
                   borderRadius: "14px",
@@ -692,14 +653,271 @@ export default function HomepageSections() {
             >
               Our Offerings
             </Typography>
-            <Typography
+            {/* <Typography
               sx={{ fontSize: "0.88rem", color: "#64748b", fontFamily: W }}
             >
               Everything you need for comprehensive UPSC preparation
-            </Typography>
+            </Typography> */}
           </Box>
 
-          {/* ─── Featured card: Mains cum Prelims ─── */}
+          {/* ─── NEW: EzeeExams / MagicMocks (2 cards) ─── */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                md: "repeat(2, minmax(0, 1fr))",
+              },
+              gap: { xs: 2, md: 2 },
+              alignItems: "stretch",
+            }}
+          >
+            {products.map((p, i) => (
+              <Box
+                key={i}
+                sx={{
+                  background: "#fff",
+                  border: "2px solid #e5e7eb",
+                  borderRadius: "18px",
+                  overflow: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                  boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
+                  transition: "all 0.22s ease",
+                  "&:hover": {
+                    borderColor: p.color,
+                    transform: "translateY(-5px)",
+                    boxShadow: `0 20px 48px ${p.color}22`,
+                  },
+                }}
+              >
+                {/* Tinted header */}
+                <Box
+                  sx={{
+                    background: p.lightBg,
+                    borderBottom: `1.5px solid ${p.borderCol}`,
+                    p: "16px 20px",
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                    <Box
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: "14px",
+                        background: "#fff",
+                        border: `1.5px solid ${p.borderCol}`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                        boxShadow: `0 2px 10px ${p.color}18`,
+                      }}
+                    >
+                      {p.icon}
+                    </Box>
+                    <Box>
+                      <Typography
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: "1.1rem",
+                          color: p.color,
+                          fontFamily: W,
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        {p.title}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: "0.78rem",
+                          fontWeight: 600,
+                          color: "#6b7280",
+                          lineHeight: 1.5,
+                          fontFamily: W,
+                          mt: 0.2,
+                        }}
+                      >
+                        {p.sub}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+
+                {/* Body */}
+                <Box
+                  sx={{
+                    p: "16px 20px 20px",
+                    display: "flex",
+                    flexDirection: "column",
+                    flex: 1,
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: "0.8rem",
+                      color: "#374151",
+                      fontFamily: W,
+                      lineHeight: 1.6,
+                      mb: 1.6,
+                    }}
+                  >
+                    {p.intro}
+                  </Typography>
+
+                  <Box sx={{ height: "1px", background: "#f1f5f9", mb: 1.5 }} />
+
+                  {/* Numbered points (with optional sub-points) */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 1.2,
+                      mb: 1.6,
+                    }}
+                  >
+                    {p.points.map((pt, pi) => (
+                      <Box key={pi}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: 1,
+                          }}
+                        >
+                          <NumBadge n={pi + 1} color={p.color} />
+                          <Typography
+                            sx={{
+                              fontSize: "0.8rem",
+                              color: "#374151",
+                              fontFamily: W,
+                              lineHeight: 1.55,
+                            }}
+                          >
+                            {pt.text}
+                          </Typography>
+                        </Box>
+
+                        {/* Sub-points under this point */}
+                        {"subs" in pt && pt.subs && (
+                          <Box
+                            sx={{
+                              ml: 3.5,
+                              mt: 0.8,
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: 0.6,
+                            }}
+                          >
+                            {pt.subs.map((s, si) => (
+                              <Box
+                                key={si}
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "flex-start",
+                                  gap: 1,
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    width: 6,
+                                    height: 6,
+                                    borderRadius: "50%",
+                                    background: p.color,
+                                    flexShrink: 0,
+                                    mt: "7px",
+                                  }}
+                                />
+                                <Typography
+                                  sx={{
+                                    fontSize: "0.76rem",
+                                    color: s.bold ? "#111827" : "#4b5563",
+                                    fontWeight: s.bold ? 700 : 400,
+                                    fontFamily: W,
+                                    lineHeight: 1.55,
+                                  }}
+                                >
+                                  {s.text}
+                                </Typography>
+                              </Box>
+                            ))}
+                          </Box>
+                        )}
+                      </Box>
+                    ))}
+                  </Box>
+
+                  {/* Highlight line (only EzeeExams has this) */}
+                  {p.highlight && (
+                    <Box
+                      sx={{
+                        mb: 1.6,
+                        px: 1.2,
+                        py: 0.8,
+                        borderRadius: "8px",
+                        background: `${p.color}0d`,
+                        border: `1px dashed ${p.color}45`,
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontSize: "0.74rem",
+                          fontWeight: 700,
+                          color: p.color,
+                          fontFamily: W,
+                          lineHeight: 1.45,
+                        }}
+                      >
+                        {p.highlight}
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {/* Pushes the button to the bottom so both cards align */}
+                  <Box sx={{ flex: 1 }} />
+
+                  <Button
+                    component={Link}
+                    href={p.href}
+                    variant="outlined"
+                    endIcon={
+                      <svg
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                      </svg>
+                    }
+                    sx={{
+                      borderColor: p.color,
+                      color: p.color,
+                      borderRadius: "10px",
+                      fontWeight: 700,
+                      textTransform: "none",
+                      fontSize: "0.83rem",
+                      py: 0.9,
+                      fontFamily: W,
+                      "&:hover": {
+                        background: `${p.color}08`,
+                        borderColor: p.color,
+                      },
+                    }}
+                  >
+                    {p.btn}
+                  </Button>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+
+          {/* ═══ OLD OFFERINGS — COMMENTED OUT ═══
           <Box
             sx={{
               mb: { xs: 2.5, md: 3 },
@@ -710,7 +928,6 @@ export default function HomepageSections() {
               position: "relative",
             }}
           >
-            {/* Best Value Badge */}
             <Box
               sx={{
                 position: "absolute",
@@ -749,7 +966,6 @@ export default function HomepageSections() {
                 alignItems: "center",
               }}
             >
-              {/* Left Content */}
               <Box>
                 <Typography
                   sx={{
@@ -808,7 +1024,6 @@ export default function HomepageSections() {
                 </Box>
               </Box>
 
-              {/* Right Price + Button */}
               <Box
                 sx={{
                   display: "flex",
@@ -817,7 +1032,6 @@ export default function HomepageSections() {
                   gap: 1.6,
                 }}
               >
-                {/* Price Box */}
                 <Box
                   sx={{
                     textAlign: "center",
@@ -852,7 +1066,6 @@ export default function HomepageSections() {
                   </Typography>
                 </Box>
 
-                {/* Enroll Button */}
                 <Button
                   variant="contained"
                   fullWidth
@@ -893,7 +1106,6 @@ export default function HomepageSections() {
             </Box>
           </Box>
 
-          {/* ─── 3-column grid: Prelims Practice / Prelims Mobile App / 1-to-1 Consultation ─── */}
           <Box
             sx={{
               display: "grid",
@@ -924,7 +1136,6 @@ export default function HomepageSections() {
                   },
                 }}
               >
-                {/* Tinted header */}
                 <Box
                   sx={{
                     background: o.lightBg,
@@ -984,7 +1195,6 @@ export default function HomepageSections() {
                     flex: 1,
                   }}
                 >
-                  {/* Note badge (e.g. "Free for Mains enrolled students") */}
                   {o.note && (
                     <Box
                       sx={{
@@ -1010,7 +1220,6 @@ export default function HomepageSections() {
                     </Box>
                   )}
 
-                  {/* Price */}
                   <Box sx={{ display: "flex", gap: 1.5, mb: 1.8 }}>
                     <Box
                       sx={{
@@ -1052,7 +1261,6 @@ export default function HomepageSections() {
 
                   <Box sx={{ height: "1px", background: "#f1f5f9", mb: 1.5 }} />
 
-                  {/* Features */}
                   <Box
                     sx={{
                       display: "flex",
@@ -1119,345 +1327,12 @@ export default function HomepageSections() {
               </Box>
             ))}
           </Box>
+          ═══ END OLD OFFERINGS ═══ */}
         </Box>
       </Box>
 
       {/* ══════════════════════════════════════════════
-          §3  TEST FORMATS
-      ══════════════════════════════════════════════ */}
-      <Box
-        component="section"
-        sx={{ pt: "24px", pb: "24px", background: "#fff" }}
-      >
-        <Box
-          sx={{ maxWidth: 1240, mx: "auto", px: { xs: "18px", sm: "24px" } }}
-        >
-          {/* ══════════════════════════════════════════
-              Data Insights Panel
-              — Trend Analysis card removed (duplicate of
-                Subject Weightage, which links to the same
-                Insights-page section)
-              — grid now 3 responsive columns
-              — Subject Weightage donut now shows real
-                PrelimsPass subjects (Economy / Environment /
-                History — the 3 highest-weightage subjects
-                per the Insights page 2011–2025 data), not
-                Mains GS papers
-              — cards deep-link to the corresponding section
-                on the UPSC Insights page
-          ══════════════════════════════════════════ */}
-          <Box
-            sx={{
-              borderRadius: "18px",
-              overflow: "hidden",
-              border: "1.5px solid #e5e7eb",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
-            }}
-          >
-            <Box
-              sx={{
-                background: "linear-gradient(135deg,#0f172a 0%,#1e293b 100%)",
-                p: { xs: "14px 18px", md: "16px 24px" },
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                gap: 2,
-              }}
-            >
-              <Box>
-                <Typography
-                  sx={{
-                    fontWeight: 800,
-                    fontSize: { xs: "1.05rem", md: "1.2rem" },
-                    color: "#fff",
-                    fontFamily: W,
-                  }}
-                >
-                  Data.{" "}
-                  <Box component="span" sx={{ color: "#4ade80" }}>
-                    Insights.
-                  </Box>{" "}
-                  Improvement.
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: "0.75rem",
-                    color: "#64748b",
-                    fontFamily: W,
-                    mt: 0.2,
-                  }}
-                >
-                  Analytics that make your preparation smarter
-                </Typography>
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 0.8,
-                  px: 1.5,
-                  py: 0.6,
-                  borderRadius: "8px",
-                  background: "rgba(74,222,128,0.12)",
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 7,
-                    height: 7,
-                    borderRadius: "50%",
-                    background: "#4ade80",
-                  }}
-                />
-                <Typography
-                  sx={{
-                    fontSize: "0.68rem",
-                    fontWeight: 700,
-                    color: "#4ade80",
-                    fontFamily: W,
-                  }}
-                >
-                  Live Data
-                </Typography>
-              </Box>
-            </Box>
-
-            <Box
-              sx={{
-                background: "#fff",
-                p: { xs: "14px", md: "18px 24px" },
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "1fr 1fr",
-                  md: "repeat(3,1fr)",
-                },
-                gap: 1.5,
-              }}
-            >
-              {/* Subject Weightage — linked to Insights page */}
-              <Link
-                href="/upsc-insights#subject-weightage"
-                style={{ textDecoration: "none" }}
-              >
-                <Box
-                  sx={insightCardSx(
-                    "linear-gradient(135deg,#f5f3ff,#fff)",
-                    "#ddd6fe",
-                    "rgba(124,58,237,0.1)",
-                  )}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
-                    <Donut pct={56} color="#7c3aed" />
-                    <Box>
-                      {[
-                        ["Economy", "21%", "#7c3aed"],
-                        ["Environment", "18%", "#a78bfa"],
-                        ["History", "17%", "#6d28d9"],
-                      ].map(([s, p, c], i) => (
-                        <Box
-                          key={i}
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 0.5,
-                            mb: 0.25,
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              width: 5,
-                              height: 5,
-                              borderRadius: "50%",
-                              background: c,
-                              flexShrink: 0,
-                            }}
-                          />
-                          <Typography
-                            sx={{
-                              fontSize: "0.6rem",
-                              color: "#374151",
-                              fontFamily: W,
-                            }}
-                          >
-                            {s}
-                          </Typography>
-                          <Typography
-                            sx={{
-                              fontSize: "0.6rem",
-                              fontWeight: 700,
-                              color: c,
-                              fontFamily: W,
-                            }}
-                          >
-                            {p}
-                          </Typography>
-                        </Box>
-                      ))}
-                    </Box>
-                  </Box>
-                  <Typography
-                    sx={{
-                      fontWeight: 700,
-                      fontSize: "0.82rem",
-                      color: "#111827",
-                      fontFamily: W,
-                      mt: 1,
-                      mb: 0.2,
-                    }}
-                  >
-                    Subject Weightage
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: "0.68rem",
-                      color: "#6b7280",
-                      fontFamily: W,
-                    }}
-                  >
-                    Top subjects, 2011 – 2025
-                  </Typography>
-                </Box>
-              </Link>
-
-              {/* Cut-off Trends — linked to Insights page */}
-              <Link
-                href="/upsc-insights#cutoff-trend"
-                style={{ textDecoration: "none" }}
-              >
-                <Box
-                  sx={insightCardSx(
-                    "linear-gradient(135deg,#fff7ed,#fff)",
-                    "#fed7aa",
-                    "rgba(234,88,12,0.1)",
-                  )}
-                >
-                  <MiniBar
-                    heights={[70, 66, 74, 68, 80, 72, 84, 78]}
-                    color="#ea580c"
-                  />
-                  <Typography
-                    sx={{
-                      fontWeight: 700,
-                      fontSize: "0.82rem",
-                      color: "#111827",
-                      fontFamily: W,
-                      mt: 1,
-                      mb: 0.2,
-                    }}
-                  >
-                    Cut-off Trends
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: "0.68rem",
-                      color: "#6b7280",
-                      fontFamily: W,
-                    }}
-                  >
-                    Category-wise analysis (2020–2025)
-                  </Typography>
-                  <Box
-                    sx={{
-                      mt: 0.6,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 0.5,
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        fontSize: "0.65rem",
-                        color: "#ea580c",
-                        fontWeight: 700,
-                        fontFamily: W,
-                      }}
-                    >
-                      ↑ 3.2
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontSize: "0.63rem",
-                        color: "#94a3b8",
-                        fontFamily: W,
-                      }}
-                    >
-                      pts this cycle
-                    </Typography>
-                  </Box>
-                </Box>
-              </Link>
-
-              {/* Performance Analytics */}
-              <Box
-                sx={insightCardSx(
-                  "linear-gradient(135deg,#eff6ff,#fff)",
-                  "#bfdbfe",
-                  "rgba(37,99,235,0.1)",
-                )}
-              >
-                <MiniBar
-                  heights={[38, 55, 45, 70, 52, 82, 65, 90]}
-                  color="#2563eb"
-                />
-                <Typography
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: "0.82rem",
-                    color: "#111827",
-                    fontFamily: W,
-                    mt: 1,
-                    mb: 0.2,
-                  }}
-                >
-                  Performance Analytics
-                </Typography>
-                <Typography
-                  sx={{ fontSize: "0.68rem", color: "#6b7280", fontFamily: W }}
-                >
-                  Excel-style detailed reports
-                </Typography>
-                <Box
-                  sx={{
-                    mt: 0.6,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 0.5,
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontSize: "0.65rem",
-                      color: "#2563eb",
-                      fontWeight: 700,
-                      fontFamily: W,
-                    }}
-                  >
-                    90%
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: "0.63rem",
-                      color: "#94a3b8",
-                      fontFamily: W,
-                    }}
-                  >
-                    top score
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-        </Box>
-      </Box>
-
-      {/* PYQ section */}
-
-      <PyqSection />
-
-      {/* ══════════════════════════════════════════════
-            HOW IT WORKS — compact
+          §3  HOW IT WORKS (below Our Offerings)
       ══════════════════════════════════════════════ */}
       <Box
         component="section"
@@ -1469,6 +1344,7 @@ export default function HomepageSections() {
           overflow: "hidden",
         }}
       >
+        {/* Soft glow behind the steps */}
         <Box
           sx={{
             position: "absolute",
@@ -1506,7 +1382,7 @@ export default function HomepageSections() {
             <Typography
               sx={{
                 fontSize: "0.82rem",
-                color: "#475569",
+                color: "#94a3b8",
                 fontFamily: W,
                 mt: 0.6,
               }}
@@ -1514,6 +1390,7 @@ export default function HomepageSections() {
               Your complete UPSC preparation in 6 simple steps
             </Typography>
           </Box>
+
           <Box
             sx={{
               display: "grid",
@@ -1522,7 +1399,7 @@ export default function HomepageSections() {
                 sm: "repeat(3,1fr)",
                 lg: "repeat(6,1fr)",
               },
-              gap: { xs: 2, md: 1.5 },
+              gap: { xs: 2.5, md: 1.5 },
               position: "relative",
             }}
           >
@@ -1535,16 +1412,18 @@ export default function HomepageSections() {
                   alignItems: "center",
                   textAlign: "center",
                   position: "relative",
+                  px: { xs: 0.5, lg: 0.8 },
                 }}
               >
+                {/* Connector line + arrow (desktop only) */}
                 {i < steps.length - 1 && (
                   <Box
                     sx={{
                       display: { xs: "none", lg: "block" },
                       position: "absolute",
                       top: 26,
-                      left: "calc(50% + 28px)",
-                      width: "calc(100% - 24px)",
+                      left: "calc(50% + 34px)",
+                      width: "calc(100% - 36px)",
                       height: "1.5px",
                       background:
                         "linear-gradient(90deg, rgba(74,222,128,0.45), rgba(74,222,128,0.1))",
@@ -1563,6 +1442,8 @@ export default function HomepageSections() {
                     }}
                   />
                 )}
+
+                {/* Icon circle with step number badge */}
                 <Box
                   sx={{
                     width: 52,
@@ -1610,12 +1491,13 @@ export default function HomepageSections() {
                     {s.n}
                   </Box>
                 </Box>
+
                 <Typography
                   sx={{
                     fontWeight: 700,
-                    fontSize: "0.78rem",
+                    fontSize: "0.8rem",
                     color: "#e2e8f0",
-                    mb: 0.4,
+                    mb: 0.5,
                     fontFamily: W,
                     lineHeight: 1.3,
                   }}
@@ -1624,8 +1506,8 @@ export default function HomepageSections() {
                 </Typography>
                 <Typography
                   sx={{
-                    fontSize: "0.67rem",
-                    color: "#475569",
+                    fontSize: "0.7rem",
+                    color: "#94a3b8",
                     lineHeight: 1.5,
                     fontFamily: W,
                   }}
@@ -1635,8 +1517,11 @@ export default function HomepageSections() {
               </Box>
             ))}
           </Box>
-          <Box sx={{ textAlign: "center", mt: { xs: 4, md: 4 } }}>
+
+          {/* <Box sx={{ textAlign: "center", mt: { xs: 4, md: 4 } }}>
             <Button
+              component={Link}
+              href="#"
               variant="contained"
               endIcon={
                 <svg
@@ -1674,9 +1559,13 @@ export default function HomepageSections() {
             >
               Start Your Journey Today
             </Button>
-          </Box>
+          </Box> */}
         </Box>
       </Box>
+
+      {/* PYQ section */}
+
+      <PyqSection />
     </>
   );
 }
