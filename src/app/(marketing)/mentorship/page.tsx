@@ -104,14 +104,14 @@ const whatYouGet = [
 ];
 
 const streakTiers = [
-  { code: "SS-25", reward: "CSAT Online Classes" },
-  { code: "SS-50", reward: "Prelims One-to-One Consulting" },
-  { code: "SS-100", reward: "Mains One-to-One Consulting" },
+  { code: "SS-7", reward: "CSAT Online Classes" },
+  { code: "SS-14", reward: "Prelims One-to-One Consulting" },
+  { code: "SS-21", reward: "Mains One-to-One Consulting" },
 ];
 
 const streakSchedule = [
-  { days: "Monday – Thursday", note: "CSAT classes for SS-25 achievers" },
-  { days: "Friday – Sunday", note: "Sessions for SS-50 and SS-100 achievers" },
+  { days: "Monday – Friday", note: "CSAT classes for SS-7 achievers" },
+  { days: "Saturday & Sunday", note: "Sessions for SS-14 and SS-21 achievers" },
 ];
 
 function BannerImage({
@@ -272,7 +272,7 @@ export default function PricingPage() {
                 px: { xs: 1, md: 0 },
               }}
             >
-              Get personalised one-to-one guidance from experienced mentors.
+              Be a silver strike achiever.
               Choose the subject you want to focus on and book your session.
             </Typography>
           </Box>
@@ -293,7 +293,7 @@ export default function PricingPage() {
                 {/* Desktop Image */}
                 <Box
                   component="img"
-                  src="/Images/prelims1.png"
+                  src="/Images/pprelims.png"
                   alt="Prelims Desktop Banner"
                   sx={{
                     width: "100%",
@@ -484,7 +484,7 @@ export default function PricingPage() {
                         >
                           What is Silver Streak?
                         </Typography>
-                        {/* TODO: confirm "SAMI App" with the client */}
+                        {/* TODO: confirm "EzeeExams App" with the client */}
                         <Typography
                           sx={{
                             mt: 0.8,
@@ -493,8 +493,8 @@ export default function PricingPage() {
                             lineHeight: 1.6,
                           }}
                         >
-                          Silver Streak is for SAMI App users - PP Mobile App
-                          users, who use the app daily for 25, 50 or 100 days.
+                          Silver Streak is for EzeeExams App users - PP Mobile App
+                          users, who use the app daily for 7, 14 or 21 days.
                           Achiever get this additional benefits from PP.
                         </Typography>
 
