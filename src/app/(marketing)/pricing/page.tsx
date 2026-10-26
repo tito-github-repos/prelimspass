@@ -917,7 +917,7 @@ const plans: Plan[] = [
   },
   {
     id: "magicmocks",
-    title: "MagicMocks",
+    title: "MagicMains",
     subtitle: "Eases GS Mains",
     stats: ["Answer Script Evaluation", "1-to-1 Feedback"],
     features: ["14 years of GS Mains PYQs practice", "20 full-length GS Mains mock tests practice."],
