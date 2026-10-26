@@ -127,6 +127,153 @@ const subjects = [
   },
 ];
 
+/* ══════════════════════════════════════════════
+   SHARED HERO CONTENT
+   Used by BOTH desktop and mobile so they always match:
+   badge → heading (2x2 grid) → tagline
+══════════════════════════════════════════════ */
+function HeroContent() {
+  return (
+    <>
+      {/* badge */}
+      <Box
+        sx={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "6px",
+          px: "10px",
+          py: "5px",
+          borderRadius: "999px",
+          background: "rgba(22,163,74,0.10)",
+          color: "#16a34a",
+          fontSize: "0.65rem",
+          fontWeight: 700,
+          mb: "10px",
+          width: "fit-content",
+        }}
+      >
+        <Box sx={{ width: 6, height: 6, borderRadius: "50%", background: "#16a34a", flexShrink: 0 }} />
+        <Box component="span" sx={{ whiteSpace: "nowrap" }}>Consistency. Coverage. Completeness.</Box>
+      </Box>
+
+      {/* heading: 2 columns x 2 rows */}
+      <Typography
+        className="homepage-heading"
+        component="h1"
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          columnGap: { xs: "10px", md: "28px" },
+          rowGap: "8px",
+          fontSize: { xs: "0.85rem", sm: "1.15rem", md: "1.45rem" },
+          fontWeight: 800,
+          lineHeight: 1.25,
+          letterSpacing: "-0.3px",
+          color: "#0f172a",
+          mb: "16px",
+          wordBreak: "break-word",
+        }}
+      >
+        <Box component="span" sx={{ display: "block" }}>
+          Prelims <Box component="span" sx={{ color: "#16a34a" }}>PYQs</Box> Practice
+        </Box>
+        <Box component="span" sx={{ display: "block" }}>
+          Mains <Box component="span" sx={{ color: "#16a34a" }}>PYQs</Box> Practice
+        </Box>
+
+        <Box component="span" sx={{ display: "block" }}>
+          Prelims <Box component="span" sx={{ color: "#16a34a" }}>Mock</Box> Practice
+        </Box>
+        <Box component="span" sx={{ display: "block" }}>
+          Mains <Box component="span" sx={{ color: "#16a34a" }}>Mock</Box> Practice
+        </Box>
+      </Typography>
+
+      {/* tagline: two lines with a green accent bar */}
+      <Box
+        sx={{
+          borderLeft: "4px solid #16a34a",
+          pl: { xs: "12px", lg: "16px" },
+          py: "2px",
+          width: "fit-content",
+        }}
+      >
+        <Typography
+          sx={{
+            fontSize: { xs: "1.05rem", lg: "1.3rem" },
+            fontWeight: 800,
+            color: "#16a34a",
+            lineHeight: 1.3,
+            letterSpacing: "-0.2px",
+          }}
+        >
+          Coverage Density,
+        </Typography>
+        <Typography
+          sx={{
+            fontSize: { xs: "1.05rem", lg: "1.3rem" },
+            fontWeight: 800,
+            color: "#0f172a",
+            lineHeight: 1.3,
+            letterSpacing: "-0.2px",
+          }}
+        >
+          Ensured; Fully Governed.
+        </Typography>
+      </Box>
+
+      {/* stats (hidden, same as before)
+      <Box sx={{ mt: "18px" }}>
+        <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "20px", overflowX: "auto", "&::-webkit-scrollbar": { display: "none" } }}>
+          {stats.map((s, i) => (
+            <Box key={i} sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+              <Box
+                sx={{
+                  width: 32, height: 32,
+                  borderRadius: "8px",
+                  background: "rgba(22,163,74,0.10)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  color: "#16a34a", flexShrink: 0,
+                }}
+              >
+                {s.icon}
+              </Box>
+              <Box>
+                <Typography sx={{ fontWeight: 800, fontSize: "0.85rem", color: "#111827", lineHeight: 1.2, whiteSpace: "nowrap" }}>
+                  {s.value}
+                </Typography>
+                <Typography sx={{ fontSize: "0.67rem", color: "#94a3b8", lineHeight: 1.3, whiteSpace: "nowrap" }}>
+                  {s.label}
+                </Typography>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+      */}
+
+      {/* buttons (hidden, same as before)
+      <Box sx={{ display: "flex", flexDirection: "row", gap: "10px", width: "100%", mt: "18px" }}>
+        <Button
+          variant="contained"
+          className="homepage-primary-btn"
+          sx={{ flex: 1, py: 1.05, px: 2.8, borderRadius: "10px", fontWeight: 700, textTransform: "none", fontSize: "0.875rem", whiteSpace: "nowrap", minWidth: 0 }}
+        >
+          Start Practicing Now
+        </Button>
+        <Button
+          variant="outlined"
+          className="homepage-secondary-btn"
+          sx={{ flex: 1, py: 1.05, px: 2.8, borderRadius: "10px", fontWeight: 700, textTransform: "none", fontSize: "0.875rem", background: "#fff", whiteSpace: "nowrap", minWidth: 0 }}
+        >
+          View Test Plan
+        </Button>
+      </Box>
+      */}
+    </>
+  );
+}
+
 export default function HeroSection() {
   return (
     <Box sx={{ position: "relative", pb: { xs: 0, lg: "40px" }, overflowX: "hidden" }}>
@@ -146,7 +293,7 @@ export default function HeroSection() {
             sizes="100vw"
             style={{ objectFit: "cover", objectPosition: "center center" }}
           />
-          {/* ── Stronger smoke: image stays sharp at top, dissolves fully into white by 90% ── */}
+          {/* Smoke: image stays sharp at top, dissolves fully into white by 90% */}
           <Box
             sx={{
               position: "absolute",
@@ -158,7 +305,7 @@ export default function HeroSection() {
           />
         </Box>
 
-        {/* Content — pulled up to overlap the faded area */}
+        {/* Content: pulled up to overlap the faded area */}
         <Box
           sx={{
             position: "relative",
@@ -169,128 +316,7 @@ export default function HeroSection() {
             background: "transparent",
           }}
         >
-          {/* badge */}
-          <Box
-            sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              px: "10px",
-              py: "5px",
-              borderRadius: "999px",
-              background: "rgba(22,163,74,0.10)",
-              color: "#16a34a",
-              fontSize: "0.65rem",
-              fontWeight: 700,
-              mb: "6px",
-              width: "fit-content",
-            }}
-          >
-            <Box sx={{ width: 6, height: 6, borderRadius: "50%", background: "#16a34a", flexShrink: 0 }} />
-            <Box component="span" sx={{ whiteSpace: "nowrap" }}>Your Journey to UPSC Success Starts Here</Box>
-          </Box>
-
-          {/* heading */}
-          
-          {/* heading */}
-          
-          {/* description */}
-          <Typography
-            sx={{
-              fontSize: "0.78rem",
-              color: "#64748b",
-              lineHeight: 1.55,
-              mb: "12px",
-            }}
-          >
-            Focused preparation, measurable progress — 
-            smart analytics and personal mentorship to help you crack UPSC 2027.
-          </Typography>
-
-          {/* stats card */}
-          <Box
-            sx={{
-              background: "#fff",
-              border: "1px solid #e9eef3",
-              borderRadius: "12px",
-              boxShadow: "0 1px 6px rgba(0,0,0,0.05)",
-              p: "8px 10px",
-              mb: "12px",
-            }}
-          >
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gap: "10px 16px",
-              }}
-            >
-              {stats.map((s, i) => (
-                <Box key={i} sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "8px" }}>
-                  <Box
-                    sx={{
-                      width: 28, height: 28,
-                      borderRadius: "8px",
-                      background: "rgba(22,163,74,0.10)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      color: "#16a34a",
-                      flexShrink: 0,
-                    }}
-                  >
-                    {s.icon}
-                  </Box>
-                  <Box sx={{ minWidth: 0 }}>
-                    <Typography sx={{ fontWeight: 800, fontSize: "0.78rem", color: "#111827", lineHeight: 1.2 }}>
-                      {s.value}
-                    </Typography>
-                    <Typography sx={{ fontSize: "0.6rem", color: "#94a3b8", lineHeight: 1.3 }}>
-                      {s.label}
-                    </Typography>
-                  </Box>
-                </Box>
-              ))}
-            </Box>
-          </Box>
-
-          {/* buttons */}
-          <Box sx={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
-            <Button
-              variant="contained"
-              className="homepage-primary-btn"
-              endIcon={
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              }
-              sx={{
-                width: "100%",
-                py: 1.1,
-                borderRadius: "10px",
-                fontWeight: 700,
-                textTransform: "none",
-                fontSize: "0.88rem",
-                boxShadow: "0 8px 24px rgba(22,163,74,0.28)",
-              }}
-            >
-              Start Practicing Now
-            </Button>
-            <Button
-              variant="outlined"
-              className="homepage-secondary-btn"
-              sx={{
-                width: "100%",
-                py: 1.1,
-                borderRadius: "10px",
-                fontWeight: 700,
-                textTransform: "none",
-                fontSize: "0.88rem",
-                background: "#fff",
-              }}
-            >
-              View Test Plan
-            </Button>
-          </Box>
+          <HeroContent />
         </Box>
       </Box>
 
@@ -314,7 +340,7 @@ export default function HeroSection() {
             minHeight: "400px",
           }}
         >
-          {/* Image — right col */}
+          {/* Image: right col */}
           <Box
             sx={{
               order: 2,
@@ -343,7 +369,7 @@ export default function HeroSection() {
             />
           </Box>
 
-          {/* Content — left col */}
+          {/* Content: left col */}
           <Box
             sx={{
               order: 1,
@@ -357,154 +383,7 @@ export default function HeroSection() {
               boxSizing: "border-box",
             }}
           >
-            {/* badge */}
-            <Box
-              sx={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                px: "10px", py: "5px",
-                borderRadius: "999px",
-                background: "rgba(22,163,74,0.10)",
-                color: "#16a34a",
-                fontSize: "0.65rem",
-                fontWeight: 700,
-                mb: "10px",
-                width: "fit-content",
-              }}
-            >
-              <Box sx={{ width: 6, height: 6, borderRadius: "50%", background: "#16a34a", flexShrink: 0 }} />
-              <Box component="span" sx={{ whiteSpace: "nowrap" }}>Consistency, Coverage, Completeness</Box>
-            </Box>
-
-            {/* heading */}
-            <Typography
-              className="homepage-heading"
-              component="h1"
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-                columnGap: { xs: "14px", md: "28px" },
-                rowGap: "8px",
-                fontSize: { xs: "0.95rem", sm: "1.15rem", md: "1.45rem" },
-                fontWeight: 800,
-                lineHeight: 1.25,
-                letterSpacing: "-0.3px",
-                color: "#0f172a",
-                mb: "10px",
-                wordBreak: "break-word",
-              }}
-            >
-              {/* Left column: Prelims */}
-              <Box component="span" sx={{ display: "block" }}>
-                Prelims <Box component="span" sx={{ color: "#16a34a" }}>PYQs</Box> Practice
-              </Box>
-              {/* Right column: Mains */}
-              <Box component="span" sx={{ display: "block" }}>
-                Mains <Box component="span" sx={{ color: "#16a34a" }}>PYQs</Box> Practice
-              </Box>
-
-              <Box component="span" sx={{ display: "block" }}>
-                Prelims <Box component="span" sx={{ color: "#16a34a" }}>Mock</Box> Practice
-              </Box>
-              <Box component="span" sx={{ display: "block" }}>
-                Mains <Box component="span" sx={{ color: "#16a34a" }}>Mock</Box> Practice
-              </Box>
-
-              <Box component="span" sx={{ display: "block" }}>
-                Prelims <Box component="span" sx={{ color: "#16a34a" }}>Subjects Coverage</Box> Practice
-              </Box>
-              <Box component="span" sx={{ display: "block" }}>
-                Mains <Box component="span" sx={{ color: "#16a34a" }}>Subjects Coverage</Box> Practice
-              </Box>
-            </Typography>
-
-            {/* description */}
-            <Typography
-              sx={{
-                fontSize: "0.9rem",
-                color: "#64748b",
-                lineHeight: 1.65,
-                mb: "18px",
-                maxWidth: "440px",
-              }}
-            >
-              Focused preparation, measurable progress — 
-              smart analytics and personal mentorship to help you crack UPSC 2027.
-            </Typography>
-
-            {/* stats */}
-            {/* <Box sx={{ mb: "18px" }}>
-              <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "20px", overflowX: "auto", "&::-webkit-scrollbar": { display: "none" } }}>
-                {stats.map((s, i) => (
-                  <Box key={i} sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "8px", flexShrink: 0 }}>
-                    <Box
-                      sx={{
-                        width: 32, height: 32,
-                        borderRadius: "8px",
-                        background: "rgba(22,163,74,0.10)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        color: "#16a34a", flexShrink: 0,
-                      }}
-                    >
-                      {s.icon}
-                    </Box>
-                    <Box>
-                      <Typography sx={{ fontWeight: 800, fontSize: "0.85rem", color: "#111827", lineHeight: 1.2, whiteSpace: "nowrap" }}>
-                        {s.value}
-                      </Typography>
-                      <Typography sx={{ fontSize: "0.67rem", color: "#94a3b8", lineHeight: 1.3, whiteSpace: "nowrap" }}>
-                        {s.label}
-                      </Typography>
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-            </Box> */}
-
-            {/* buttons */}
-            {/* <Box sx={{ display: "flex", flexDirection: "row", gap: "10px", width: "100%" }}>
-              <Button
-                variant="contained"
-                className="homepage-primary-btn"
-                endIcon={
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                    <polyline points="12 5 19 12 12 19" />
-                  </svg>
-                }
-                sx={{
-                  flex: 1,
-                  py: 1.05, px: 2.8,
-                  borderRadius: "10px",
-                  fontWeight: 700,
-                  textTransform: "none",
-                  fontSize: "0.875rem",
-                  boxShadow: "0 8px 24px rgba(22,163,74,0.28)",
-                  whiteSpace: "nowrap",
-                  minWidth: 0,
-                }}
-              >
-                Start Practicing Now
-              </Button>
-              <Button
-                variant="outlined"
-                className="homepage-secondary-btn"
-                sx={{
-                  flex: 1,
-                  py: 1.05, px: 2.8,
-                  borderRadius: "10px",
-                  fontWeight: 700,
-                  textTransform: "none",
-                  fontSize: "0.875rem",
-                  background: "#fff",
-                  whiteSpace: "nowrap",
-                  minWidth: 0,
-                }}
-              >
-                View Test Plan
-              </Button>
-            </Box> */}
+            <HeroContent />
           </Box>
         </Box>
       </Box>
