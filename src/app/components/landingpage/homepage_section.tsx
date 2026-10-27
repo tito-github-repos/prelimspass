@@ -234,7 +234,7 @@ const products = [
     points: [
       { text: "Aspirants can download the answer booklets." },
       {
-        text: "Write answers and share it with Magic Mocks team for evaluation and one to one feedback.",
+        text: "Write answers and share it with MagicMains team for evaluation and one to one feedback.",
       },
       {
         text: "After registration, the MagicMains mobile app link is sent to your registered email.",
