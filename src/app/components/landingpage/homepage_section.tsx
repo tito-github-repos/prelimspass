@@ -204,7 +204,7 @@ const products = [
         text: "Completely FREE for all registered users for one day.",
       },
     ],
-    highlight: "Sixty mock tests practice before the 2027 prelims examination.",
+    highlight: "60 mock tests practice before the 2027 prelims examination.",
     btn: "Buy Now",
     href: "/pricing",
   },
@@ -243,7 +243,7 @@ const products = [
         text: "Completely FREE for all registered users for one day.",
       },
     ],
-    highlight: "",
+    highlight: "20 mock tests practice before the 2027 mains examination.",
     btn: "Buy Now",
     href: "/pricing",
   },
@@ -511,8 +511,176 @@ const steps = [
     ),
   },
 ];
+/* ══ HOW MAGICMAINS WORKS: 4 steps (reuses EzeeExams icons 1, 2, 4, 5) ══ */
+const mmSteps = [
+  {
+    ...steps[0],
+    n: "1",
+    title: "Register in MagicMains",
+    desc: "To access the mobile app",
+  },
+  {
+    ...steps[1],
+    n: "2",
+    title: "Practice PYQs",
+    desc: "For mains coverage",
+  },
+  {
+    ...steps[3],
+    n: "3",
+    title: "Practice Non-PYQs",
+    desc: "For 2027 coverage in MM",
+  },
+  {
+    ...steps[4],
+    n: "4",
+    title: "Practice 2027 Mocks",
+    desc: "Be exam-ready for Mains 2027",
+  },
+];
 
 const W = "var(--website-font)";
+
+function StepsRow({
+  items,
+  cols,
+  maxWidth,
+}: {
+  items: typeof steps;
+  cols: number;
+  maxWidth?: number;
+}) {
+  return (
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: {
+          xs: "repeat(2,1fr)",
+          sm: cols === 4 ? "repeat(2,1fr)" : "repeat(3,1fr)",
+          lg: `repeat(${cols},1fr)`,
+        },
+        gap: { xs: 2.5, md: 1.5 },
+        position: "relative",
+        maxWidth: maxWidth ?? "none",
+        mx: "auto",
+      }}
+    >
+      {items.map((s, i) => (
+        <Box
+          key={i}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            textAlign: "center",
+            position: "relative",
+            px: { xs: 0.5, lg: 0.8 },
+          }}
+        >
+          {/* Connector line + arrow (desktop only) */}
+          {i < items.length - 1 && (
+            <Box
+              sx={{
+                display: { xs: "none", lg: "block" },
+                position: "absolute",
+                top: 26,
+                left: "calc(50% + 34px)",
+                width: "calc(100% - 36px)",
+                height: "1.5px",
+                background:
+                  "linear-gradient(90deg, rgba(74,222,128,0.45), rgba(74,222,128,0.1))",
+                zIndex: 0,
+                "&::after": {
+                  content: '""',
+                  position: "absolute",
+                  right: -1,
+                  top: -4,
+                  width: 7,
+                  height: 7,
+                  borderTop: "1.5px solid rgba(74,222,128,0.45)",
+                  borderRight: "1.5px solid rgba(74,222,128,0.45)",
+                  transform: "rotate(45deg)",
+                },
+              }}
+            />
+          )}
+
+          {/* Icon circle with step number badge */}
+          <Box
+            sx={{
+              width: 52,
+              height: 52,
+              borderRadius: "50%",
+              background: "rgba(22,163,74,0.1)",
+              border: "1.5px solid rgba(74,222,128,0.3)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#4ade80",
+              mb: 1.5,
+              position: "relative",
+              zIndex: 1,
+              transition: "all 0.22s ease",
+              "&:hover": {
+                background: "#16a34a",
+                color: "#fff",
+                border: "1.5px solid #16a34a",
+                transform: "scale(1.1)",
+                boxShadow: "0 0 20px rgba(22,163,74,0.45)",
+              },
+            }}
+          >
+            {s.icon}
+            <Box
+              sx={{
+                position: "absolute",
+                top: -7,
+                right: -7,
+                width: 20,
+                height: 20,
+                borderRadius: "50%",
+                background: "#16a34a",
+                color: "#fff",
+                fontSize: "0.58rem",
+                fontWeight: 800,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontFamily: W,
+                boxShadow: "0 2px 8px rgba(22,163,74,0.6)",
+              }}
+            >
+              {s.n}
+            </Box>
+          </Box>
+
+          <Typography
+            sx={{
+              fontWeight: 700,
+              fontSize: "0.8rem",
+              color: "#e2e8f0",
+              mb: 0.5,
+              fontFamily: W,
+              lineHeight: 1.3,
+            }}
+          >
+            {s.title}
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: "0.7rem",
+              color: "#94a3b8",
+              lineHeight: 1.5,
+              fontFamily: W,
+            }}
+          >
+            {s.desc}
+          </Typography>
+        </Box>
+      ))}
+    </Box>
+  );
+}
 
 export default function HomepageSections() {
   return (
@@ -847,7 +1015,10 @@ export default function HomepageSections() {
                     ))}
                   </Box>
 
-                  {/* Highlight line (only EzeeExams has this) */}
+                 {/* Pushes the button to the bottom so both cards align */}
+                  <Box sx={{ flex: 1 }} />
+
+                {/* Highlight line (only EzeeExams has this) */}
                   {p.highlight && (
                     <Box
                       sx={{
@@ -872,9 +1043,6 @@ export default function HomepageSections() {
                       </Typography>
                     </Box>
                   )}
-
-                  {/* Pushes the button to the bottom so both cards align */}
-                  <Box sx={{ flex: 1 }} />
 
                   <Button
                     component={Link}
@@ -1367,156 +1535,60 @@ export default function HomepageSections() {
             position: "relative",
           }}
         >
-          <Box sx={{ textAlign: "center", mb: { xs: 3, md: 3.5 } }}>
-            <Typography
-              component="h2"
-              sx={{
-                fontSize: { xs: "1.4rem", md: "1.8rem" },
-                fontWeight: 800,
-                color: "#fff",
-                fontFamily: W,
-              }}
-            >
-              How It Works?
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: "0.82rem",
-                color: "#94a3b8",
-                fontFamily: W,
-                mt: 0.6,
-              }}
-            >
-              Your complete UPSC preparation in 6 simple steps
-            </Typography>
-          </Box>
+          {/* ── EzeeExams flow ── */}
+<Box sx={{ textAlign: "center", mb: { xs: 3, md: 3.5 } }}>
+  <Typography
+    component="h2"
+    sx={{
+      fontSize: { xs: "1.4rem", md: "1.8rem" },
+      fontWeight: 800,
+      color: "#fff",
+      fontFamily: W,
+    }}
+  >
+    How EzeeExams Works?
+  </Typography>
+  <Typography
+    sx={{ fontSize: "0.82rem", color: "#94a3b8", fontFamily: W, mt: 0.6 }}
+  >
+    Your complete Prelims preparation in 6 simple steps
+  </Typography>
+</Box>
 
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: {
-                xs: "repeat(2,1fr)",
-                sm: "repeat(3,1fr)",
-                lg: "repeat(6,1fr)",
-              },
-              gap: { xs: 2.5, md: 1.5 },
-              position: "relative",
-            }}
-          >
-            {steps.map((s, i) => (
-              <Box
-                key={i}
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  textAlign: "center",
-                  position: "relative",
-                  px: { xs: 0.5, lg: 0.8 },
-                }}
-              >
-                {/* Connector line + arrow (desktop only) */}
-                {i < steps.length - 1 && (
-                  <Box
-                    sx={{
-                      display: { xs: "none", lg: "block" },
-                      position: "absolute",
-                      top: 26,
-                      left: "calc(50% + 34px)",
-                      width: "calc(100% - 36px)",
-                      height: "1.5px",
-                      background:
-                        "linear-gradient(90deg, rgba(74,222,128,0.45), rgba(74,222,128,0.1))",
-                      zIndex: 0,
-                      "&::after": {
-                        content: '""',
-                        position: "absolute",
-                        right: -1,
-                        top: -4,
-                        width: 7,
-                        height: 7,
-                        borderTop: "1.5px solid rgba(74,222,128,0.45)",
-                        borderRight: "1.5px solid rgba(74,222,128,0.45)",
-                        transform: "rotate(45deg)",
-                      },
-                    }}
-                  />
-                )}
+<StepsRow items={steps} cols={6} />
 
-                {/* Icon circle with step number badge */}
-                <Box
-                  sx={{
-                    width: 52,
-                    height: 52,
-                    borderRadius: "50%",
-                    background: "rgba(22,163,74,0.1)",
-                    border: "1.5px solid rgba(74,222,128,0.3)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#4ade80",
-                    mb: 1.5,
-                    position: "relative",
-                    zIndex: 1,
-                    transition: "all 0.22s ease",
-                    "&:hover": {
-                      background: "#16a34a",
-                      color: "#fff",
-                      border: "1.5px solid #16a34a",
-                      transform: "scale(1.1)",
-                      boxShadow: "0 0 20px rgba(22,163,74,0.45)",
-                    },
-                  }}
-                >
-                  {s.icon}
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      top: -7,
-                      right: -7,
-                      width: 20,
-                      height: 20,
-                      borderRadius: "50%",
-                      background: "#16a34a",
-                      color: "#fff",
-                      fontSize: "0.58rem",
-                      fontWeight: 800,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontFamily: W,
-                      boxShadow: "0 2px 8px rgba(22,163,74,0.6)",
-                    }}
-                  >
-                    {s.n}
-                  </Box>
-                </Box>
+{/* Divider between the two flows */}
+<Box
+  sx={{
+    height: "1px",
+    background:
+      "linear-gradient(90deg, transparent, rgba(148,163,184,0.25), transparent)",
+    my: { xs: 4, md: 5 },
+  }}
+/>
 
-                <Typography
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: "0.8rem",
-                    color: "#e2e8f0",
-                    mb: 0.5,
-                    fontFamily: W,
-                    lineHeight: 1.3,
-                  }}
-                >
-                  {s.title}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: "0.7rem",
-                    color: "#94a3b8",
-                    lineHeight: 1.5,
-                    fontFamily: W,
-                  }}
-                >
-                  {s.desc}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
+  {/* ── MagicMains flow ── */}
+  <Box sx={{ textAlign: "center", mb: { xs: 3, md: 3.5 } }}>
+    <Typography
+      component="h2"
+      sx={{
+        fontSize: { xs: "1.4rem", md: "1.8rem" },
+        fontWeight: 800,
+        color: "#fff",
+        fontFamily: W,
+      }}
+    >
+      How MagicMains Works?
+    </Typography>
+    <Typography
+      sx={{ fontSize: "0.82rem", color: "#94a3b8", fontFamily: W, mt: 0.6 }}
+    >
+      Your Mains answer writing practice in 4 simple steps
+    </Typography>
+  </Box>
+
+  <StepsRow items={mmSteps} cols={4} maxWidth={860} />
+
 
           {/* <Box sx={{ textAlign: "center", mt: { xs: 4, md: 4 } }}>
             <Button
