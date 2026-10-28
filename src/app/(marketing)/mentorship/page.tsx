@@ -272,7 +272,7 @@ export default function PricingPage() {
                 px: { xs: 1, md: 0 },
               }}
             >
-              Be a silver strike achiever.
+              Be a silver streak achiever.
               Choose the subject you want to focus on and book your session.
             </Typography>
           </Box>
