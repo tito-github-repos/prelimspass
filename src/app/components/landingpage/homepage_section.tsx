@@ -396,7 +396,7 @@ const steps = [
   {
     n: "2",
     title: "Practice PYQs",
-    desc: "For coverage",
+    desc: "For trends & pattern analysis",
     // Phone with question lines
     icon: (
       <svg
@@ -523,7 +523,7 @@ const mmSteps = [
     ...steps[1],
     n: "2",
     title: "Practice PYQs",
-    desc: "For mains coverage",
+    desc: "For trends & pattern analysis",
   },
   {
     ...steps[3],
