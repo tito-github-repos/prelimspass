@@ -152,8 +152,25 @@ function HeroContent() {
           width: "fit-content",
         }}
       >
-        <Box sx={{ width: 6, height: 6, borderRadius: "50%", background: "#16a34a", flexShrink: 0 }} />
-        <Box component="span" sx={{ whiteSpace: "nowrap" }}>Consistency. Coverage. Completeness.</Box>
+        {["Consistency", "Coverage", "Completeness"].map((word) => (
+          <Box
+            key={word}
+            sx={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+          >
+            <Box
+              sx={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: "#16a34a",
+                flexShrink: 0,
+              }}
+            />
+            <Box component="span" sx={{ whiteSpace: "nowrap" }}>
+              {word}
+            </Box>
+          </Box>
+        ))}
       </Box>
 
       {/* heading: 2 columns x 2 rows */}
