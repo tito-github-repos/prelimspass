@@ -110,8 +110,8 @@ const streakTiers = [
 ];
 
 const streakSchedule = [
-  { days: "Monday – Friday", note: "CSAT classes for SS-7 achievers" },
-  { days: "Saturday & Sunday", note: "Sessions for SS-14 and SS-21 achievers" },
+  { days: "Mondays – Fridays", note: "CSAT classes for SS-7 achievers" },
+  { days: "Saturdays & Sundays", note: "Sessions for SS-14 and SS-21 achievers" },
 ];
 
 function BannerImage({
@@ -273,7 +273,7 @@ export default function PricingPage() {
               }}
             >
               Be a silver streak achiever.
-              Choose the subject you want to focus on and book your session.
+              {/* Choose the subject you want to focus on and book your session. */}
             </Typography>
           </Box>
 
