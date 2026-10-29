@@ -367,7 +367,7 @@ const wFeats = [
   "Improve writing skills consistently",
 ];
 
-/* ══ HOW IT WORKS: 6 steps (EzeeExams flow)
+/* ══ HOW IT WORKS: 5 steps (EzeeExams flow)
    Phone icons = Mobile App steps · Monitor icons = Web App steps ══ */
 const steps = [
   {
@@ -395,8 +395,8 @@ const steps = [
   },
   {
     n: "2",
-    title: "Practice PYQs",
-    desc: "For trends & pattern analysis",
+    title: "Practice PYQs & Non-PYQs",
+    desc: "For PYQs Coverage & 2027 Coverage",
     // Phone with question lines
     icon: (
       <svg
@@ -441,31 +441,9 @@ const steps = [
       </svg>
     ),
   },
+
   {
     n: "4",
-    title: "Practice Non-PYQs",
-    desc: "For 2027 coverage in EE",
-    // Phone with stacked layers
-    icon: (
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <rect x="5" y="1.5" width="14" height="21" rx="2.5" />
-        <polygon points="12 6 8 8 12 10 16 8 12 6" />
-        <polyline points="8 11.5 12 13.5 16 11.5" />
-        <polyline points="8 15 12 17 16 15" />
-      </svg>
-    ),
-  },
-  {
-    n: "5",
     title: "Practice 2027 Mocks",
     desc: "Be exam-ready for Prelims 2027",
     // Monitor with a check mark
@@ -488,7 +466,7 @@ const steps = [
     ),
   },
   {
-    n: "6",
+    n: "5",
     title: "Revise Again & Again",
     desc: "Build speed & memory retention",
     // Repeat arrows
@@ -541,6 +519,10 @@ const mmSteps = [
 
 const W = "var(--website-font)";
 
+/* Centered steps row.
+   Uses flex + justifyContent:"center" so every row (including a partial
+   last row on tablet/mobile) stays centered, and `cols` items fit exactly
+   in one row on large screens. */
 function StepsRow({
   items,
   cols,
@@ -553,13 +535,10 @@ function StepsRow({
   return (
     <Box
       sx={{
-        display: "grid",
-        gridTemplateColumns: {
-          xs: "repeat(2,1fr)",
-          sm: cols === 4 ? "repeat(2,1fr)" : "repeat(3,1fr)",
-          lg: `repeat(${cols},1fr)`,
-        },
-        gap: { xs: 2.5, md: 1.5 },
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        rowGap: { xs: 2.5, md: 3 },
         position: "relative",
         maxWidth: maxWidth ?? "none",
         mx: "auto",
@@ -569,6 +548,13 @@ function StepsRow({
         <Box
           key={i}
           sx={{
+            // xs: 2 per row | sm: 3 per row (2 when 4 items) | lg: all in one row
+            width: {
+              xs: "50%",
+              sm: cols === 4 ? "50%" : "33.333%",
+              lg: `${100 / cols}%`,
+            },
+            boxSizing: "border-box",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -1015,10 +1001,10 @@ export default function HomepageSections() {
                     ))}
                   </Box>
 
-                 {/* Pushes the button to the bottom so both cards align */}
+                  {/* Pushes the button to the bottom so both cards align */}
                   <Box sx={{ flex: 1 }} />
 
-                {/* Highlight line (only EzeeExams has this) */}
+                  {/* Highlight line (only EzeeExams has this) */}
                   {p.highlight && (
                     <Box
                       sx={{
@@ -1535,60 +1521,69 @@ export default function HomepageSections() {
             position: "relative",
           }}
         >
-          {/* ── EzeeExams flow ── */}
-<Box sx={{ textAlign: "center", mb: { xs: 3, md: 3.5 } }}>
-  <Typography
-    component="h2"
-    sx={{
-      fontSize: { xs: "1.4rem", md: "1.8rem" },
-      fontWeight: 800,
-      color: "#fff",
-      fontFamily: W,
-    }}
-  >
-    How EzeeExams Works?
-  </Typography>
-  <Typography
-    sx={{ fontSize: "0.82rem", color: "#94a3b8", fontFamily: W, mt: 0.6 }}
-  >
-    Your complete Prelims preparation in 6 simple steps
-  </Typography>
-</Box>
+          {/* ── EzeeExams flow (5 steps, centered) ── */}
+          <Box sx={{ textAlign: "center", mb: { xs: 3, md: 3.5 } }}>
+            <Typography
+              component="h2"
+              sx={{
+                fontSize: { xs: "1.4rem", md: "1.8rem" },
+                fontWeight: 800,
+                color: "#fff",
+                fontFamily: W,
+              }}
+            >
+              How EzeeExams Works?
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "0.82rem",
+                color: "#94a3b8",
+                fontFamily: W,
+                mt: 0.6,
+              }}
+            >
+              Your complete Prelims preparation in 5 simple steps
+            </Typography>
+          </Box>
 
-<StepsRow items={steps} cols={6} />
+          <StepsRow items={steps} cols={5} maxWidth={1100} />
 
-{/* Divider between the two flows */}
-<Box
-  sx={{
-    height: "1px",
-    background:
-      "linear-gradient(90deg, transparent, rgba(148,163,184,0.25), transparent)",
-    my: { xs: 4, md: 5 },
-  }}
-/>
+          {/* Divider between the two flows */}
+          <Box
+            sx={{
+              height: "1px",
+              background:
+                "linear-gradient(90deg, transparent, rgba(148,163,184,0.25), transparent)",
+              my: { xs: 4, md: 5 },
+            }}
+          />
 
-  {/* ── MagicMains flow ── */}
-  <Box sx={{ textAlign: "center", mb: { xs: 3, md: 3.5 } }}>
-    <Typography
-      component="h2"
-      sx={{
-        fontSize: { xs: "1.4rem", md: "1.8rem" },
-        fontWeight: 800,
-        color: "#fff",
-        fontFamily: W,
-      }}
-    >
-      How MagicMains Works?
-    </Typography>
-    <Typography
-      sx={{ fontSize: "0.82rem", color: "#94a3b8", fontFamily: W, mt: 0.6 }}
-    >
-      Your Mains answer writing practice in 4 simple steps
-    </Typography>
-  </Box>
+          {/* ── MagicMains flow (4 steps, centered) ── */}
+          <Box sx={{ textAlign: "center", mb: { xs: 3, md: 3.5 } }}>
+            <Typography
+              component="h2"
+              sx={{
+                fontSize: { xs: "1.4rem", md: "1.8rem" },
+                fontWeight: 800,
+                color: "#fff",
+                fontFamily: W,
+              }}
+            >
+              How MagicMains Works?
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "0.82rem",
+                color: "#94a3b8",
+                fontFamily: W,
+                mt: 0.6,
+              }}
+            >
+              Your Mains answer writing practice in 4 simple steps
+            </Typography>
+          </Box>
 
-  <StepsRow items={mmSteps} cols={4} maxWidth={860} />
-
+          <StepsRow items={mmSteps} cols={4} maxWidth={860} />
 
           {/* <Box sx={{ textAlign: "center", mt: { xs: 4, md: 4 } }}>
             <Button
