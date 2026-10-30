@@ -35,9 +35,10 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "/" },
-  { label: "Insights", href: "/upsc-insights" },
-  { label: "Mentorship", href: "/mentorship" },
   { label: "Pricing", href: "/pricing" },
+  { label: "Mentorship", href: "/mentorship" },
+  { label: "Insights", href: "/upsc-insights" },
+
   { label: "Contact", href: "/contacts" },
 ];
 

@@ -29,11 +29,17 @@ const halfWidthAt = (y: number) => (HALF_BASE * (y - TOP)) / (BOTTOM - TOP);
 export default function SelectionPyramid() {
   return (
     <Box
-      sx={{ width: "100%", maxWidth: 520, mt: 3 }}
+      sx={{ width: "100%", height: "100%" }}
       role="img"
       aria-label="UPSC selection funnel: Applied, Prelims appeared, Mains selection, Interview selection, Final selection"
     >
-      <svg viewBox="0 0 520 340" width="100%" style={{ display: "block" }}>
+      <svg
+        viewBox="0 0 520 340"
+        width="100%"
+        height="100%"
+        preserveAspectRatio="xMidYMid meet"
+        style={{ display: "block" }}
+      >
         {stages.map((s, i) => {
           const y0 = TOP + i * TIER_H;
           const y1 = y0 + TIER_H;

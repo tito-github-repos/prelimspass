@@ -198,68 +198,76 @@ export default function UPSCInsightsSection() {
       <Box
         sx={{
           px: { xs: 2.5, md: 5 },
-          py: { xs: 3, md: 2 },
+          pt: { xs: 2, md: 2.5 },
+          pb: { xs: 2, md: 2 },
           background: "linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)",
         }}
       >
-        <Stack
-          direction={{ xs: "column", lg: "row" }}
-          spacing={{ xs: 3, md: 2 }}
-          alignItems="center"
-          justifyContent="space-between"
+        {/* Centered heading + description */}
+        <Box
+          sx={{
+            textAlign: "center",
+            maxWidth: 720,
+            mx: "auto",
+            mb: { xs: 1.5, md: 1.5 },
+          }}
         >
-          {/* LEFT CONTENT */}
-          <Box sx={{ flex: 1, maxWidth: "650px" }}>
-            <Chip
-              label="UPSC INSIGHTS 2027"
-              sx={{
-                mb: 2,
-                background: "#dcfce7",
-                color: "#19c880",
-                fontWeight: 700,
-                fontSize: "0.72rem",
-                letterSpacing: "0.5px",
-              }}
-            />
+          <Typography
+            component="h1"
+            sx={{
+              fontWeight: 800,
+              lineHeight: 1.1,
+              color: "#0f172a",
+              fontSize: { xs: "1.7rem", sm: "2.1rem", md: "2.4rem" },
+            }}
+          >
+            Insights &{" "}
+            <Box component="span" sx={{ color: "#19c880" }}>
+              Analysis.
+            </Box>
+          </Typography>
 
-            <Typography
-              sx={{
-                fontWeight: 800,
-                lineHeight: 1.15,
-                color: "#0f172a",
-                fontSize: { xs: "1.9rem", sm: "2.4rem", md: "2.4rem" },
-              }}
-            >
-              UPSC Insights &
-              <Box component="span" sx={{ display: "block", color: "#19c880" }}>
-                Exam Analysis
-              </Box>
-            </Typography>
+          <Typography
+            sx={{
+              mt: 0.75,
+              color: "#64748b",
+              lineHeight: 1.6,
+              fontSize: { xs: "0.88rem", md: "0.95rem" },
+            }}
+          >
+            Understand UPSC trends, exam patterns, subject weightage, and
+            cut-offs from 2011–2025 and prepare strategically for UPSC 2027.
+          </Typography>
+        </Box>
 
-            <Typography
-              sx={{
-                mt: 2,
-                color: "#64748b",
-                lineHeight: 1.7,
-                maxWidth: "520px",
-                fontSize: { xs: "0.9rem", md: "0.95rem" },
-              }}
-            >
-              Understand UPSC trends, exam patterns, subject weightage, and
-              cut-offs from 2011–2025 and prepare strategically for UPSC 2027.
-            </Typography>
+        {/* Pyramid (left) + image (right), same height */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
+            gap: { xs: 2, lg: 3 },
+            alignItems: "center",
+            maxWidth: 1240,
+            mx: "auto",
+          }}
+        >
+          <Box sx={{ height: { xs: 270, md: 320 } }}>
             <SelectionPyramid />
           </Box>
 
-          {/* RIGHT IMAGE */}
-          <Box className="hero-image-wrapper">
+          <Box sx={{ height: { xs: 230, md: 320 }, overflow: "hidden" }}>
             <img
               src="/Images/UPSC_img-1.png"
               alt="UPSC Insights"
-              className="hero-image"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                display: "block",
+              }}
             />
           </Box>
-        </Stack>
+        </Box>
       </Box>
 
       <Box
@@ -642,154 +650,7 @@ export default function UPSCInsightsSection() {
         </Box>
       </Box>
 
-      {/* MOCK TEST SECTION */}
-      <Box className="mock-test-section" px={4} pb={3}>
-        <Box textAlign="center" mb={2.5}>
-          <Typography
-            sx={{
-              fontWeight: 800,
-              color: "#0f172a",
-              fontSize: { xs: "1.35rem", md: "1.9rem" },
-            }}
-          >
-            Mock Test Format
-          </Typography>
-
-          <Typography
-            sx={{
-              mt: 1,
-              color: "#64748b",
-              fontSize: { xs: "0.85rem", md: "0.92rem" },
-            }}
-          >
-            Designed based on real UPSC Prelims examination pattern
-          </Typography>
-        </Box>
-
-        <Box className="mock-card-grid">
-          {[
-            { title: "Duration", value: "2 Hours", icon: <AccessTimeIcon /> },
-            { title: "Total Questions", value: "100", icon: <QuizIcon /> },
-            {
-              title: "Negative Marking",
-              value: "1/3rd",
-              icon: <TrackChangesIcon />,
-            },
-            {
-              title: "Difficulty",
-              value: "Real UPSC Standard",
-              icon: <InsightsIcon />,
-            },
-            {
-              title: "Includes",
-              value: "Solutions, Review & Performance Tracking",
-              icon: <DescriptionIcon />,
-            },
-          ].map((item, index) => (
-            <Card key={index} elevation={0} className="mock-card">
-              <Box className="mock-icon">{item.icon}</Box>
-
-              <Typography
-                sx={{
-                  fontWeight: 700,
-                  color: "#0f172a",
-                  fontSize: "0.88rem",
-                  mb: 0.75,
-                }}
-              >
-                {item.title}
-              </Typography>
-
-              <Typography
-                sx={{
-                  color: "#19c880",
-                  fontWeight: 800,
-                  fontSize: { xs: "0.95rem", md: "1.05rem" },
-                  lineHeight: 1.45,
-                }}
-              >
-                {item.value}
-              </Typography>
-            </Card>
-          ))}
-        </Box>
-
-        {/* ================= TEST PLAN SECTION ================= */}
-        {/* <Box className="upsc-plan-section">
-          <Box className="plan-heading-wrapper">
-            <Typography className="plan-main-heading">
-              UPSC 2026–2027
-              <span className="green-text"> Test Plan</span>
-            </Typography>
-
-            <Typography className="plan-sub-heading">
-              Day-wise subject allocation (June–May)
-            </Typography>
-          </Box>
-
-          <Box className="test-plan-wrapper">
-            <Box className="test-plan-inner">
-              <Box className="month-grid">
-                <Box className="empty-cell" />
-                {["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"].map(
-                  (month) => (
-                    <Box key={month} className="month-box">
-                      {month}
-                    </Box>
-                  )
-                )}
-              </Box>
-
-              {[
-                { day: "Mon", subject: "Environment", className: "env-box" },
-                { day: "Tue", subject: "Geography", className: "geo-box" },
-                { day: "Wed", subject: "Science & Tech", className: "sci-box" },
-                { day: "Thu", subject: "Polity", className: "polity-box" },
-                { day: "Fri", subject: "Economics", className: "eco-box" },
-                { day: "Sat", subject: "History", className: "history-box" },
-                { day: "Sun", subject: "CSAT", className: "csat-box" },
-              ].map((row, rowIndex) => (
-                <Box key={rowIndex} className="plan-row">
-                  <Box className="day-label">{row.day}</Box>
-
-                  {Array.from({ length: 12 }).map((_, index) => (
-                    <Box
-                      key={index}
-                      className={index >= 8 ? "mock-test-box" : `subject-box ${row.className}`}
-                    >
-                      {index >= 8 ? "Mock Test" : row.subject}
-                    </Box>
-                  ))}
-                </Box>
-              ))}
-
-              <Box className="mains-section">
-                <Typography className="mains-heading">MAINS TEST PLAN</Typography>
-
-                <Box className="plan-row">
-                  <Box className="day-label">Saturday</Box>
-                  {Array.from({ length: 12 }).map((_, index) => (
-                    <Box key={index} className="essay-box">
-                      Essay & Ethics
-                    </Box>
-                  ))}
-                </Box>
-
-                <Box className="plan-row">
-                  <Box className="day-label">Sunday</Box>
-                  {["GS1", "GS1", "GS1", "GS2", "GS2", "GS2", "GS3", "GS3", "GS3", "GS4", "GS4", "Revision"].map(
-                    (item, index) => (
-                      <Box key={index} className="gs-box">
-                        {item}
-                      </Box>
-                    )
-                  )}
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-        </Box> */}
-      </Box>
+     
 
       {/* ================= SMART ANALYSIS SECTION ================= */}
       <Box className="smart-analysis-section">
@@ -832,7 +693,7 @@ export default function UPSCInsightsSection() {
         </Box>
 
         {/* ================= BOTTOM FEATURES ================= */}
-        <Box className="bottom-feature-container">
+        {/* <Box className="bottom-feature-container">
           {[
             {
               icon: <PsychologyIcon />,
@@ -867,7 +728,7 @@ export default function UPSCInsightsSection() {
               </Box>
             </Box>
           ))}
-        </Box>
+        </Box> */}
       </Box>
     </Box>
   );
