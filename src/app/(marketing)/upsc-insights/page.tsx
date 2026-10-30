@@ -34,6 +34,7 @@ import TrackChangesIcon from "@mui/icons-material/TrackChanges";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import SelectionPyramid from "@/app/components/Selectionpyramid";
 
 /* ══ Data Insights panel: font + helpers (moved from homepage) ══ */
 const W = "inherit";
@@ -247,44 +248,7 @@ export default function UPSCInsightsSection() {
               Understand UPSC trends, exam patterns, subject weightage, and
               cut-offs from 2011–2025 and prepare strategically for UPSC 2027.
             </Typography>
-
-            {/* STATS */}
-            <Box className="hero-stats-grid">
-              {[
-                {
-                  icon: <InsightsIcon />,
-                  title: "16 Years",
-                  subtitle: "Question Analysis",
-                },
-                {
-                  icon: <MenuBookIcon />,
-                  title: "7 Subjects",
-                  subtitle: "UPSC Coverage",
-                },
-                {
-                  icon: <QuizIcon />,
-                  title: "100 Questions",
-                  subtitle: "Real UPSC Pattern",
-                },
-                {
-                  icon: <RocketLaunchIcon />,
-                  title: "60 Tests",
-                  subtitle: "Mock Test Series",
-                },
-              ].map((item, index) => (
-                <Card key={index} elevation={0} className="hero-mini-card">
-                  <Box className="hero-mini-icon">{item.icon}</Box>
-                  <Box>
-                    <Typography className="hero-mini-title">
-                      {item.title}
-                    </Typography>
-                    <Typography className="hero-mini-subtitle">
-                      {item.subtitle}
-                    </Typography>
-                  </Box>
-                </Card>
-              ))}
-            </Box>
+            <SelectionPyramid />
           </Box>
 
           {/* RIGHT IMAGE */}
@@ -298,211 +262,23 @@ export default function UPSCInsightsSection() {
         </Stack>
       </Box>
 
-      {/* ══════════════════════════════════════════
-          DATA. INSIGHTS. IMPROVEMENT. PANEL
-          (moved from homepage — cards jump to the
-          sections below on this same page)
-      ══════════════════════════════════════════ */}
-    <Box
-  sx={{
-    background: "#fff",
-    p: { xs: "14px", md: "18px 24px" },
-    display: "grid",
-    gridTemplateColumns: {
-      xs: "1fr",
-      sm: "1fr 1fr",
-      md: "repeat(2,1fr)", // ← was repeat(3,1fr); 2 cards now fill the row
-    },
-    gap: 1.5,
+      <Box
+        sx={{
+          background: "#fff",
+          p: { xs: "14px", md: "18px 24px" },
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "1fr 1fr",
+            md: "repeat(2,1fr)", // ← was repeat(3,1fr); 2 cards now fill the row
+          },
+          gap: 1.5,
 
-    // make each link + card stretch to full cell width/height
-    "& > a": { display: "block" },
-    "& > a > *": { height: "100%", boxSizing: "border-box" },
-  }}
->
-  {/* Subject Weightage — jumps to section below */}
-  <a href="#subject-weightage" style={{ textDecoration: "none" }}>
-    <Box
-      sx={insightCardSx(
-        "linear-gradient(135deg,#f5f3ff,#fff)",
-        "#ddd6fe",
-        "rgba(124,58,237,0.1)",
-      )}
-    >
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
-        <Donut pct={56} color="#7c3aed" />
-        <Box>
-          {[
-            ["Economy", "21%", "#7c3aed"],
-            ["Environment", "18%", "#a78bfa"],
-            ["History", "17%", "#6d28d9"],
-          ].map(([s, p, c], i) => (
-            <Box
-              key={i}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 0.5,
-                mb: 0.25,
-              }}
-            >
-              <Box
-                sx={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: "50%",
-                  background: c,
-                  flexShrink: 0,
-                }}
-              />
-              <Typography
-                sx={{ fontSize: "0.6rem", color: "#374151", fontFamily: W }}
-              >
-                {s}
-              </Typography>
-              <Typography
-                sx={{
-                  fontSize: "0.6rem",
-                  fontWeight: 700,
-                  color: c,
-                  fontFamily: W,
-                }}
-              >
-                {p}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
-      </Box>
-      <Typography
-        sx={{
-          fontWeight: 700,
-          fontSize: "0.82rem",
-          color: "#111827",
-          fontFamily: W,
-          mt: 1,
-          mb: 0.2,
+          // make each link + card stretch to full cell width/height
+          "& > a": { display: "block" },
+          "& > a > *": { height: "100%", boxSizing: "border-box" },
         }}
-      >
-        Subject Weightage
-      </Typography>
-      <Typography
-        sx={{ fontSize: "0.68rem", color: "#6b7280", fontFamily: W }}
-      >
-        Top subjects, 2011 – 2025
-      </Typography>
-    </Box>
-  </a>
-
-  {/* Cut-off Trends — jumps to section below */}
-  <a href="#cutoff-trend" style={{ textDecoration: "none" }}>
-    <Box
-      sx={insightCardSx(
-        "linear-gradient(135deg,#fff7ed,#fff)",
-        "#fed7aa",
-        "rgba(234,88,12,0.1)",
-      )}
-    >
-      <MiniBar
-        heights={[70, 66, 74, 68, 80, 72, 84, 78]}
-        color="#ea580c"
-      />
-      <Typography
-        sx={{
-          fontWeight: 700,
-          fontSize: "0.82rem",
-          color: "#111827",
-          fontFamily: W,
-          mt: 1,
-          mb: 0.2,
-        }}
-      >
-        Cut-off Trends
-      </Typography>
-      <Typography
-        sx={{ fontSize: "0.68rem", color: "#6b7280", fontFamily: W }}
-      >
-        Category-wise analysis (2020–2025)
-      </Typography>
-      <Box sx={{ mt: 0.6, display: "flex", alignItems: "center", gap: 0.5 }}>
-        <Typography
-          sx={{
-            fontSize: "0.65rem",
-            color: "#ea580c",
-            fontWeight: 700,
-            fontFamily: W,
-          }}
-        >
-          ↑ 3.2
-        </Typography>
-        <Typography
-          sx={{ fontSize: "0.63rem", color: "#94a3b8", fontFamily: W }}
-        >
-          pts this cycle
-        </Typography>
-      </Box>
-    </Box>
-  </a>
-
-  {/* Performance Analytics */}
-  {/* <Box
-    sx={insightCardSx(
-      "linear-gradient(135deg,#eff6ff,#fff)",
-      "#bfdbfe",
-      "rgba(37,99,235,0.1)",
-    )}
-  >
-    <MiniBar
-      heights={[38, 55, 45, 70, 52, 82, 65, 90]}
-      color="#2563eb"
-    />
-    <Typography
-      sx={{
-        fontWeight: 700,
-        fontSize: "0.82rem",
-        color: "#111827",
-        fontFamily: W,
-        mt: 1,
-        mb: 0.2,
-      }}
-    >
-      Performance Analytics
-    </Typography>
-    <Typography
-      sx={{ fontSize: "0.68rem", color: "#6b7280", fontFamily: W }}
-    >
-      Excel-style detailed reports
-    </Typography>
-    <Box
-      sx={{
-        mt: 0.6,
-        display: "flex",
-        alignItems: "center",
-        gap: 0.5,
-      }}
-    >
-      <Typography
-        sx={{
-          fontSize: "0.65rem",
-          color: "#2563eb",
-          fontWeight: 700,
-          fontFamily: W,
-        }}
-      >
-        90%
-      </Typography>
-      <Typography
-        sx={{
-          fontSize: "0.63rem",
-          color: "#94a3b8",
-          fontFamily: W,
-        }}
-      >
-        top score
-      </Typography>
-    </Box>
-  </Box> */}
-</Box>
+      ></Box>
 
       {/* MAIN ANALYSIS SECTION */}
       <Box sx={{ px: { xs: 2, md: 5 }, py: { xs: 2.5, md: 3 } }}>
