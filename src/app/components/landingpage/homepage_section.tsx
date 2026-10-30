@@ -673,116 +673,7 @@ export default function HomepageSections() {
     <>
       <PromoPopup />
 
-      {/* ══════════════════════════════════════════════
-          §1  WHY CHOOSE
-      ══════════════════════════════════════════════ */}
-      <Box
-        component="section"
-        sx={{ pt: "24px", pb: "24px", background: "#fff" }}
-      >
-        <Box
-          sx={{ maxWidth: 1240, mx: "auto", px: { xs: "18px", sm: "24px" } }}
-        >
-          <Box sx={{ textAlign: "center", mb: 2.5 }}>
-            <Typography
-              component="h2"
-              sx={{
-                fontSize: { xs: "1.55rem", md: "2rem" },
-                fontWeight: 800,
-                color: "#0f172a",
-                fontFamily: W,
-                lineHeight: 1.2,
-              }}
-            >
-              Why Aspirants Choose{" "}
-              <Box component="span" sx={{ color: "#16a34a" }}>
-                PrelimsPass
-              </Box>
-              ?
-            </Typography>
-          </Box>
-
-          {/* Centered flex-wrap: works for 5 cards at every screen size */}
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              gap: "14px",
-            }}
-          >
-            {features.map((f, i) => (
-              <Box
-                key={i}
-                sx={{
-                  width: {
-                    xs: "calc((100% - 14px) / 2)",
-                    sm: "calc((100% - 28px) / 3)",
-                    lg: "calc((100% - 56px) / 5)",
-                  },
-                  boxSizing: "border-box",
-                  background: "#fff",
-                  border: "1.5px solid #e5e7eb",
-                  borderRadius: "14px",
-                  p: { xs: "14px 10px", md: "16px 12px" },
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  textAlign: "center",
-                  gap: 0.8,
-                  cursor: "default",
-                  boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-                  transition: "all 0.2s ease",
-                  "&:hover": {
-                    borderColor: "#16a34a",
-                    boxShadow: "0 8px 28px rgba(22,163,74,0.13)",
-                    transform: "translateY(-4px)",
-                    "& .fbox": { background: "#16a34a", color: "#fff" },
-                  },
-                }}
-              >
-                <Box
-                  className="fbox"
-                  sx={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: "12px",
-                    background: "rgba(22,163,74,0.09)",
-                    color: "#16a34a",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  {f.icon}
-                </Box>
-                <Typography
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: "0.78rem",
-                    color: "#111827",
-                    fontFamily: W,
-                    lineHeight: 1.3,
-                  }}
-                >
-                  {f.title}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: "0.68rem",
-                    color: "#6b7280",
-                    lineHeight: 1.5,
-                    fontFamily: W,
-                  }}
-                >
-                  {f.desc}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-        </Box>
-      </Box>
+  
 
       {/* ══════════════════════════════════════════════
           §2  OUR OFFERINGS
@@ -1630,9 +1521,7 @@ export default function HomepageSections() {
         </Box>
       </Box>
 
-      {/* PYQ section */}
-
-      <PyqSection />
+     
     </>
   );
 }
