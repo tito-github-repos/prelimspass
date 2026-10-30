@@ -1,833 +1,3 @@
-
-// "use client";
-
-// import Link from "next/link";
-// import { useRef, useState } from "react";
-// import type { CSSProperties, ReactNode } from "react";
-// import {
-//   Box,
-//   Button,
-//   Card,
-//   CardContent,
-//   Chip,
-//   Container,
-//   GlobalStyles,
-//   Grid,
-//   Stack,
-//   Typography,
-//   useMediaQuery,
-//   useTheme,
-// } from "@mui/material";
-
-// import SecurityRoundedIcon from "@mui/icons-material/SecurityRounded";
-// import BarChartRoundedIcon from "@mui/icons-material/BarChartRounded";
-// import GpsFixedRoundedIcon from "@mui/icons-material/GpsFixedRounded";
-// import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
-// import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-// import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
-// import CardGiftcardRoundedIcon from "@mui/icons-material/CardGiftcardRounded";
-// import PhoneAndroidRoundedIcon from "@mui/icons-material/PhoneAndroidRounded";
-// import LaptopMacRoundedIcon from "@mui/icons-material/LaptopMacRounded";
-// import DescriptionRoundedIcon from "@mui/icons-material/DescriptionRounded";
-// import WorkspacePremiumRoundedIcon from "@mui/icons-material/WorkspacePremiumRounded";
-// import AutorenewRoundedIcon from "@mui/icons-material/AutorenewRounded";
-// import CurrencyRupeeRoundedIcon from "@mui/icons-material/CurrencyRupeeRounded";
-// import Groups2RoundedIcon from "@mui/icons-material/Groups2Rounded";
-// import AllInclusiveRoundedIcon from "@mui/icons-material/AllInclusiveRounded";
-
-// /* ─────────────────────────── Tuning knobs ─────────────────────────── */
-
-// const GREEN = "#16a34a";
-// const DARK_GREEN = "#14532d";
-// const GREEN_GRADIENT = `linear-gradient(165deg, ${DARK_GREEN} 0%, #15803d 60%, ${GREEN} 100%)`;
-
-// const SLOTS = 5;
-// const CENTER = 2; // slot index (0-4) that gets the highlight
-// const GAP = 20; // px gap between cards on desktop (keep in sync with grid gap)
-// const SLOT_Y = [30, 12, -26, 12, 30]; // vertical offset per slot -> the arc
-// const SLOT_SCALE = [0.97, 1, 1.06, 1, 0.97]; // center card is bigger
-// const SLOT_ROT = [14, 7, 0, -7, -14]; // rotateY (deg): outer cards face the center
-// const PERSPECTIVE = 1500; // px, depth of the 3D tilt
-// const ROTATE_MS = 800; // duration of one rotation
-// const EASE = "cubic-bezier(0.65, 0, 0.35, 1)";
-// const INTENT_DELAY = 180; // ms the cursor must rest on a card before it rotates
-// const COOLDOWN = ROTATE_MS + 50; // ms before another rotation is allowed
-
-// const mod = (n: number, m: number) => ((n % m) + m) % m;
-
-// /* ───────────────────────────── Plan data ───────────────────────────── */
-
-// type Plan = {
-//   id: string;
-//   badge?: string;
-//   icon: ReactNode;
-//   title: string;
-//   sub: string;
-//   features: string[];
-//   price: string;
-//   note: string;
-//   cta: string;
-//   href: string;
-//   featured?: boolean; // default highlighted plan
-//   outlined?: boolean; // outlined button when not highlighted
-// };
-
-// const plans: Plan[] = [
-//   {
-//     id: "free",
-//     badge: "FREE TRIAL",
-//     icon: <CardGiftcardRoundedIcon />,
-//     title: "Free Plan",
-//     sub: "Free access",
-//     features: [
-//       "Prelims PYQ Access and Practice",
-//       "FREE for all registered users",
-//       "Basic Dashboard Access",
-//       "No Payment Required",
-//       "Login / Register Required",
-//     ],
-//     price: "₹0",
-//     note: "(Free Forever)",
-//     cta: "Get Started",
-//     href: "/register?plan=free-trial",
-//     outlined: true,
-//   },
-//   {
-//     id: "mobile",
-//     icon: <PhoneAndroidRoundedIcon />,
-//     title: "Prelims Mobile App",
-//     sub: "Subjects Coverage",
-//     features: [
-//       "Complete Prelims subject-wise coverage",
-//       "New facts added every week",
-//       "Revise more, in the shortest possible time",
-//     ],
-//     price: "₹999",
-//     note: "(One Time / Annual Plan)",
-//     cta: "Get Started",
-//     href: "/register?plan=mobile",
-//   },
-//   {
-//     id: "web",
-//     badge: "Most Popular",
-//     icon: <LaptopMacRoundedIcon />,
-//     title: "Prelims Web App",
-//     sub: "100 Mock Tests from 2027 January 1, Friday.",
-//     features: [
-//       "100 full-length mock tests",
-//       "Detailed analysis & performance tracking",
-//       "Attempt online from any device",
-//       "Real UPSC pattern (+2 / -0.66)",
-//     ],
-//     price: "₹999",
-//     note: "(One Time / Annual Plan)",
-//     cta: "Get Started",
-//     href: "/register?plan=web",
-//     featured: true,
-//   },
-//   {
-//     id: "mains-pyq",
-//     badge: "PYQs",
-//     icon: <DescriptionRoundedIcon />,
-//     title: "GS Mains",
-//     sub: "14 years PYQs + 70 Papers Answer Scripts Evaluation",
-//     features: [
-//       "14 years of GS Mains PYQs",
-//       "70 papers with answer scripts",
-//       "Expert evaluation & detailed feedback",
-//     ],
-//     price: "₹999",
-//     note: "(One Time / Annual Plan)",
-//     cta: "Get Started",
-//     href: "/register?plan=mains-pyq",
-//   },
-//   {
-//     id: "mains-mock",
-//     badge: "MOCK TESTS",
-//     icon: <GpsFixedRoundedIcon />,
-//     title: "GS Mains",
-//     sub: "10 MockTests + 50 Papers Answer Scripts Evaluation",
-//     features: [
-//       "10 full-length GS Mains mock tests",
-//       "50 papers with answer scripts",
-//       "Expert evaluation & detailed feedback",
-//     ],
-//     price: "₹999",
-//     note: "(One Time / Annual Plan)",
-//     cta: "Get Started",
-//     href: "/register?plan=mains-mock",
-//   },
-// ];
-
-// const whyChoose = [
-//   {
-//     icon: <GpsFixedRoundedIcon />,
-//     title: "Focused Preparation",
-//     subtitle: "Subject-wise & exam-oriented learning",
-//   },
-//   {
-//     icon: <BarChartRoundedIcon />,
-//     title: "Data Driven Insights",
-//     subtitle: "Track your progress with real-time analytics",
-//   },
-//   {
-//     icon: <PersonRoundedIcon />,
-//     title: "Expert Mentorship",
-//     subtitle: "Learn from experienced mentors",
-//   },
-//   {
-//     icon: <SecurityRoundedIcon />,
-//     title: "Track Your Progress",
-//     subtitle: "Stay consistent and achieve your goals",
-//   },
-// ];
-
-// /* ───────────────────────────── Plan card ───────────────────────────── */
-
-// type PlanCardProps = {
-//   plan: Plan;
-//   index: number; // original position in the plans array (its grid cell)
-//   slot: number; // current visual position (0-4)
-//   isCenter: boolean;
-//   wrapping: boolean; // card is wrapping around the end of the row
-//   spin: number; // rotation counter, used to restart the fade animation
-//   onHover: () => void;
-//   onLeave: () => void;
-//   onFocus: () => void;
-// };
-
-// function PlanCard({
-//   plan,
-//   index,
-//   slot,
-//   isCenter,
-//   wrapping,
-//   spin,
-//   onHover,
-//   onLeave,
-//   onFocus,
-// }: PlanCardProps) {
-//   const colorTransition = "color 0.5s ease, background 0.5s ease";
-
-//   const btnBg = isCenter ? "#d9f99d" : plan.outlined ? "#fff" : GREEN;
-//   const btnColor = isCenter ? DARK_GREEN : plan.outlined ? GREEN : "#fff";
-//   const btnHoverBg = isCenter
-//     ? "#bef264"
-//     : plan.outlined
-//       ? "#ecfdf3"
-//       : "#15803d";
-
-//   return (
-//     <Card
-//       onMouseEnter={onHover}
-//       onMouseMove={onHover}
-//       onMouseLeave={onLeave}
-//       onFocus={onFocus}
-//       // --d = how many cells this card is displaced from its own grid cell
-//       style={{ "--d": slot - index } as CSSProperties}
-//       sx={{
-//         position: "relative",
-//         overflow: "hidden",
-//         display: "flex",
-//         flexDirection: "column",
-//         borderRadius: "24px",
-//         border: "1px solid",
-//         borderColor: isCenter ? GREEN : "#e2efe6",
-//         background:
-//           "radial-gradient(circle at 100% 0%, #e3f5e9 0%, rgba(227,245,233,0) 42%), #fff",
-//         boxShadow: isCenter
-//           ? "0 28px 50px rgba(20, 83, 45, 0.35)"
-//           : "0 10px 28px rgba(15, 23, 42, 0.08)",
-//         zIndex: isCenter ? 3 : wrapping ? 0 : 1,
-
-//         // Desktop: slide to the slot, follow the arc, tilt toward the center.
-//         // Below lg the cards simply stack normally.
-//         transform: {
-//           xs: "none",
-//           lg: `translate(calc(var(--d) * (100% + ${GAP}px)), ${SLOT_Y[slot]}px) scale(${SLOT_SCALE[slot]}) rotateY(${SLOT_ROT[slot]}deg)`,
-//         },
-//         transition: `transform ${ROTATE_MS}ms ${EASE}, box-shadow 0.6s ease, border-color 0.6s ease`,
-
-//         // A card that wraps around the row fades out while it travels
-//         // behind the others, then fades back in at its new slot
-//         animation: {
-//           xs: "none",
-//           lg: wrapping
-//             ? `${spin % 2 === 0 ? "pricingDipA" : "pricingDipB"} ${ROTATE_MS}ms ease`
-//             : "none",
-//         },
-
-//         "@media (prefers-reduced-motion: reduce)": {
-//           transition: "none",
-//           animation: "none",
-//         },
-//       }}
-//     >
-//       {/* Green layer that fades in when the card is highlighted */}
-//       <Box
-//         aria-hidden
-//         sx={{
-//           position: "absolute",
-//           inset: 0,
-//           background: GREEN_GRADIENT,
-//           opacity: isCenter ? 1 : 0,
-//           transition: "opacity 0.6s ease",
-//           pointerEvents: "none",
-//         }}
-//       />
-
-//       <CardContent
-//         sx={{
-//           position: "relative",
-//           zIndex: 1,
-//           flexGrow: 1,
-//           display: "flex",
-//           flexDirection: "column",
-//           p: { xs: 2.5, lg: 2, xl: 2.75 },
-//           "&:last-child": { pb: { xs: 2.5, lg: 2, xl: 2.75 } },
-//         }}
-//       >
-//         {/* Icon + badge */}
-//         <Stack
-//           direction="row"
-//           justifyContent="space-between"
-//           alignItems="flex-start"
-//           mb={2}
-//         >
-//           <Box
-//             sx={{
-//               width: 54,
-//               height: 54,
-//               borderRadius: "50%",
-//               display: "flex",
-//               alignItems: "center",
-//               justifyContent: "center",
-//               background: isCenter ? "rgba(255,255,255,0.18)" : "#e3f5e9",
-//               color: isCenter ? "#fff" : GREEN,
-//               transition: colorTransition,
-//               "& svg": { fontSize: 28 },
-//             }}
-//           >
-//             {plan.icon}
-//           </Box>
-
-//           {plan.badge && (
-//             <Chip
-//               size="small"
-//               icon={
-//                 plan.featured ? (
-//                   <WorkspacePremiumRoundedIcon sx={{ fontSize: 16 }} />
-//                 ) : undefined
-//               }
-//               label={plan.badge}
-//               sx={{
-//                 fontWeight: 700,
-//                 fontSize: "0.7rem",
-//                 background: plan.featured
-//                   ? "#fde68a"
-//                   : isCenter
-//                     ? "rgba(255,255,255,0.2)"
-//                     : "#eef2f1",
-//                 color: plan.featured
-//                   ? "#78350f"
-//                   : isCenter
-//                     ? "#fff"
-//                     : "#334155",
-//                 transition: colorTransition,
-//               }}
-//             />
-//           )}
-//         </Stack>
-
-//         {/* Title + subtitle */}
-//         <Typography
-//           fontWeight={800}
-//           sx={{
-//             fontSize: { xs: "1.35rem", lg: "1.1rem", xl: "1.3rem" },
-//             lineHeight: 1.25,
-//             color: isCenter ? "#fff" : "#0b1b2b",
-//             transition: colorTransition,
-//           }}
-//         >
-//           {plan.title}
-//         </Typography>
-//         <Typography
-//           sx={{
-//             mt: 0.75,
-//             mb: 2,
-//             fontSize: { xs: "0.88rem", lg: "0.8rem", xl: "0.86rem" },
-//             lineHeight: 1.45,
-//             color: isCenter ? "rgba(255,255,255,0.85)" : "#5b6470",
-//             minHeight: { lg: "4.4em" },
-//             transition: colorTransition,
-//           }}
-//         >
-//           {plan.sub}
-//         </Typography>
-
-//         <Box
-//           sx={{
-//             borderBottom: "1px solid",
-//             borderColor: isCenter ? "rgba(255,255,255,0.25)" : "#e5e7eb",
-//             mb: 2,
-//             transition: "border-color 0.5s ease",
-//           }}
-//         />
-
-//         {/* Features */}
-//         <Stack spacing={1.4} mb={3}>
-//           {plan.features.map((f) => (
-//             <Stack key={f} direction="row" spacing={1} alignItems="flex-start">
-//               <CheckCircleIcon
-//                 sx={{
-//                   color: isCenter ? "#bbf7d0" : GREEN,
-//                   fontSize: 17,
-//                   mt: "2px",
-//                   flexShrink: 0,
-//                   transition: colorTransition,
-//                 }}
-//               />
-//               <Typography
-//                 sx={{
-//                   fontSize: { xs: "0.88rem", lg: "0.78rem", xl: "0.85rem" },
-//                   lineHeight: 1.4,
-//                   color: isCenter ? "#fff" : "#374151",
-//                   transition: colorTransition,
-//                 }}
-//               >
-//                 {f}
-//               </Typography>
-//             </Stack>
-//           ))}
-//         </Stack>
-
-//         {/* Price + button, pinned to the bottom so every card lines up */}
-//         <Box sx={{ mt: "auto" }}>
-//           <Box
-//             sx={{
-//               borderRadius: "14px",
-//               py: 1.4,
-//               textAlign: "center",
-//               mb: 1.75,
-//               border: "1px solid",
-//               borderColor: isCenter ? "rgba(253,230,138,0.7)" : "transparent",
-//               background: isCenter ? "rgba(255,255,255,0.14)" : "#ecfdf3",
-//               transition: "all 0.5s ease",
-//             }}
-//           >
-//             <Typography
-//               fontWeight={800}
-//               sx={{
-//                 fontSize: { xs: "1.7rem", lg: "1.5rem", xl: "1.8rem" },
-//                 lineHeight: 1.2,
-//                 color: isCenter ? "#fff" : "#0b1b2b",
-//                 transition: colorTransition,
-//               }}
-//             >
-//               {plan.price}
-//             </Typography>
-//             <Typography
-//               sx={{
-//                 fontSize: { xs: "0.8rem", lg: "0.72rem", xl: "0.78rem" },
-//                 color: isCenter ? "rgba(255,255,255,0.85)" : "#5b6470",
-//                 transition: colorTransition,
-//               }}
-//             >
-//               {plan.note}
-//             </Typography>
-//           </Box>
-
-//           <Button
-//             component={Link}
-//             href={plan.href}
-//             fullWidth
-//             variant="contained"
-//             endIcon={<ArrowForwardRoundedIcon />}
-//             sx={{
-//               background: btnBg,
-//               color: btnColor,
-//               border: "2px solid",
-//               borderColor: plan.outlined && !isCenter ? GREEN : "transparent",
-//               fontWeight: 700,
-//               textTransform: "none",
-//               borderRadius: "14px",
-//               py: 1.1,
-//               fontSize: "0.92rem",
-//               boxShadow: "none",
-//               transition: "all 0.5s ease",
-//               "&:hover": { background: btnHoverBg, boxShadow: "none" },
-//             }}
-//           >
-//             {plan.cta}
-//           </Button>
-//         </Box>
-//       </CardContent>
-//     </Card>
-//   );
-// }
-
-// /* ───────────────────────────── Page ───────────────────────────── */
-
-// type Rotation = {
-//   offset: number; // every card sits at slot (index + offset) % 5
-//   shift: number; // slots moved in the last rotation (-2..2)
-//   spin: number; // increments each rotation
-// };
-
-// export default function PricingPage() {
-//   const theme = useTheme();
-//   const isDesktop = useMediaQuery(theme.breakpoints.up("lg"));
-
-//   const [rot, setRot] = useState<Rotation>({ offset: 0, shift: 0, spin: 0 });
-//   const rotRef = useRef(rot);
-//   rotRef.current = rot;
-
-//   const intentTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-//   const pendingIndex = useRef<number | null>(null);
-//   const lockedId = useRef<string | null>(null); // card that landed under the cursor
-//   const cooldownUntil = useRef(0);
-
-//   const clearIntent = () => {
-//     if (intentTimer.current) clearTimeout(intentTimer.current);
-//     intentTimer.current = null;
-//     pendingIndex.current = null;
-//   };
-
-//   // Rotate the whole row so that cards sit at (index + target) % 5
-//   const rotateTo = (target: number) => {
-//     const prev = rotRef.current;
-//     if (prev.offset === target) return;
-
-//     // Shortest direction, so the hovered card travels at most 2 slots
-//     let shift = mod(target - prev.offset, SLOTS);
-//     if (shift > SLOTS / 2) shift -= SLOTS;
-
-//     const next: Rotation = { offset: target, shift, spin: prev.spin + 1 };
-//     rotRef.current = next;
-//     setRot(next);
-//   };
-
-//   const handleHover = (index: number) => {
-//     if (!isDesktop) return;
-
-//     const id = plans[index].id;
-
-//     // The card that rotated under a resting cursor must not trigger again
-//     if (lockedId.current === id) return;
-//     // Cards sliding past the cursor mid-rotation are ignored
-//     if (Date.now() < cooldownUntil.current) return;
-
-//     const slot = mod(index + rotRef.current.offset, SLOTS);
-//     if (slot === CENTER) {
-//       clearIntent();
-//       return;
-//     }
-//     if (pendingIndex.current === index) return;
-
-//     // Wait for the cursor to rest, so a quick sweep across the row
-//     // doesn't spin it
-//     clearIntent();
-//     pendingIndex.current = index;
-//     intentTimer.current = setTimeout(() => {
-//       intentTimer.current = null;
-//       pendingIndex.current = null;
-
-//       const target = mod(CENTER - index, SLOTS);
-//       const currentSlot = mod(index + rotRef.current.offset, SLOTS);
-//       // After rotating, this card will be sitting where the cursor is
-//       const arrivingIndex = mod(currentSlot - target, SLOTS);
-//       lockedId.current = plans[arrivingIndex].id;
-//       cooldownUntil.current = Date.now() + COOLDOWN;
-//       rotateTo(target);
-//     }, INTENT_DELAY);
-//   };
-
-//   const handleLeave = (index: number) => {
-//     clearIntent();
-//     if (lockedId.current === plans[index].id) lockedId.current = null;
-//   };
-
-//   // Keyboard users: tabbing into a card rotates it to the center too
-//   const handleFocus = (index: number) => {
-//     if (!isDesktop) return;
-//     clearIntent();
-//     rotateTo(mod(CENTER - index, SLOTS));
-//   };
-
-//   // Leaving the whole row rotates back to the default order
-//   const resetRotation = () => {
-//     clearIntent();
-//     lockedId.current = null;
-//     cooldownUntil.current = 0;
-//     rotateTo(0);
-//   };
-
-//   return (
-//     <Box
-//       sx={{
-//         background: "#f8fbf8",
-//         minHeight: "100vh",
-//         pt: { xs: 5, md: 7 },
-//       }}
-//     >
-//       {/* Keyframes for cards that wrap around the row (two names so the
-//           animation restarts on every rotation) */}
-//       <GlobalStyles
-//         styles={{
-//           "@keyframes pricingDipA": {
-//             "0%": { opacity: 1 },
-//             "35%": { opacity: 0 },
-//             "65%": { opacity: 0 },
-//             "100%": { opacity: 1 },
-//           },
-//           "@keyframes pricingDipB": {
-//             "0%": { opacity: 1 },
-//             "35%": { opacity: 0 },
-//             "65%": { opacity: 0 },
-//             "100%": { opacity: 1 },
-//           },
-//         }}
-//       />
-
-//       <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
-//         {/* Heading */}
-//         <Box textAlign="center" mb={{ xs: 4, md: 5 }}>
-//           <Typography
-//             variant="h2"
-//             fontWeight={800}
-//             sx={{
-//               fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem" },
-//               lineHeight: 1.2,
-//               color: "#0b1b2b",
-//             }}
-//           >
-//             Minimum Pricing. <br />
-//             <Box component="span" sx={{ color: GREEN }}>
-//               Maximum Preparation.
-//             </Box>
-//           </Typography>
-
-//           <Typography
-//             sx={{
-//               mt: 2,
-//               maxWidth: "680px",
-//               mx: "auto",
-//               color: "#5b6470",
-//               fontSize: { xs: "0.88rem", md: "0.98rem" },
-//               lineHeight: 1.7,
-//             }}
-//           >
-//             Choose the plan that fits your UPSC journey. Practice more, analyze
-//             better, and improve every day with PrelimsPass.
-//           </Typography>
-//         </Box>
-
-//         {/* Cards: 5 in one row on desktop, hover rotates a card to the center */}
-//         <Box
-//           onMouseLeave={resetRotation}
-//           sx={{
-//             display: "grid",
-//             gridTemplateColumns: {
-//               xs: "1fr",
-//               md: "repeat(2, 1fr)",
-//               lg: "repeat(5, 1fr)",
-//             },
-//             gap: { xs: "24px", lg: `${GAP}px` },
-//             alignItems: "stretch",
-//             pt: { lg: 5 },
-//             pb: { lg: 4 },
-//             perspective: { lg: `${PERSPECTIVE}px` },
-//           }}
-//         >
-//           {plans.map((plan, index) => {
-//             const slot = mod(index + rot.offset, SLOTS);
-//             const prevSlot = mod(slot - rot.shift, SLOTS);
-//             const wrapping = rot.spin > 0 && prevSlot + rot.shift !== slot;
-//             const isCenter = isDesktop ? slot === CENTER : !!plan.featured;
-
-//             return (
-//               <PlanCard
-//                 key={plan.id}
-//                 plan={plan}
-//                 index={index}
-//                 slot={slot}
-//                 isCenter={isCenter}
-//                 wrapping={isDesktop && wrapping}
-//                 spin={rot.spin}
-//                 onHover={() => handleHover(index)}
-//                 onLeave={() => handleLeave(index)}
-//                 onFocus={() => handleFocus(index)}
-//               />
-//             );
-//           })}
-//         </Box>
-//       </Container>
-
-//       <Box sx={{ height: 48 }} />
-
-//       {/* ── WHY CHOOSE ── */}
-//       <Box
-//         sx={{
-//           mt: { xs: 5, md: 6 },
-//           borderRadius: { xs: "32px 32px 0 0", md: "56px 56px 0 0" },
-//           border: "1px solid #dfeee3",
-//           background:
-//             "linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(244,250,246,0.95) 100%)",
-//           py: { xs: 3, md: 4 },
-//           boxShadow: "0 10px 40px rgba(22,163,74,0.05)",
-//           overflow: "hidden",
-//         }}
-//       >
-//         <Typography
-//           variant="h4"
-//           fontWeight={800}
-//           textAlign="center"
-//           sx={{
-//             color: "#111827",
-//             fontSize: { xs: "1.25rem", md: "1.6rem" },
-//           }}
-//         >
-//           Why Choose{" "}
-//           <Box component="span" sx={{ color: "#16a34a" }}>
-//             PrelimsPass
-//           </Box>
-//           ?
-//         </Typography>
-
-//         <Grid container sx={{ mt: { xs: 1, md: 0 } }}>
-//           {[
-//             {
-//               icon: (
-//                 <SecurityRoundedIcon sx={{ fontSize: { xs: 22, md: 28 } }} />
-//               ),
-//               title: "Real",
-//               subtitle: "UPSC Standard",
-//             },
-//             {
-//               icon: (
-//                 <AllInclusiveRoundedIcon
-//                   sx={{ fontSize: { xs: 22, md: 28 } }}
-//                 />
-//               ),
-//               title: "Unlimited",
-//               subtitle: "Practice",
-//             },
-//             {
-//               icon: (
-//                 <AutorenewRoundedIcon sx={{ fontSize: { xs: 22, md: 28 } }} />
-//               ),
-//               title: "24hr",
-//               subtitle: "Evaluation",
-//             },
-//             {
-//               icon: (
-//                 <BarChartRoundedIcon sx={{ fontSize: { xs: 22, md: 28 } }} />
-//               ),
-//               title: "Data-Driven",
-//               subtitle: "Analytics",
-//             },
-//             {
-//               icon: (
-//                 <CurrencyRupeeRoundedIcon
-//                   sx={{ fontSize: { xs: 22, md: 28 } }}
-//                 />
-//               ),
-//               title: "Affordable",
-//               subtitle: "Pricing",
-//             },
-//             {
-//               icon: (
-//                 <Groups2RoundedIcon sx={{ fontSize: { xs: 22, md: 28 } }} />
-//               ),
-//               title: "Trusted by",
-//               subtitle: "Aspirants",
-//             },
-//           ].map((item, index) => (
-//             <Grid
-//               key={index}
-//               size={{ xs: 4, md: 2 }}
-//               sx={{
-//                 position: "relative",
-//                 textAlign: "center",
-//                 py: { xs: 2, md: 1.5 },
-//                 // Bottom border separating the two rows on mobile (3-col layout)
-//                 borderBottom: {
-//                   xs: index < 3 ? "1px solid #e5e7eb" : "none",
-//                   md: "none",
-//                 },
-//               }}
-//             >
-//               {/* Vertical divider */}
-//               {index !== 5 && (
-//                 <Box
-//                   sx={{
-//                     position: "absolute",
-//                     right: 0,
-//                     top: "50%",
-//                     transform: "translateY(-50%)",
-//                     width: "1px",
-//                     height: "50px",
-//                     background: "#e5e7eb",
-//                     // On xs (3 cols): hide after every 3rd item
-//                     display: {
-//                       xs: (index + 1) % 3 === 0 ? "none" : "block",
-//                       md: "block",
-//                     },
-//                   }}
-//                 />
-//               )}
-
-//               {/* ICON */}
-//               <Box
-//                 sx={{
-//                   width: { xs: 46, md: 60 },
-//                   height: { xs: 46, md: 60 },
-//                   borderRadius: "50%",
-//                   background:
-//                     "linear-gradient(180deg, #f4fbf6 0%, #e9f7ee 100%)",
-//                   border: "1px solid #e3f1e7",
-//                   display: "flex",
-//                   alignItems: "center",
-//                   justifyContent: "center",
-//                   mx: "auto",
-//                   mb: { xs: 1, md: 1.5 },
-//                   color: "#16a34a",
-//                 }}
-//               >
-//                 {item.icon}
-//               </Box>
-
-//               {/* TITLE */}
-//               <Typography
-//                 sx={{
-//                   fontWeight: 700,
-//                   fontSize: { xs: "11.5px", md: "13px" },
-//                   color: "#111827",
-//                   lineHeight: 1.2,
-//                 }}
-//               >
-//                 {item.title}
-//               </Typography>
-
-//               {/* SUBTITLE */}
-//               <Typography
-//                 sx={{
-//                   fontSize: { xs: "10.5px", md: "13px" },
-//                   color: "#374151",
-//                   lineHeight: 1.3,
-//                   mt: 0.5,
-//                 }}
-//               >
-//                 {item.subtitle}
-//               </Typography>
-//             </Grid>
-//           ))}
-//         </Grid>
-//       </Box>
-//     </Box>
-//   );
-// }
-
 "use client";
 
 import Link from "next/link";
@@ -843,21 +13,17 @@ import {
   Typography,
 } from "@mui/material";
 
-import SecurityRoundedIcon from "@mui/icons-material/SecurityRounded";
 import BarChartRoundedIcon from "@mui/icons-material/BarChartRounded";
 import GpsFixedRoundedIcon from "@mui/icons-material/GpsFixedRounded";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import LaptopMacRoundedIcon from "@mui/icons-material/LaptopMacRounded";
 import DescriptionRoundedIcon from "@mui/icons-material/DescriptionRounded";
-import AutorenewRoundedIcon from "@mui/icons-material/AutorenewRounded";
-import CurrencyRupeeRoundedIcon from "@mui/icons-material/CurrencyRupeeRounded";
-import Groups2RoundedIcon from "@mui/icons-material/Groups2Rounded";
-import AllInclusiveRoundedIcon from "@mui/icons-material/AllInclusiveRounded";
 import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import EditNoteRoundedIcon from "@mui/icons-material/EditNoteRounded";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
+import PyqSection from "@/app/components/landingpage/PyqSection";
 
 /* ─────────────────────────── Tuning knobs ─────────────────────────── */
 
@@ -866,7 +32,11 @@ const GREEN_DARK = "#15803d";
 const DARK_GREEN = "#14532d";
 const GREEN_GRADIENT = `linear-gradient(165deg, ${DARK_GREEN} 0%, ${GREEN_DARK} 60%, ${GREEN} 100%)`;
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
-const COLOR_T = "color 450ms ease, background 450ms ease, border-color 450ms ease";
+const COLOR_T =
+  "color 450ms ease, background 450ms ease, border-color 450ms ease";
+
+// Font used in the "Why Aspirants Choose" section
+const W = "var(--website-font)";
 
 /* ───────────────────────────── Plan data ───────────────────────────── */
 
@@ -920,7 +90,10 @@ const plans: Plan[] = [
     title: "MagicMains",
     subtitle: "Eases GS Mains",
     stats: ["Answer Script Evaluation", "1-to-1 Feedback"],
-    features: ["14 years of GS Mains PYQs practice", "20 full-length GS Mains mock tests practice."],
+    features: [
+      "14 years of GS Mains PYQs practice",
+      "20 full-length GS Mains mock tests practice.",
+    ],
     price: "₹9,999",
     href: "/register?plan=mains-mock",
     headerIcon: <GpsFixedRoundedIcon />,
@@ -934,13 +107,151 @@ const plans: Plan[] = [
   },
 ];
 
-const whyChoose = [
-  { icon: <SecurityRoundedIcon />, title: "Real", subtitle: "UPSC Standard" },
-  { icon: <AllInclusiveRoundedIcon />, title: "Unlimited", subtitle: "Practice" },
-  { icon: <AutorenewRoundedIcon />, title: "24hr", subtitle: "Evaluation" },
-  { icon: <BarChartRoundedIcon />, title: "Data-Driven", subtitle: "Analytics" },
-  { icon: <CurrencyRupeeRoundedIcon />, title: "Affordable", subtitle: "Pricing" },
-  { icon: <Groups2RoundedIcon />, title: "Trusted by", subtitle: "Aspirants" },
+/* ══ DATA ══ */
+const svgProps = {
+  width: 20,
+  height: 20,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.8,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+};
+
+const features = [
+  {
+    title: "UPSC Pattern",
+    desc: "All tests strictly follow UPSC exam pattern and difficulty level.",
+    icon: (
+      <svg {...svgProps}>
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+    ),
+  },
+  {
+    title: "Unlimited Practice",
+    desc: "Topic-wise & subject-wise questions with unlimited retakes.",
+    icon: (
+      <svg {...svgProps}>
+        <rect x="3" y="3" width="7" height="7" rx="1" />
+        <rect x="14" y="3" width="7" height="7" rx="1" />
+        <rect x="3" y="14" width="7" height="7" rx="1" />
+        <rect x="14" y="14" width="7" height="7" rx="1" />
+      </svg>
+    ),
+  },
+  {
+    title: "Mock Exams",
+    desc: "Real UPSC pattern mock tests.",
+    icon: (
+      <svg {...svgProps}>
+        <rect x="2" y="3" width="20" height="14" rx="2" />
+        <path d="M8 21h8M12 17v4" />
+      </svg>
+    ),
+  },
+  {
+    title: "Progress Tracking",
+    desc: "Monitor your journey with detailed reports and trend analysis.",
+    icon: (
+      <svg {...svgProps}>
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+      </svg>
+    ),
+  },
+  {
+    title: "Detailed Analytics",
+    desc: "Track accuracy, speed, strengths and topic performance.",
+    icon: (
+      <svg {...svgProps}>
+        <line x1="18" y1="20" x2="18" y2="10" />
+        <line x1="12" y1="20" x2="12" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="14" />
+        <polyline points="2 20 22 20" />
+      </svg>
+    ),
+  },
+];
+
+const subjects = [
+  {
+    label: "Environment",
+    icon: (
+      <svg {...svgProps}>
+        <path d="M12 22V12" />
+        <path d="M12 12C12 12 7 10 5 6c3 0 5.5 1.5 7 6z" />
+        <path d="M12 12C12 12 17 10 19 6c-3 0-5.5 1.5-7 6z" />
+        <path d="M5 22h14" />
+      </svg>
+    ),
+  },
+  {
+    label: "Geography",
+    icon: (
+      <svg {...svgProps}>
+        <circle cx="12" cy="12" r="10" />
+        <line x1="2" y1="12" x2="22" y2="12" />
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+      </svg>
+    ),
+  },
+  {
+    label: "Science & Tech",
+    icon: (
+      <svg {...svgProps}>
+        <path d="M8 3v4l-2 1-2-1V3" />
+        <path d="M6 8v13" />
+        <path d="M14 3v4l2 1 2-1V3" />
+        <path d="M18 8v13" />
+        <path d="M6 21h12" />
+      </svg>
+    ),
+  },
+  {
+    label: "Polity",
+    icon: (
+      <svg {...svgProps}>
+        <line x1="12" y1="2" x2="12" y2="5" />
+        <path d="M4 10H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h20a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1h-2" />
+        <rect x="6" y="5" width="12" height="5" rx="1" />
+        <line x1="9" y1="15" x2="9" y2="18" />
+        <line x1="12" y1="15" x2="12" y2="18" />
+        <line x1="15" y1="15" x2="15" y2="18" />
+      </svg>
+    ),
+  },
+  {
+    label: "Economics",
+    icon: (
+      <svg {...svgProps}>
+        <line x1="12" y1="1" x2="12" y2="23" />
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+      </svg>
+    ),
+  },
+  {
+    label: "History",
+    icon: (
+      <svg {...svgProps}>
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+        <path d="M3 3v5h5" />
+        <path d="M12 7v5l4 2" />
+      </svg>
+    ),
+  },
+  {
+    label: "Current Affairs",
+    icon: (
+      <svg {...svgProps}>
+        <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
+        <path d="M18 14h-8" />
+        <path d="M15 18h-5" />
+        <path d="M10 6h8v4h-8z" />
+      </svg>
+    ),
+  },
 ];
 
 /* ───────────────────────────── Illustration ───────────────────────────── */
@@ -978,7 +289,8 @@ function Illustration({ data }: { data: Plan["illustration"] }) {
           position: "absolute",
           inset: "6% 4%",
           borderRadius: "50%",
-          background: "radial-gradient(circle, #d3f2de 0%, rgba(211,242,222,0) 70%)",
+          background:
+            "radial-gradient(circle, #d3f2de 0%, rgba(211,242,222,0) 70%)",
           transition: "opacity 450ms ease",
           ".pp-card:hover &": { opacity: 0.25 },
         }}
@@ -1135,7 +447,9 @@ function PlanCard({ plan }: { plan: Plan }) {
                     ? `linear-gradient(145deg, ${GREEN} 0%, ${DARK_GREEN} 100%)`
                     : "#e3f5e9",
                   color: isSquare ? "#fff" : GREEN,
-                  boxShadow: isSquare ? "0 10px 20px rgba(22,163,74,0.3)" : "none",
+                  boxShadow: isSquare
+                    ? "0 10px 20px rgba(22,163,74,0.3)"
+                    : "none",
                   transition: COLOR_T,
                   "& svg": { fontSize: 30 },
                 }}
@@ -1179,7 +493,12 @@ function PlanCard({ plan }: { plan: Plan }) {
                 mb={2.25}
               >
                 {plan.stats.map((s, i) => (
-                  <Stack key={s} direction="row" alignItems="center" columnGap={{ xs: 1.25, sm: 1.75 }}>
+                  <Stack
+                    key={s}
+                    direction="row"
+                    alignItems="center"
+                    columnGap={{ xs: 1.25, sm: 1.75 }}
+                  >
                     {i > 0 && (
                       <Box
                         className="pp-divider"
@@ -1236,7 +555,12 @@ function PlanCard({ plan }: { plan: Plan }) {
                 >
                   <CheckCircleIcon
                     className="pp-check"
-                    sx={{ color: GREEN, fontSize: 21, flexShrink: 0, transition: COLOR_T }}
+                    sx={{
+                      color: GREEN,
+                      fontSize: 21,
+                      flexShrink: 0,
+                      transition: COLOR_T,
+                    }}
                   />
                   <Typography
                     className="pp-text"
@@ -1379,6 +703,145 @@ function PlanCard({ plan }: { plan: Plan }) {
   );
 }
 
+/* ───────────────────────────── Subjects bar ───────────────────────────── */
+
+function SubjectsBar() {
+  return (
+    <Box
+      sx={{
+        background: "#fff",
+        borderRadius: "14px",
+        boxShadow: "0 4px 24px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05)",
+        border: "1px solid #f1f5f9",
+        px: "14px",
+        py: "12px",
+        display: "flex",
+        alignItems: "center",
+        flexWrap: "nowrap",
+        overflow: "hidden",
+      }}
+    >
+      {/* pinned label */}
+      <Box
+        sx={{
+          flexShrink: 0,
+          pr: "12px",
+          mr: "12px",
+          borderRight: "1px solid #e5e7eb",
+        }}
+      >
+        <Typography
+          sx={{
+            fontWeight: 700,
+            fontSize: "0.8rem",
+            color: "#0f172a",
+            lineHeight: 1.35,
+            whiteSpace: "nowrap",
+          }}
+        >
+          Practice Across
+        </Typography>
+        <Typography
+          sx={{
+            fontWeight: 700,
+            fontSize: "0.8rem",
+            color: "#0f172a",
+            lineHeight: 1.35,
+            whiteSpace: "nowrap",
+          }}
+        >
+          All UPSC Subjects
+        </Typography>
+      </Box>
+
+      {/* scrollable subjects */}
+      <Box
+        sx={{
+          display: "flex",
+          flex: 1,
+          flexWrap: "nowrap",
+          alignItems: "center",
+          justifyContent: { xs: "flex-start", lg: "space-around" },
+          overflowX: "auto",
+          gap: "2px",
+          "&::-webkit-scrollbar": { display: "none" },
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
+        }}
+      >
+        {subjects.map((sub) => (
+          <Box
+            key={sub.label}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "3px",
+              cursor: "pointer",
+              px: "10px",
+              py: "5px",
+              borderRadius: "8px",
+              flexShrink: 0,
+              transition: "all 0.2s ease",
+              "&:hover": {
+                background: "rgba(22,163,74,0.07)",
+                "& .subject-icon": { color: "#16a34a" },
+                "& .subject-label": { color: "#16a34a" },
+              },
+            }}
+          >
+            <Box
+              className="subject-icon"
+              sx={{
+                color: "#60c083",
+                transition: "color 0.2s ease",
+                lineHeight: 0,
+              }}
+            >
+              {sub.icon}
+            </Box>
+            <Typography
+              className="subject-label"
+              sx={{
+                fontSize: "0.68rem",
+                fontWeight: 600,
+                color: "#64748b",
+                whiteSpace: "nowrap",
+                transition: "color 0.2s ease",
+              }}
+            >
+              {sub.label}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
+
+      {/* chevron hint (mobile only) */}
+      <Box
+        sx={{
+          display: { xs: "flex", lg: "none" },
+          flexShrink: 0,
+          pl: "4px",
+          color: "#94a3b8",
+        }}
+      >
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </Box>
+    </Box>
+  );
+}
+
 /* ───────────────────────────── Page ───────────────────────────── */
 
 export default function PricingPage() {
@@ -1388,13 +851,17 @@ export default function PricingPage() {
         position: "relative",
         overflow: "hidden",
         background: "#f8fbf8",
-        minHeight: "100vh",
         pt: { xs: 5, md: 7 },
       }}
     >
       <Container
         maxWidth={false}
-        sx={{ position: "relative", maxWidth: { lg: 1240 }, px: { xs: 2, sm: 3, md: 4 } }}
+        sx={{
+          position: "relative",
+          maxWidth: { lg: 1240 },
+          px: { xs: 2, sm: 3, md: 4 },
+          pb: { xs: 3, md: 4 },
+        }}
       >
         {/* Heading */}
         <Box textAlign="center" mb={{ xs: 4, md: 6 }}>
@@ -1405,7 +872,13 @@ export default function PricingPage() {
             spacing={1.5}
             mb={1.5}
           >
-            <Box sx={{ width: { xs: 24, sm: 40 }, height: "2px", background: GREEN }} />
+            <Box
+              sx={{
+                width: { xs: 24, sm: 40 },
+                height: "2px",
+                background: GREEN,
+              }}
+            />
             <Typography
               fontWeight={700}
               sx={{
@@ -1416,7 +889,13 @@ export default function PricingPage() {
             >
               CHOOSE YOUR PLAN
             </Typography>
-            <Box sx={{ width: { xs: 24, sm: 40 }, height: "2px", background: GREEN }} />
+            <Box
+              sx={{
+                width: { xs: 24, sm: 40 },
+                height: "2px",
+                background: GREEN,
+              }}
+            />
           </Stack>
 
           <Typography
@@ -1433,61 +912,6 @@ export default function PricingPage() {
               Maximum Preparation.
             </Box>
           </Typography>
-
-          {/* <Typography
-            sx={{
-              mt: 2,
-              maxWidth: "620px",
-              mx: "auto",
-              color: "#4b5563",
-              fontSize: { xs: "0.9rem", md: "1rem" },
-              lineHeight: 1.7,
-            }}
-          >
-            Choose the plan that fits your UPSC journey. Practice more, analyze
-            better, and improve every day with PrelimsPass.
-          </Typography>
-
-          <Stack
-            direction="row"
-            justifyContent="center"
-            flexWrap="wrap"
-            gap={1.5}
-            mt={3}
-          >
-            {plans.map((plan) => (
-              <Box
-                key={plan.id}
-                sx={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 1,
-                  px: 2,
-                  py: 0.9,
-                  borderRadius: "999px",
-                  background: "#fff",
-                  border: "1px solid #cfe9d6",
-                  color: DARK_GREEN,
-                  fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                  transition: `all 300ms ${EASE}`,
-                  "&:hover": {
-                    background: GREEN,
-                    borderColor: GREEN,
-                    color: "#fff",
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 8px 18px rgba(22,163,74,0.3)",
-                  },
-                }}
-              >
-                <Box
-                  component="span"
-                  sx={{ width: 8, height: 8, borderRadius: "50%", background: "currentColor" }}
-                />
-                <b>{plan.title}</b>
-                <span>{plan.subtitle}</span>
-              </Box>
-            ))}
-          </Stack> */}
         </Box>
 
         {/* Two equal cards: stacked below lg, 50/50 on desktop */}
@@ -1498,120 +922,125 @@ export default function PricingPage() {
             </Grid>
           ))}
         </Grid>
+
+        {/* Subjects bar: in normal flow, directly below the pricing cards */}
+        <Box sx={{ mt: { xs: 3, md: 4 } }}>
+          <SubjectsBar />
+        </Box>
       </Container>
 
-      <Box sx={{ height: 48 }} />
+      {/* PYQ section (target of the floating PYQ button) */}
+      <Box id="pyq-section" sx={{ scrollMarginTop: { xs: "80px", md: "96px" } }}>
+        <PyqSection />
+      </Box>
 
       {/* ── WHY CHOOSE ── */}
       <Box
-        sx={{
-          position: "relative",
-          mt: { xs: 5, md: 6 },
-          borderRadius: { xs: "32px 32px 0 0", md: "56px 56px 0 0" },
-          border: "1px solid #dfeee3",
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(244,250,246,0.95) 100%)",
-          py: { xs: 3, md: 4 },
-          boxShadow: "0 10px 40px rgba(22,163,74,0.05)",
-          overflow: "hidden",
-        }}
+        component="section"
+        sx={{ pt: "24px", pb: "24px", background: "#fff" }}
       >
-        <Typography
-          variant="h4"
-          fontWeight={800}
-          textAlign="center"
-          sx={{ color: "#111827", fontSize: { xs: "1.25rem", md: "1.6rem" } }}
+        <Box
+          sx={{ maxWidth: 1240, mx: "auto", px: { xs: "18px", sm: "24px" } }}
         >
-          Why Choose{" "}
-          <Box component="span" sx={{ color: GREEN }}>
-            PrelimsPass
-          </Box>
-          ?
-        </Typography>
-
-        <Grid container sx={{ mt: { xs: 1, md: 0 } }}>
-          {whyChoose.map((item, index) => (
-            <Grid
-              key={item.title}
-              size={{ xs: 4, md: 2 }}
+          <Box sx={{ textAlign: "center", mb: 2.5 }}>
+            <Typography
+              component="h2"
               sx={{
-                position: "relative",
-                textAlign: "center",
-                py: { xs: 2, md: 1.5 },
-                borderBottom: {
-                  xs: index < 3 ? "1px solid #e5e7eb" : "none",
-                  md: "none",
-                },
-                "&:hover .pp-why-icon": {
-                  background: GREEN,
-                  color: "#fff",
-                  transform: "translateY(-6px) scale(1.08)",
-                  boxShadow: "0 12px 22px rgba(22,163,74,0.3)",
-                },
+                fontSize: { xs: "1.55rem", md: "2rem" },
+                fontWeight: 800,
+                color: "#0f172a",
+                fontFamily: W,
+                lineHeight: 1.2,
               }}
             >
-              {index !== whyChoose.length - 1 && (
-                <Box
-                  sx={{
-                    position: "absolute",
-                    right: 0,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    width: "1px",
-                    height: "50px",
-                    background: "#e5e7eb",
-                    display: {
-                      xs: (index + 1) % 3 === 0 ? "none" : "block",
-                      md: "block",
-                    },
-                  }}
-                />
-              )}
-
-              <Box
-                className="pp-why-icon"
-                sx={{
-                  width: { xs: 46, md: 60 },
-                  height: { xs: 46, md: 60 },
-                  borderRadius: "50%",
-                  background: "linear-gradient(180deg, #f4fbf6 0%, #e9f7ee 100%)",
-                  border: "1px solid #e3f1e7",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  mx: "auto",
-                  mb: { xs: 1, md: 1.5 },
-                  color: GREEN,
-                  transition: `all 350ms ${EASE}`,
-                  "& svg": { fontSize: { xs: 22, md: 28 } },
-                }}
-              >
-                {item.icon}
+              Why Aspirants Choose{" "}
+              <Box component="span" sx={{ color: "#16a34a" }}>
+                PrelimsPass
               </Box>
+              ?
+            </Typography>
+          </Box>
 
-              <Typography
+          {/* Centered flex-wrap: works for 5 cards at every screen size */}
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: "14px",
+            }}
+          >
+            {features.map((f) => (
+              <Box
+                key={f.title}
                 sx={{
-                  fontWeight: 700,
-                  fontSize: { xs: "11.5px", md: "13px" },
-                  color: "#111827",
-                  lineHeight: 1.2,
+                  width: {
+                    xs: "calc((100% - 14px) / 2)",
+                    sm: "calc((100% - 28px) / 3)",
+                    lg: "calc((100% - 56px) / 5)",
+                  },
+                  boxSizing: "border-box",
+                  background: "#fff",
+                  border: "1.5px solid #e5e7eb",
+                  borderRadius: "14px",
+                  p: { xs: "14px 10px", md: "16px 12px" },
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  textAlign: "center",
+                  gap: 0.8,
+                  cursor: "default",
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    borderColor: "#16a34a",
+                    boxShadow: "0 8px 28px rgba(22,163,74,0.13)",
+                    transform: "translateY(-4px)",
+                    "& .fbox": { background: "#16a34a", color: "#fff" },
+                  },
                 }}
               >
-                {item.title}
-              </Typography>
-              <Typography
-                sx={{
-                  fontSize: { xs: "10.5px", md: "13px" },
-                  color: "#374151",
-                  lineHeight: 1.3,
-                  mt: 0.5,
-                }}
-              >
-                {item.subtitle}
-              </Typography>
-            </Grid>
-          ))}
-        </Grid>
+                <Box
+                  className="fbox"
+                  sx={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: "12px",
+                    background: "rgba(22,163,74,0.09)",
+                    color: "#16a34a",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  {f.icon}
+                </Box>
+                <Typography
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: "0.78rem",
+                    color: "#111827",
+                    fontFamily: W,
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {f.title}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "0.68rem",
+                    color: "#6b7280",
+                    lineHeight: 1.5,
+                    fontFamily: W,
+                  }}
+                >
+                  {f.desc}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
       </Box>
     </Box>
   );

@@ -4,6 +4,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { Box, Typography, Fade } from "@mui/material";
 
 const SECTION_ID = "pyq-section";
+const PYQ_PATH = "/pricing"; // page where <PyqSection /> is rendered
 const W = "var(--website-font)";
 
 const BookIcon = (
@@ -37,10 +38,10 @@ export default function FloatingPyqButton() {
   const pathname = usePathname();
   const [showTip, setShowTip] = useState(false);
 
-  // Scroll to the section once we land on the homepage with the hash present
+  // Scroll to the section once we land on the pricing page with the hash present
   // (covers both a hard navigation and a client-side router.push from another page).
   useEffect(() => {
-    if (pathname !== "/") return;
+    if (pathname !== PYQ_PATH) return;
     if (typeof window === "undefined") return;
     if (window.location.hash !== `#${SECTION_ID}`) return;
 
@@ -48,7 +49,7 @@ export default function FloatingPyqButton() {
       document
         .getElementById(SECTION_ID)
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 150); // small delay so the homepage content has mounted
+    }, 150); // small delay so the page content has mounted
     return () => clearTimeout(timer);
   }, [pathname]);
 
@@ -63,11 +64,12 @@ export default function FloatingPyqButton() {
   }, []);
 
   const handleClick = () => {
-    const el = pathname === "/" ? document.getElementById(SECTION_ID) : null;
+    const el =
+      pathname === PYQ_PATH ? document.getElementById(SECTION_ID) : null;
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
     } else {
-      router.push(`/#${SECTION_ID}`);
+      router.push(`${PYQ_PATH}#${SECTION_ID}`);
     }
   };
 
