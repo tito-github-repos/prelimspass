@@ -727,7 +727,7 @@
 //               subtitle: "Analytics",
 //             },
 //             {
-//               icon: (
+//               
 //                 <CurrencyRupeeRoundedIcon
 //                   sx={{ fontSize: { xs: 22, md: 28 } }}
 //                 />
@@ -893,8 +893,8 @@ type Plan = {
 
 const plans: Plan[] = [
   {
-    id: "ezeeexams",
-    title: "EzeeExams",
+    id: "For Facts",
+    title: "For Facts",
     subtitle: "Eases GS Prelims",
     stats: ["10,000 facts", "60 mock tests"],
     features: [
@@ -917,7 +917,7 @@ const plans: Plan[] = [
   },
   {
     id: "magicmocks",
-    title: "MagicMains",
+    title: "WriteRight",
     subtitle: "Eases GS Mains",
     stats: ["Answer Script Evaluation", "1-to-1 Feedback"],
     features: ["14 years of GS Mains PYQs practice", "20 full-length GS Mains mock tests practice."],

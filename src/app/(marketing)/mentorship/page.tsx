@@ -484,7 +484,7 @@ export default function PricingPage() {
                         >
                           What is Silver Streak?
                         </Typography>
-                        {/* TODO: confirm "EzeeExams App" with the client */}
+                        {/* TODO: confirm "For Facts App" with the client */}
                         <Typography
                           sx={{
                             mt: 0.8,
@@ -493,7 +493,7 @@ export default function PricingPage() {
                             lineHeight: 1.6,
                           }}
                         >
-                          Silver Streak is for EzeeExams App users - PP Mobile App
+                          Silver Streak is for For Facts App users - PP Mobile App
                           users, who use the app daily for 7, 14 or 21 days.
                           Achiever get this additional benefits from PP.
                         </Typography>

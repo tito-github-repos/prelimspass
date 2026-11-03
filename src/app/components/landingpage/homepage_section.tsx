@@ -181,7 +181,7 @@ const products = [
         }}
       />
     ),
-    title: "EzeeExams - EE",
+    title: "For Facts-FF",
     sub: "Eases GS Prelims",
     intro:
       "Two applications, Mobile App and Web App, eases GS prelims preparation.",
@@ -214,30 +214,67 @@ const products = [
     borderCol: "#fed7aa",
     // Edit document icon: descriptive answers (from /public/Icons/edit-document-icon.svg)
     icon: (
-      <Box
-        component="span"
-        sx={{
-          display: "block",
-          width: 26,
-          height: 26,
-          backgroundColor: "#ea580c",
-          WebkitMask:
-            "url(/Icons/edit-document-icon.svg) center / contain no-repeat",
-          mask: "url(/Icons/edit-document-icon.svg) center / contain no-repeat",
-        }}
-      />
-    ),
-    title: "MagicMains - MM",
+  <Box
+    component="span"
+    sx={{ position: "relative", display: "block", width: 26, height: 26 }}
+  >
+    {/* existing notepad + pencil icon */}
+    <Box
+      component="span"
+      sx={{
+        display: "block",
+        width: "100%",
+        height: "100%",
+        backgroundColor: "#ea580c",
+        WebkitMask:
+          "url(/Icons/edit-document-icon.svg) center / contain no-repeat",
+        mask: "url(/Icons/edit-document-icon.svg) center / contain no-repeat",
+      }}
+    />
+
+    {/* tick badge, bottom-right corner */}
+    <Box
+      component="span"
+      sx={{
+        position: "absolute",
+        right: -7,
+        bottom: -7,
+        width: 15,
+        height: 15,
+        borderRadius: "50%",
+        background: "#16a34a",
+        border: "1.5px solid #fff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <svg
+        width="9"
+        height="9"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#fff"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+    </Box>
+  </Box>
+),
+    title: "WriteRight-RR",
     sub: "Eases GS Mains",
     intro:
       "MM is a mobile application addresses mains answer writing practice, by providing pyqs and mock questions in an answer booklet format- paper wise ,syllabus wise, subject wise and topic wise.",
     points: [
       { text: "Aspirants can download the answer booklets." },
       {
-        text: "Write answers and share it with MagicMains team for evaluation and one to one feedback.",
+        text: "Write answers and share it with WriteRight team for evaluation and one to one feedback.",
       },
       {
-        text: "After registration, the MagicMains mobile app link is sent to your registered email.",
+        text: "After registration, the WriteRight mobile app link is sent to your registered email.",
       },
       {
         text: "Completely FREE for all registered users for one day.",
@@ -367,12 +404,12 @@ const wFeats = [
   "Improve writing skills consistently",
 ];
 
-/* ══ HOW IT WORKS: 6 steps (EzeeExams flow)
+/* ══ HOW IT WORKS: 6 steps (For Facts flow)
    Phone icons = Mobile App steps · Monitor icons = Web App steps ══ */
 const steps = [
   {
     n: "1",
-    title: "Register in EzeeExams",
+    title: "Register in For Facts",
     desc: "To access the mobile app",
     // Phone with a user (register)
     icon: (
@@ -511,12 +548,12 @@ const steps = [
     ),
   },
 ];
-/* ══ HOW MAGICMAINS WORKS: 4 steps (reuses EzeeExams icons 1, 2, 4, 5) ══ */
+/* ══ HOW WRITERIGHT WORKS: 4 steps (reuses For Facts icons 1, 2, 4, 5) ══ */
 const mmSteps = [
   {
     ...steps[0],
     n: "1",
-    title: "Register in MagicMains",
+    title: "Register in WriteRight",
     desc: "To access the mobile app",
   },
   {
@@ -828,7 +865,7 @@ export default function HomepageSections() {
             </Typography> */}
           </Box>
 
-          {/* ─── NEW: EzeeExams / MagicMocks (2 cards) ─── */}
+          {/* ─── NEW: For Facts / MagicMocks (2 cards) ─── */}
           <Box
             sx={{
               display: "grid",
@@ -1018,7 +1055,7 @@ export default function HomepageSections() {
                  {/* Pushes the button to the bottom so both cards align */}
                   <Box sx={{ flex: 1 }} />
 
-                {/* Highlight line (only EzeeExams has this) */}
+                {/* Highlight line (only For Facts has this) */}
                   {p.highlight && (
                     <Box
                       sx={{
@@ -1535,7 +1572,7 @@ export default function HomepageSections() {
             position: "relative",
           }}
         >
-          {/* ── EzeeExams flow ── */}
+          {/* ── For Facts flow ── */}
 <Box sx={{ textAlign: "center", mb: { xs: 3, md: 3.5 } }}>
   <Typography
     component="h2"
@@ -1546,7 +1583,7 @@ export default function HomepageSections() {
       fontFamily: W,
     }}
   >
-    How EzeeExams Works?
+    How For Facts Works?
   </Typography>
   <Typography
     sx={{ fontSize: "0.82rem", color: "#94a3b8", fontFamily: W, mt: 0.6 }}
@@ -1567,7 +1604,7 @@ export default function HomepageSections() {
   }}
 />
 
-  {/* ── MagicMains flow ── */}
+  {/* ── WriteRight flow ── */}
   <Box sx={{ textAlign: "center", mb: { xs: 3, md: 3.5 } }}>
     <Typography
       component="h2"
@@ -1578,7 +1615,7 @@ export default function HomepageSections() {
         fontFamily: W,
       }}
     >
-      How MagicMains Works?
+      How WriteRight Works?
     </Typography>
     <Typography
       sx={{ fontSize: "0.82rem", color: "#94a3b8", fontFamily: W, mt: 0.6 }}
