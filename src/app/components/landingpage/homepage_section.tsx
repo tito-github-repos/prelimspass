@@ -267,7 +267,7 @@ const products = [
     title: "wRiteRight - RR",
     sub: "Eases GS Mains",
     intro:
-      "MM is a mobile application addresses mains answer writing practice, by providing pyqs and mock questions in an answer booklet format- paper wise ,syllabus wise, subject wise and topic wise.",
+      "RR is a mobile application addresses mains answer writing practice, by providing pyqs and mock questions in an answer booklet format- paper wise ,syllabus wise, subject wise and topic wise.",
     points: [
       { text: "Aspirants can download the answer booklets." },
       {
@@ -544,7 +544,7 @@ const mmSteps = [
     ...steps[3],
     n: "3",
     title: "Practice Non-PYQs",
-    desc: "For 2027 coverage in MM",
+    desc: "For 2027 coverage in RR",
   },
   {
     ...steps[4],
