@@ -87,7 +87,7 @@ const plans: Plan[] = [
   },
   {
     id: "magicmocks",
-    title: "WriteRight",
+    title: "wRiteRight",
     subtitle: "Eases GS Mains",
     stats: ["Answer Script Evaluation", "1-to-1 Feedback"],
     features: [

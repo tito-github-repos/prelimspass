@@ -264,17 +264,17 @@ const products = [
         </Box>
       </Box>
     ),
-    title: "WriteRight - RR",
+    title: "wRiteRight - RR",
     sub: "Eases GS Mains",
     intro:
       "MM is a mobile application addresses mains answer writing practice, by providing pyqs and mock questions in an answer booklet format- paper wise ,syllabus wise, subject wise and topic wise.",
     points: [
       { text: "Aspirants can download the answer booklets." },
       {
-        text: "Write answers and share it with WriteRight team for evaluation and one to one feedback.",
+        text: "Write answers and share it with wRiteRight team for evaluation and one to one feedback.",
       },
       {
-        text: "After registration, the WriteRight mobile app link is sent to your registered email.",
+        text: "After registration, the wRiteRight mobile app link is sent to your registered email.",
       },
       {
         text: "Completely FREE for all registered users for one day.",
@@ -531,7 +531,7 @@ const mmSteps = [
   {
     ...steps[0],
     n: "1",
-    title: "Register in WriteRight",
+    title: "Register in wRiteRight",
     desc: "To access the mobile app",
   },
   {
@@ -1495,7 +1495,7 @@ export default function HomepageSections() {
                 fontFamily: W,
               }}
             >
-              How WriteRight Works?
+              How wRiteRight Works?
             </Typography>
             <Typography
               sx={{
