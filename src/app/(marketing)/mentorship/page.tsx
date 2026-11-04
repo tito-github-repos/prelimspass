@@ -523,7 +523,7 @@ export default function PricingPage() {
                           </Box>{" "}
                           who use the app daily for 7, 14, or 21 consecutive
                           days. Achievers receive these additional benefits from
-                          FF.
+                          PP.
                         </Typography>
 
                         {/* Tiers */}
@@ -720,7 +720,7 @@ export default function PricingPage() {
                         </Box>
 
                         {/* TODO: add link / onClick for booking */}
-                        <Button
+                        {/* <Button
                           endIcon={<ArrowForwardRoundedIcon />}
                           sx={{
                             px: { xs: 3, md: 4 },
@@ -736,7 +736,7 @@ export default function PricingPage() {
                           }}
                         >
                           Book Consultation
-                        </Button>
+                        </Button> */}
                       </Box>
                     </Grid>
                   </Grid>

@@ -171,9 +171,9 @@ export default function PyqSection() {
                     lineHeight: 1.3,
                   }}
                 >
-                  Completely FREE for all registered users
+                  Completely FREE for all registered users.
                 </Typography>
-                <Typography
+                {/* <Typography
                   sx={{
                     fontSize: "0.72rem",
                     fontWeight: 800,
@@ -185,7 +185,7 @@ export default function PyqSection() {
                   }}
                 >
                   for one Day
-                </Typography>
+                </Typography> */}
               </Box>
             </Box>
           </Box>

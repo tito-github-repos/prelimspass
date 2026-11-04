@@ -201,10 +201,10 @@ const products = [
         text: "After registration, the mobile app link is sent to your registered email.",
       },
       {
-        text: "Completely FREE for all registered users for one day.",
+        text: "All Registered users can access and practice PYQs FF Mobile App and FF Web App.",
       },
     ],
-    highlight: "60 mock tests practice before the 2027 prelims examination.",
+    highlight: "30 mock tests practice before the 2027 prelims examination.",
     btn: "Buy Now",
     href: "/pricing",
   },
@@ -264,23 +264,23 @@ const products = [
         </Box>
       </Box>
     ),
-    title: "wRiteRight - RR",
+    title: "wRite Right - RR",
     sub: "Eases GS Mains",
     intro:
       "RR is a mobile application addresses mains answer writing practice, by providing pyqs and mock questions in an answer booklet format- paper wise ,syllabus wise, subject wise and topic wise.",
     points: [
       { text: "Aspirants can download the answer booklets." },
       {
-        text: "Write answers and share it with wRiteRight team for evaluation and one to one feedback.",
+        text: "Write answers and share it with wRite Right team for evaluation and one to one feedback.",
       },
       {
-        text: "After registration, the wRiteRight mobile app link is sent to your registered email.",
+        text: "After registration, the wRite Right mobile app link is sent to your registered email.",
       },
       {
-        text: "Completely FREE for all registered users for one day.",
+        text: "All Registered users can access and  view  PYQs  Paperwise,syllabuswise and topicwise in RR Mobile App.",
       },
     ],
-    highlight: "20 mock tests practice before the 2027 mains examination.",
+    highlight: "10 mock tests practice before the 2027 mains examination.",
     btn: "Buy Now",
     href: "/pricing",
   },
@@ -531,7 +531,7 @@ const mmSteps = [
   {
     ...steps[0],
     n: "1",
-    title: "Register in wRiteRight",
+    title: "Register in wRite Right",
     desc: "To access the mobile app",
   },
   {
@@ -731,7 +731,7 @@ export default function HomepageSections() {
                 mb: 0.5,
               }}
             >
-              Our Offerings
+              PP Offerings
             </Typography>
             {/* <Typography
               sx={{ fontSize: "0.88rem", color: "#64748b", fontFamily: W }}
@@ -1495,7 +1495,7 @@ export default function HomepageSections() {
                 fontFamily: W,
               }}
             >
-              How wRiteRight Works?
+              How wRite Right Works?
             </Typography>
             <Typography
               sx={{
