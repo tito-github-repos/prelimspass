@@ -13,13 +13,8 @@ import {
   Typography,
 } from "@mui/material";
 
-import BarChartRoundedIcon from "@mui/icons-material/BarChartRounded";
-import GpsFixedRoundedIcon from "@mui/icons-material/GpsFixedRounded";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
-import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded";
-import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
-import EditNoteRoundedIcon from "@mui/icons-material/EditNoteRounded";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import PyqSection from "@/app/components/landingpage/PyqSection";
 
@@ -38,25 +33,27 @@ const W = "var(--website-font)";
 
 /* ───────────────────────────── Plan data ───────────────────────────── */
 
+// A separately priced pack shown inside a card (used by wRiteRight)
+type Pack = {
+  title: string;
+  features: string[];
+  price: string;
+  href: string;
+};
+
 type Plan = {
   id: string;
   title: string;
   subtitle: string;
-  stats?: string[]; // "10,000 facts | 60 mock tests" style row
-  description?: string; // shown instead of stats when there are none
+  stats?: string[]; // shown as small pills under the header
   features: string[];
+  packs?: Pack[]; // when present, the card shows separate priced packs
   price: string;
   originalPrice?: string; // struck-through price
   offer?: string; // ribbon text, e.g. "Until Dec 31, 2026"
   href: string;
   headerIcon: ReactNode;
   headerIconShape: "square" | "circle";
-  illustration: {
-    main: ReactNode;
-    badge: ReactNode;
-    topLeft: ReactNode;
-    topRight: ReactNode;
-  };
 };
 
 const plans: Plan[] = [
@@ -64,7 +61,7 @@ const plans: Plan[] = [
     id: "ezeeexams",
     title: "For Facts",
     subtitle: "Eases GS Prelims",
-    stats: ["10,000 facts", "60 mock tests"],
+    stats: ["10,000 facts", "30 mock tests"],
     features: [
       "Detailed analysis & performance tracking",
       "Attempt online from any device",
@@ -75,14 +72,14 @@ const plans: Plan[] = [
     offer: "Until Dec 31, 2026",
     href: "/register?plan=web",
 
-    // Poll icon (same as the products section) – header
+    // Poll icon (same as the products section)
     headerIcon: (
       <Box
         component="span"
         sx={{
           display: "block",
-          width: 30,
-          height: 30,
+          width: 34,
+          height: 34,
           backgroundColor: "currentColor",
           WebkitMask: "url(/Icons/poll-icon.svg) center / contain no-repeat",
           mask: "url(/Icons/poll-icon.svg) center / contain no-repeat",
@@ -90,44 +87,41 @@ const plans: Plan[] = [
       />
     ),
     headerIconShape: "square",
-    illustration: {
-      // Poll icon – big illustration
-      main: (
-        <Box
-          component="span"
-          sx={{
-            display: "block",
-            width: { xs: 84, sm: 96 },
-            height: { xs: 84, sm: 96 },
-            backgroundColor: "currentColor",
-            WebkitMask: "url(/Icons/poll-icon.svg) center / contain no-repeat",
-            mask: "url(/Icons/poll-icon.svg) center / contain no-repeat",
-            filter: "drop-shadow(0 14px 16px rgba(22,163,74,0.28))",
-          }}
-        />
-      ),
-      badge: <BarChartRoundedIcon />,
-      topLeft: <MenuBookRoundedIcon />,
-      topRight: <GpsFixedRoundedIcon />,
-    },
   },
   {
-    id: "magicmocks",
-    title: "wRiteRight",
+    id: "wRiteRight",
+    title: "wRite Right",
     subtitle: "Eases GS Mains",
     stats: ["Answer Script Evaluation", "1-to-1 Feedback"],
-    features: [
-      "14 years of GS Mains PYQs practice",
-      "20 full-length GS Mains mock tests practice.",
+    features: [],
+    packs: [
+      {
+        title: "PYQs Pack",
+        features: [
+          "14 years of GS Mains PYQs practice",
+          "70 GS Mains PYQs with answer script evaluation",
+        ],
+        price: "₹9,999",
+        href: "/register?plan=mains-pyq",
+      },
+      {
+        title: "Mock Tests Pack",
+        features: [
+          "10 full-length GS Mains mock tests practice",
+          "50 GS Mains mock papers with answer script evaluation",
+        ],
+        price: "₹9,999",
+        href: "/register?plan=mains-mock",
+      },
     ],
     price: "₹9,999",
     href: "/register?plan=mains-mock",
 
-    // Edit-document icon + tick badge (same as the products section) – header
+    // Edit-document icon + tick badge (same as the products section)
     headerIcon: (
       <Box
         component="span"
-        sx={{ position: "relative", display: "block", width: 30, height: 30 }}
+        sx={{ position: "relative", display: "block", width: 34, height: 34 }}
       >
         <Box
           component="span"
@@ -145,10 +139,10 @@ const plans: Plan[] = [
           component="span"
           sx={{
             position: "absolute",
-            right: -8,
-            bottom: -8,
-            width: 17,
-            height: 17,
+            right: -9,
+            bottom: -9,
+            width: 19,
+            height: 19,
             borderRadius: "50%",
             background: GREEN,
             border: "1.5px solid #fff",
@@ -158,8 +152,8 @@ const plans: Plan[] = [
           }}
         >
           <svg
-            width="10"
-            height="10"
+            width="11"
+            height="11"
             viewBox="0 0 24 24"
             fill="none"
             stroke="#fff"
@@ -173,66 +167,6 @@ const plans: Plan[] = [
       </Box>
     ),
     headerIconShape: "square",
-    illustration: {
-      // Edit-document icon + tick badge – big illustration
-      main: (
-        <Box
-          component="span"
-          sx={{
-            position: "relative",
-            display: "block",
-            width: { xs: 84, sm: 96 },
-            height: { xs: 84, sm: 96 },
-            filter: "drop-shadow(0 14px 16px rgba(22,163,74,0.28))",
-          }}
-        >
-          <Box
-            component="span"
-            sx={{
-              display: "block",
-              width: "100%",
-              height: "100%",
-              backgroundColor: "currentColor",
-              WebkitMask:
-                "url(/Icons/edit-document-icon.svg) center / contain no-repeat",
-              mask: "url(/Icons/edit-document-icon.svg) center / contain no-repeat",
-            }}
-          />
-          <Box
-            component="span"
-            sx={{
-              position: "absolute",
-              right: { xs: -14, sm: -16 },
-              bottom: { xs: -14, sm: -16 },
-              width: { xs: 36, sm: 42 },
-              height: { xs: 36, sm: 42 },
-              borderRadius: "50%",
-              background: GREEN,
-              border: "3px solid #fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <svg
-              width="55%"
-              height="55%"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#fff"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          </Box>
-        </Box>
-      ),
-      badge: <PersonRoundedIcon />,
-      topLeft: <EditNoteRoundedIcon />,
-      topRight: <CheckCircleIcon />,
-    },
   },
 ];
 
@@ -383,99 +317,6 @@ const subjects = [
   },
 ];
 
-/* ───────────────────────────── Illustration ───────────────────────────── */
-
-// A static "scene" built from icons, so no image assets are needed
-function Illustration({ data }: { data: Plan["illustration"] }) {
-  const bubble = {
-    position: "absolute" as const,
-    width: 36,
-    height: 36,
-    borderRadius: "50%",
-    background: "#fff",
-    color: GREEN,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "0 8px 20px rgba(20,83,45,0.15)",
-    "& svg": { fontSize: 18 },
-  };
-
-  return (
-    <Box
-      className="pp-illus"
-      sx={{
-        position: "relative",
-        width: "100%",
-        height: "100%",
-        minHeight: { xs: 150, sm: 170 },
-        transition: `transform 600ms ${EASE}`,
-      }}
-    >
-      <Box
-        aria-hidden
-        sx={{
-          position: "absolute",
-          inset: "6% 4%",
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, #d3f2de 0%, rgba(211,242,222,0) 70%)",
-          transition: "opacity 450ms ease",
-          ".pp-card:hover &": { opacity: 0.25 },
-        }}
-      />
-
-      <Box
-        aria-hidden
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          display: "flex",
-          color: GREEN,
-          transition: COLOR_T,
-          ".pp-card:hover &": { color: "#bbf7d0" },
-          "& svg": {
-            fontSize: { xs: 84, sm: 96 },
-            filter: "drop-shadow(0 14px 16px rgba(22,163,74,0.28))",
-          },
-        }}
-      >
-        {data.main}
-      </Box>
-
-      <Box aria-hidden sx={{ ...bubble, top: "6%", left: "8%" }}>
-        {data.topLeft}
-      </Box>
-      <Box aria-hidden sx={{ ...bubble, top: "4%", right: "6%" }}>
-        {data.topRight}
-      </Box>
-
-      <Box
-        aria-hidden
-        sx={{
-          position: "absolute",
-          right: "4%",
-          bottom: "8%",
-          width: 46,
-          height: 46,
-          borderRadius: "50%",
-          background: `linear-gradient(145deg, ${GREEN} 0%, ${DARK_GREEN} 100%)`,
-          color: "#fff",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 12px 24px rgba(20,83,45,0.35)",
-          "& svg": { fontSize: 24 },
-        }}
-      >
-        {data.badge}
-      </Box>
-    </Box>
-  );
-}
-
 /* ───────────────────────────── Plan card ───────────────────────────── */
 
 function PlanCard({ plan }: { plan: Plan }) {
@@ -502,14 +343,17 @@ function PlanCard({ plan }: { plan: Plan }) {
           borderColor: GREEN,
         },
         "&:hover .pp-overlay": { opacity: 1 },
-        "&:hover .pp-illus": { transform: "scale(1.05)" },
 
         // Text and elements switch to light colours on the green layer
         "&:hover .pp-title": { color: "#fff" },
         "&:hover .pp-sub": { color: "#bbf7d0" },
         "&:hover .pp-text": { color: "#fff" },
         "&:hover .pp-check": { color: "#bbf7d0" },
-        "&:hover .pp-divider": { background: "rgba(255,255,255,0.4)" },
+        "&:hover .pp-chip": {
+          background: "rgba(255,255,255,0.16)",
+          borderColor: "rgba(255,255,255,0.35)",
+          color: "#fff",
+        },
         "&:hover .pp-hicon": {
           background: "rgba(255,255,255,0.2)",
           color: "#fff",
@@ -547,286 +391,359 @@ function PlanCard({ plan }: { plan: Plan }) {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          p: { xs: 2.25, sm: 3 },
-          "&:last-child": { pb: { xs: 2.25, sm: 3 } },
+          p: { xs: 2.5, sm: 3.25 },
+          "&:last-child": { pb: { xs: 2.5, sm: 3.25 } },
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row", md: "column", lg: "row" },
-            gap: { xs: 1, sm: 2 },
-            flexGrow: 1,
-          }}
-        >
-          {/* Left: header, stats, features */}
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Stack direction="row" spacing={2} alignItems="center" mb={2}>
+        {/* ── Header: icon + title ── */}
+        <Stack direction="row" spacing={2} alignItems="center" mb={2}>
+          <Box
+            className="pp-hicon"
+            sx={{
+              width: 64,
+              height: 64,
+              flexShrink: 0,
+              borderRadius: isSquare ? "20px" : "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: isSquare
+                ? `linear-gradient(145deg, ${GREEN} 0%, ${DARK_GREEN} 100%)`
+                : "#e3f5e9",
+              color: isSquare ? "#fff" : GREEN,
+              boxShadow: isSquare ? "0 10px 20px rgba(22,163,74,0.3)" : "none",
+              transition: COLOR_T,
+              "& svg": { fontSize: 34 },
+            }}
+          >
+            {plan.headerIcon}
+          </Box>
+
+          <Box sx={{ minWidth: 0 }}>
+            <Typography
+              className="pp-title"
+              fontWeight={800}
+              sx={{
+                fontSize: { xs: "1.5rem", sm: "1.75rem" },
+                lineHeight: 1.15,
+                color: "#0b1b2b",
+                transition: COLOR_T,
+              }}
+            >
+              {plan.title}
+            </Typography>
+            <Typography
+              className="pp-sub"
+              fontWeight={700}
+              sx={{
+                color: GREEN,
+                fontSize: { xs: "0.95rem", sm: "1.05rem" },
+                transition: COLOR_T,
+              }}
+            >
+              {plan.subtitle}
+            </Typography>
+          </Box>
+        </Stack>
+
+        {/* ── Highlights as pills ── */}
+        {plan.stats && (
+          <Stack
+            direction="row"
+            flexWrap="wrap"
+            sx={{ gap: 1, mb: 2.5 }}
+          >
+            {plan.stats.map((s) => (
               <Box
-                className="pp-hicon"
+                key={s}
+                className="pp-chip"
                 sx={{
-                  width: 56,
-                  height: 56,
-                  flexShrink: 0,
-                  borderRadius: isSquare ? "18px" : "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: isSquare
-                    ? `linear-gradient(145deg, ${GREEN} 0%, ${DARK_GREEN} 100%)`
-                    : "#e3f5e9",
-                  color: isSquare ? "#fff" : GREEN,
-                  boxShadow: isSquare
-                    ? "0 10px 20px rgba(22,163,74,0.3)"
-                    : "none",
+                  px: 1.75,
+                  py: 0.6,
+                  borderRadius: "999px",
+                  background: "rgba(22,163,74,0.1)",
+                  border: "1px solid rgba(22,163,74,0.25)",
+                  color: GREEN_DARK,
+                  fontWeight: 700,
+                  fontSize: { xs: "0.8rem", sm: "0.88rem" },
+                  lineHeight: 1.4,
                   transition: COLOR_T,
-                  "& svg": { fontSize: 30 },
                 }}
               >
-                {plan.headerIcon}
+                {s}
               </Box>
+            ))}
+          </Stack>
+        )}
 
-              <Box sx={{ minWidth: 0 }}>
-                <Typography
-                  className="pp-title"
-                  fontWeight={800}
-                  sx={{
-                    fontSize: { xs: "1.4rem", sm: "1.6rem" },
-                    lineHeight: 1.15,
-                    color: "#0b1b2b",
-                    transition: COLOR_T,
-                  }}
-                >
-                  {plan.title}
-                </Typography>
-                <Typography
-                  className="pp-sub"
-                  fontWeight={700}
+        {/* ── Features (For Facts) ── */}
+        {plan.features.length > 0 && (
+          <Stack spacing={1.5} sx={{ mb: 2.5 }}>
+            {plan.features.map((f) => (
+              <Stack
+                key={f}
+                direction="row"
+                spacing={1.25}
+                alignItems="center"
+                sx={{
+                  transition: `transform 300ms ${EASE}`,
+                  "&:hover": { transform: "translateX(6px)" },
+                }}
+              >
+                <CheckCircleIcon
+                  className="pp-check"
                   sx={{
                     color: GREEN,
-                    fontSize: { xs: "0.95rem", sm: "1.05rem" },
+                    fontSize: 21,
+                    flexShrink: 0,
+                    transition: COLOR_T,
+                  }}
+                />
+                <Typography
+                  className="pp-text"
+                  sx={{
+                    color: "#374151",
+                    fontSize: { xs: "0.9rem", sm: "0.95rem" },
                     transition: COLOR_T,
                   }}
                 >
-                  {plan.subtitle}
+                  {f}
                 </Typography>
-              </Box>
-            </Stack>
+              </Stack>
+            ))}
+          </Stack>
+        )}
 
-            {plan.stats ? (
-              <Stack
-                direction="row"
-                alignItems="center"
-                flexWrap="nowrap"
-                columnGap={{ xs: 1.25, sm: 1.75 }}
-                mb={2.25}
+        {/* ── Price + button (pinned to the bottom so both cards line up) ── */}
+        {plan.packs ? (
+          // Separate priced packs (wRiteRight)
+          <Box
+            sx={{
+              mt: "auto",
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+              gap: 2,
+            }}
+          >
+            {plan.packs.map((pack) => (
+              <Box
+                key={pack.title}
+                className="pp-pricebox"
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  borderRadius: "18px",
+                  p: { xs: 2, sm: 2.25 },
+                  background: "rgba(236,253,243,0.9)",
+                  border: "1px solid #dff3e5",
+                  transition: COLOR_T,
+                }}
               >
-                {plan.stats.map((s, i) => (
-                  <Stack
-                    key={s}
-                    direction="row"
-                    alignItems="center"
-                    columnGap={{ xs: 1.25, sm: 1.75 }}
-                  >
-                    {i > 0 && (
-                      <Box
-                        className="pp-divider"
+                <Typography
+                  className="pp-text"
+                  fontWeight={800}
+                  sx={{
+                    color: "#0b1b2b",
+                    fontSize: "1.05rem",
+                    mb: 1.25,
+                    transition: COLOR_T,
+                  }}
+                >
+                  {pack.title}
+                </Typography>
+
+                <Stack spacing={1} sx={{ flexGrow: 1, mb: 1.75 }}>
+                  {pack.features.map((f) => (
+                    <Stack
+                      key={f}
+                      direction="row"
+                      spacing={1}
+                      alignItems="flex-start"
+                    >
+                      <CheckCircleIcon
+                        className="pp-check"
                         sx={{
-                          width: "2px",
-                          height: 24,
-                          background: "#cfe3d5",
+                          color: GREEN,
+                          fontSize: 19,
+                          flexShrink: 0,
+                          mt: "1px",
                           transition: COLOR_T,
                         }}
                       />
-                    )}
-                    <Typography
-                      className="pp-text"
-                      fontWeight={700}
-                      sx={{
-                        color: "#1f2937",
-                        fontSize: { xs: "0.82rem", sm: "0.95rem" },
-                        whiteSpace: "nowrap",
-                        transition: COLOR_T,
-                      }}
-                    >
-                      {s}
-                    </Typography>
-                  </Stack>
-                ))}
-              </Stack>
-            ) : (
-              <Typography
-                className="pp-text"
-                sx={{
-                  color: "#4b5563",
-                  fontSize: { xs: "0.92rem", sm: "1rem" },
-                  lineHeight: 1.5,
-                  mb: 2.25,
-                  maxWidth: 260,
-                  transition: COLOR_T,
-                }}
-              >
-                {plan.description}
-              </Typography>
-            )}
-
-            <Stack spacing={1.4}>
-              {plan.features.map((f) => (
-                <Stack
-                  key={f}
-                  direction="row"
-                  spacing={1.25}
-                  alignItems="center"
-                  sx={{
-                    transition: `transform 300ms ${EASE}`,
-                    "&:hover": { transform: "translateX(6px)" },
-                  }}
-                >
-                  <CheckCircleIcon
-                    className="pp-check"
-                    sx={{
-                      color: GREEN,
-                      fontSize: 21,
-                      flexShrink: 0,
-                      transition: COLOR_T,
-                    }}
-                  />
-                  <Typography
-                    className="pp-text"
-                    sx={{
-                      color: "#374151",
-                      fontSize: { xs: "0.85rem", sm: "0.9rem" },
-                      transition: COLOR_T,
-                    }}
-                  >
-                    {f}
-                  </Typography>
+                      <Typography
+                        className="pp-text"
+                        sx={{
+                          color: "#374151",
+                          fontSize: "0.88rem",
+                          lineHeight: 1.4,
+                          transition: COLOR_T,
+                        }}
+                      >
+                        {f}
+                      </Typography>
+                    </Stack>
+                  ))}
                 </Stack>
-              ))}
-            </Stack>
-          </Box>
 
-          {/* Right: illustration */}
-          <Box
-            sx={{
-              width: { xs: "100%", sm: 170, md: "100%", lg: 170 },
-              flexShrink: 0,
-              display: "flex",
-              alignItems: "stretch",
-            }}
-          >
-            <Illustration data={plan.illustration} />
-          </Box>
-        </Box>
-
-        {/* Price + button */}
-        <Box sx={{ mt: 2.5 }}>
-          <Box
-            className="pp-pricebox"
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-              gap: 1.5,
-              borderRadius: "18px",
-              px: { xs: 2, sm: 3 },
-              py: 1.2,
-              mb: 1.75,
-              minHeight: 80,
-              background: "rgba(236,253,243,0.9)",
-              border: "1px solid #dff3e5",
-              transition: COLOR_T,
-            }}
-          >
-            <Box>
-              {plan.originalPrice && (
                 <Typography
-                  className="pp-orig"
-                  fontWeight={700}
+                  className="pp-price"
+                  fontWeight={800}
                   sx={{
-                    display: "inline-block",
-                    color: "#6b7280",
-                    fontSize: { xs: "1.3rem", sm: "1.6rem" },
-                    textDecoration: "line-through",
-                    textDecorationColor: "#ef4444",
-                    textDecorationThickness: "2px",
-                    lineHeight: 1,
+                    color: GREEN_DARK,
+                    fontSize: { xs: "1.9rem", sm: "2.1rem" },
+                    lineHeight: 1.1,
+                    mb: 1.5,
                     transition: COLOR_T,
                   }}
                 >
-                  {plan.originalPrice}
+                  {pack.price}
                 </Typography>
+
+                <Button
+                  className="pp-btn"
+                  component={Link}
+                  href={pack.href}
+                  fullWidth
+                  variant="contained"
+                  endIcon={
+                    <ArrowForwardRoundedIcon
+                      className="pp-arrow"
+                      sx={{ transition: `transform 300ms ${EASE}` }}
+                    />
+                  }
+                  sx={{
+                    background: `linear-gradient(90deg, ${GREEN} 0%, ${GREEN_DARK} 100%)`,
+                    color: "#fff",
+                    fontWeight: 700,
+                    fontSize: "1rem",
+                    textTransform: "none",
+                    borderRadius: "14px",
+                    py: 1.2,
+                    boxShadow: "none",
+                    transition: `${COLOR_T}, transform 300ms ${EASE}`,
+                    "&:hover": {
+                      boxShadow: "none",
+                      transform: "translateY(-2px)",
+                    },
+                    "&:hover .pp-arrow": { transform: "translateX(6px)" },
+                    "&:active": { transform: "translateY(0) scale(0.99)" },
+                  }}
+                >
+                  Get Started
+                </Button>
+              </Box>
+            ))}
+          </Box>
+        ) : (
+          // Single price + button (For Facts)
+          <Box sx={{ mt: "auto" }}>
+            <Box
+              className="pp-pricebox"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: 1.5,
+                borderRadius: "18px",
+                px: { xs: 2, sm: 3 },
+                py: 1.2,
+                mb: 1.75,
+                minHeight: 80,
+                background: "rgba(236,253,243,0.9)",
+                border: "1px solid #dff3e5",
+                transition: COLOR_T,
+              }}
+            >
+              <Box>
+                {plan.originalPrice && (
+                  <Typography
+                    className="pp-orig"
+                    fontWeight={700}
+                    sx={{
+                      display: "inline-block",
+                      color: "#6b7280",
+                      fontSize: { xs: "1.3rem", sm: "1.6rem" },
+                      textDecoration: "line-through",
+                      textDecorationColor: "#ef4444",
+                      textDecorationThickness: "2px",
+                      lineHeight: 1,
+                      transition: COLOR_T,
+                    }}
+                  >
+                    {plan.originalPrice}
+                  </Typography>
+                )}
+                <Typography
+                  className="pp-price"
+                  fontWeight={800}
+                  sx={{
+                    color: GREEN_DARK,
+                    fontSize: { xs: "2.1rem", sm: "2.5rem" },
+                    lineHeight: 1.1,
+                    transition: COLOR_T,
+                  }}
+                >
+                  {plan.price}
+                </Typography>
+              </Box>
+
+              {plan.offer && (
+                <Stack
+                  className="pp-offer"
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                  sx={{
+                    background: DARK_GREEN,
+                    color: "#fff",
+                    px: 2,
+                    py: 1,
+                    borderRadius: "10px",
+                    fontWeight: 700,
+                    fontSize: { xs: "0.85rem", sm: "0.95rem" },
+                    transform: "rotate(-4deg)",
+                    boxShadow: "0 8px 18px rgba(20,83,45,0.3)",
+                    transition: COLOR_T,
+                  }}
+                >
+                  <CalendarMonthRoundedIcon sx={{ fontSize: 20 }} />
+                  <span>{plan.offer}</span>
+                </Stack>
               )}
-              <Typography
-                className="pp-price"
-                fontWeight={800}
-                sx={{
-                  color: GREEN_DARK,
-                  fontSize: { xs: "2.1rem", sm: "2.5rem" },
-                  lineHeight: 1.1,
-                  transition: COLOR_T,
-                }}
-              >
-                {plan.price}
-              </Typography>
             </Box>
 
-            {plan.offer && (
-              <Stack
-                className="pp-offer"
-                direction="row"
-                spacing={1}
-                alignItems="center"
-                sx={{
-                  background: DARK_GREEN,
-                  color: "#fff",
-                  px: 2,
-                  py: 1,
-                  borderRadius: "10px",
-                  fontWeight: 700,
-                  fontSize: { xs: "0.85rem", sm: "0.95rem" },
-                  transform: "rotate(-4deg)",
-                  boxShadow: "0 8px 18px rgba(20,83,45,0.3)",
-                  transition: COLOR_T,
-                }}
-              >
-                <CalendarMonthRoundedIcon sx={{ fontSize: 20 }} />
-                <span>{plan.offer}</span>
-              </Stack>
-            )}
+            <Button
+              className="pp-btn"
+              component={Link}
+              href={plan.href}
+              fullWidth
+              variant="contained"
+              endIcon={
+                <ArrowForwardRoundedIcon
+                  className="pp-arrow"
+                  sx={{ transition: `transform 300ms ${EASE}` }}
+                />
+              }
+              sx={{
+                background: `linear-gradient(90deg, ${GREEN} 0%, ${GREEN_DARK} 100%)`,
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: "1rem",
+                textTransform: "none",
+                borderRadius: "14px",
+                py: 1.2,
+                boxShadow: "none",
+                transition: `${COLOR_T}, transform 300ms ${EASE}`,
+                "&:hover": { boxShadow: "none", transform: "translateY(-2px)" },
+                "&:hover .pp-arrow": { transform: "translateX(6px)" },
+                "&:active": { transform: "translateY(0) scale(0.99)" },
+              }}
+            >
+              Get Started
+            </Button>
           </Box>
-
-          <Button
-            className="pp-btn"
-            component={Link}
-            href={plan.href}
-            fullWidth
-            variant="contained"
-            endIcon={
-              <ArrowForwardRoundedIcon
-                className="pp-arrow"
-                sx={{ transition: `transform 300ms ${EASE}` }}
-              />
-            }
-            sx={{
-              background: `linear-gradient(90deg, ${GREEN} 0%, ${GREEN_DARK} 100%)`,
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: "1rem",
-              textTransform: "none",
-              borderRadius: "14px",
-              py: 1.2,
-              boxShadow: "none",
-              transition: `${COLOR_T}, transform 300ms ${EASE}`,
-              "&:hover": { boxShadow: "none", transform: "translateY(-2px)" },
-              "&:hover .pp-arrow": { transform: "translateX(6px)" },
-              "&:active": { transform: "translateY(0) scale(0.99)" },
-            }}
-          >
-            Get Started
-          </Button>
-        </Box>
+        )}
       </CardContent>
     </Card>
   );
