@@ -147,9 +147,9 @@ function HeroContent() {
             letterSpacing: "-0.2px",
           }}
         >
-          Coverage Density,
+          Coverage Density, Ensured.
         </Typography>
-        <Typography
+        {/* <Typography
           sx={{
             fontSize: { xs: "1.05rem", lg: "1.3rem" },
             fontWeight: 800,
@@ -158,8 +158,8 @@ function HeroContent() {
             letterSpacing: "-0.2px",
           }}
         >
-          Ensured; Fully Governed.
-        </Typography>
+          Ensured.
+        </Typography> */}
       </Box>
 
       {/* stats (hidden, same as before)
