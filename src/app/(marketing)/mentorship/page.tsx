@@ -111,7 +111,10 @@ const streakTiers = [
 
 const streakSchedule = [
   { days: "Mondays – Fridays", note: "CSAT classes for SS-7 achievers" },
-  { days: "Saturdays & Sundays", note: "Sessions for SS-14 and SS-21 achievers" },
+  {
+    days: "Saturdays & Sundays",
+    note: "Sessions for SS-14 and SS-21 achievers",
+  },
 ];
 
 function BannerImage({
@@ -207,7 +210,12 @@ function CheckListCard({
 
       <Stack spacing={1.8}>
         {items.map((item) => (
-          <Stack key={item} direction="row" spacing={1.5} alignItems="flex-start">
+          <Stack
+            key={item}
+            direction="row"
+            spacing={1.5}
+            alignItems="flex-start"
+          >
             <CheckCircleRoundedIcon
               sx={{
                 color: "#16a34a",
@@ -372,7 +380,10 @@ export default function PricingPage() {
                 <Box sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
                   <Grid container spacing={{ xs: 2, md: 3 }}>
                     {/* ── CONSULTATION AGENDA ── */}
-                    <Grid size={{ xs: 12, md: 7 }} sx={{ order: { xs: 1, md: 0 } }}>
+                    <Grid
+                      size={{ xs: 12, md: 7 }}
+                      sx={{ order: { xs: 1, md: 0 } }}
+                    >
                       <Box
                         sx={{
                           border: "1px solid #e5e7eb",
@@ -453,7 +464,10 @@ export default function PricingPage() {
                     </Grid>
 
                     {/* ── HOW IT HELPS ── */}
-                    <Grid size={{ xs: 12, md: 5 }} sx={{ order: { xs: 2, md: 0 } }}>
+                    <Grid
+                      size={{ xs: 12, md: 5 }}
+                      sx={{ order: { xs: 2, md: 0 } }}
+                    >
                       <CheckListCard
                         title="How It Helps"
                         icon={
@@ -466,7 +480,10 @@ export default function PricingPage() {
                     </Grid>
 
                     {/* ── WHAT IS SILVER STREAK? ── */}
-                    <Grid size={{ xs: 12, md: 7 }} sx={{ order: { xs: 4, md: 0 } }}>
+                    <Grid
+                      size={{ xs: 12, md: 7 }}
+                      sx={{ order: { xs: 4, md: 0 } }}
+                    >
                       <Box
                         sx={{
                           bgcolor: "#fff",
@@ -493,9 +510,20 @@ export default function PricingPage() {
                             lineHeight: 1.6,
                           }}
                         >
-                          Silver Streak is for For Facts App users - PP Mobile App
-                          users, who use the app daily for 7, 14 or 21 days.
-                          Achiever get this additional benefits from PP.
+                          The Silver Streak is a reward for{" "}
+                          <Box
+                            component="span"
+                            sx={{
+                              fontWeight: 700,
+                              fontStyle: "italic",
+                              color: "#374151",
+                            }}
+                          >
+                            For Facts Mobile App users
+                          </Box>{" "}
+                          who use the app daily for 7, 14, or 21 consecutive
+                          days. Achievers receive these additional benefits from
+                          FF.
                         </Typography>
 
                         {/* Tiers */}
@@ -557,7 +585,10 @@ export default function PricingPage() {
                     </Grid>
 
                     {/* ── WHAT YOU GET ── */}
-                    <Grid size={{ xs: 12, md: 5 }} sx={{ order: { xs: 3, md: 0 } }}>
+                    <Grid
+                      size={{ xs: 12, md: 5 }}
+                      sx={{ order: { xs: 3, md: 0 } }}
+                    >
                       <CheckListCard
                         title="What You Get"
                         icon={
@@ -571,85 +602,84 @@ export default function PricingPage() {
 
                     {/* ── SILVER STREAK TIMING & DAYS (one row) ── */}
                     <Grid size={{ xs: 12 }} sx={{ order: { xs: 5, md: 0 } }}>
-                        
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: {
+                            xs: "1fr",
+                            md: "1fr 1.6fr 1.6fr",
+                          },
+                          gap: { xs: 1.5, md: 2 },
+                        }}
+                      >
                         <Box
                           sx={{
-                                                        display: "grid",
-                            gridTemplateColumns: {
-                              xs: "1fr",
-                              md: "1fr 1.6fr 1.6fr",
-                            },
-                            gap: { xs: 1.5, md: 2 },
+                            borderRadius: "16px",
+                            bgcolor: "#0a3d2e",
+                            color: "#fff",
+                            px: { xs: 2, md: 2.5 },
+                            py: { xs: 1.8, md: 2 },
                           }}
                         >
+                          <Typography
+                            sx={{
+                              fontSize: { xs: "0.75rem", md: "0.82rem" },
+                              opacity: 0.9,
+                            }}
+                          >
+                            SILVER STREAK SESSIONS
+                          </Typography>
+                          <Typography
+                            fontWeight={800}
+                            sx={{
+                              fontSize: { xs: "1.5rem", md: "1.5rem" },
+                              lineHeight: 1.2,
+                            }}
+                          >
+                            5 AM – 6 AM
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontSize: { xs: "0.8rem", md: "0.88rem" },
+                              opacity: 0.9,
+                            }}
+                          >
+                            Daily
+                          </Typography>
+                        </Box>
+
+                        {streakSchedule.map((s) => (
                           <Box
+                            key={s.days}
                             sx={{
                               borderRadius: "16px",
-                              bgcolor: "#0a3d2e",
-                              color: "#fff",
+                              border: "1px solid #e5e7eb",
+                              bgcolor: "#fff",
                               px: { xs: 2, md: 2.5 },
                               py: { xs: 1.8, md: 2 },
                             }}
                           >
                             <Typography
+                              fontWeight={700}
                               sx={{
-                                fontSize: { xs: "0.75rem", md: "0.82rem" },
-                                opacity: 0.9,
+                                color: "#0b1b2b",
+                                fontSize: { xs: "0.95rem", md: "1.05rem" },
                               }}
                             >
-                              SILVER STREAK SESSIONS
-                            </Typography>
-                            <Typography
-                              fontWeight={800}
-                              sx={{
-                                fontSize: { xs: "1.5rem", md: "1.5rem" },
-                                lineHeight: 1.2,
-                              }}
-                            >
-                              5 AM – 6 AM
+                              {s.days}
                             </Typography>
                             <Typography
                               sx={{
-                                fontSize: { xs: "0.8rem", md: "0.88rem" },
-                                opacity: 0.9,
+                                mt: 0.3,
+                                color: "#6b7280",
+                                fontSize: { xs: "0.82rem", md: "0.92rem" },
                               }}
                             >
-                              Daily
+                              {s.note}
                             </Typography>
                           </Box>
-
-                          {streakSchedule.map((s) => (
-                            <Box
-                              key={s.days}
-                              sx={{
-                                borderRadius: "16px",
-                                border: "1px solid #e5e7eb",
-                                bgcolor: "#fff",
-                                px: { xs: 2, md: 2.5 },
-                                py: { xs: 1.8, md: 2 },
-                              }}
-                            >
-                              <Typography
-                                fontWeight={700}
-                                sx={{
-                                  color: "#0b1b2b",
-                                  fontSize: { xs: "0.95rem", md: "1.05rem" },
-                                }}
-                              >
-                                {s.days}
-                              </Typography>
-                              <Typography
-                                sx={{
-                                  mt: 0.3,
-                                  color: "#6b7280",
-                                  fontSize: { xs: "0.82rem", md: "0.92rem" },
-                                }}
-                              >
-                                {s.note}
-                              </Typography>
-                            </Box>
-                          ))}
-                        </Box>
+                        ))}
+                      </Box>
                     </Grid>
 
                     {/* ── SESSION + CTA BAR ── */}
