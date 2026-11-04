@@ -17,8 +17,6 @@ import BarChartRoundedIcon from "@mui/icons-material/BarChartRounded";
 import GpsFixedRoundedIcon from "@mui/icons-material/GpsFixedRounded";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
-import LaptopMacRoundedIcon from "@mui/icons-material/LaptopMacRounded";
-import DescriptionRoundedIcon from "@mui/icons-material/DescriptionRounded";
 import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import EditNoteRoundedIcon from "@mui/icons-material/EditNoteRounded";
@@ -76,10 +74,38 @@ const plans: Plan[] = [
     originalPrice: "₹9,999",
     offer: "Until Dec 31, 2026",
     href: "/register?plan=web",
-    headerIcon: <LaptopMacRoundedIcon />,
+
+    // Poll icon (same as the products section) – header
+    headerIcon: (
+      <Box
+        component="span"
+        sx={{
+          display: "block",
+          width: 30,
+          height: 30,
+          backgroundColor: "currentColor",
+          WebkitMask: "url(/Icons/poll-icon.svg) center / contain no-repeat",
+          mask: "url(/Icons/poll-icon.svg) center / contain no-repeat",
+        }}
+      />
+    ),
     headerIconShape: "square",
     illustration: {
-      main: <LaptopMacRoundedIcon />,
+      // Poll icon – big illustration
+      main: (
+        <Box
+          component="span"
+          sx={{
+            display: "block",
+            width: { xs: 84, sm: 96 },
+            height: { xs: 84, sm: 96 },
+            backgroundColor: "currentColor",
+            WebkitMask: "url(/Icons/poll-icon.svg) center / contain no-repeat",
+            mask: "url(/Icons/poll-icon.svg) center / contain no-repeat",
+            filter: "drop-shadow(0 14px 16px rgba(22,163,74,0.28))",
+          }}
+        />
+      ),
       badge: <BarChartRoundedIcon />,
       topLeft: <MenuBookRoundedIcon />,
       topRight: <GpsFixedRoundedIcon />,
@@ -96,10 +122,113 @@ const plans: Plan[] = [
     ],
     price: "₹9,999",
     href: "/register?plan=mains-mock",
-    headerIcon: <GpsFixedRoundedIcon />,
-    headerIconShape: "circle",
+
+    // Edit-document icon + tick badge (same as the products section) – header
+    headerIcon: (
+      <Box
+        component="span"
+        sx={{ position: "relative", display: "block", width: 30, height: 30 }}
+      >
+        <Box
+          component="span"
+          sx={{
+            display: "block",
+            width: "100%",
+            height: "100%",
+            backgroundColor: "currentColor",
+            WebkitMask:
+              "url(/Icons/edit-document-icon.svg) center / contain no-repeat",
+            mask: "url(/Icons/edit-document-icon.svg) center / contain no-repeat",
+          }}
+        />
+        <Box
+          component="span"
+          sx={{
+            position: "absolute",
+            right: -8,
+            bottom: -8,
+            width: 17,
+            height: 17,
+            borderRadius: "50%",
+            background: GREEN,
+            border: "1.5px solid #fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <svg
+            width="10"
+            height="10"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </Box>
+      </Box>
+    ),
+    headerIconShape: "square",
     illustration: {
-      main: <DescriptionRoundedIcon />,
+      // Edit-document icon + tick badge – big illustration
+      main: (
+        <Box
+          component="span"
+          sx={{
+            position: "relative",
+            display: "block",
+            width: { xs: 84, sm: 96 },
+            height: { xs: 84, sm: 96 },
+            filter: "drop-shadow(0 14px 16px rgba(22,163,74,0.28))",
+          }}
+        >
+          <Box
+            component="span"
+            sx={{
+              display: "block",
+              width: "100%",
+              height: "100%",
+              backgroundColor: "currentColor",
+              WebkitMask:
+                "url(/Icons/edit-document-icon.svg) center / contain no-repeat",
+              mask: "url(/Icons/edit-document-icon.svg) center / contain no-repeat",
+            }}
+          />
+          <Box
+            component="span"
+            sx={{
+              position: "absolute",
+              right: { xs: -14, sm: -16 },
+              bottom: { xs: -14, sm: -16 },
+              width: { xs: 36, sm: 42 },
+              height: { xs: 36, sm: 42 },
+              borderRadius: "50%",
+              background: GREEN,
+              border: "3px solid #fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <svg
+              width="55%"
+              height="55%"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#fff"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </Box>
+        </Box>
+      ),
       badge: <PersonRoundedIcon />,
       topLeft: <EditNoteRoundedIcon />,
       topRight: <CheckCircleIcon />,
