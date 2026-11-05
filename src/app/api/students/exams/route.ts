@@ -169,40 +169,97 @@ export async function GET(req: Request) {
       completedAttempts.map((attempt) => attempt.exam_id),
     );
 
-    const exams = assignedExams
-      .filter((a) => {
-        const exam = a.assignment.exam;
+    // Exams the student should actually see in the table
+    const visibleAssignments = assignedExams.filter((a) => {
+      const exam = a.assignment.exam;
 
-        // NEW - explicit guard: My Exams must never show PYQ exams, even
-        // if a stale assignment row somehow exists for one from before
-        // this route was cleaned up.
-        if (exam.is_pyq) return false;
+      // Explicit guard: My Exams must never show PYQ exams, even
+      // if a stale assignment row somehow exists for one from before
+      // this route was cleaned up.
+      if (exam.is_pyq) return false;
 
-        const state = getExamState(exam);
+      const state = getExamState(exam);
 
-        // Only show upcoming or available exams that haven't been completed
-        const isUpcomingOrAvailable =
-          state === "upcoming" || state === "available";
-        const notCompleted = !completedExamIds.has(exam.exam_id);
+      // Only show upcoming or available exams that haven't been completed
+      const isUpcomingOrAvailable =
+        state === "upcoming" || state === "available";
+      const notCompleted = !completedExamIds.has(exam.exam_id);
 
-        return isUpcomingOrAvailable && notCompleted;
-      })
-      .map((a) => {
-        const exam = a.assignment.exam;
+      return isUpcomingOrAvailable && notCompleted;
+    });
 
-        return {
-          id: exam.exam_id,
-          title: exam.exam_title,
-          duration: exam.time_limit_minutes,
-          questions: exam.question_count,
-          examType: exam.exam_type,
-          state: getExamState(exam),
-          startDate: exam.scheduled_start,
-          endDate: exam.scheduled_end,
-          points: String(exam.total_marks ?? 0),
-          isLocked: !isPaidUser,
-        };
+    const examIds = visibleAssignments.map((a) => a.assignment.exam.exam_id);
+
+    /* ------------------------------------------------------
+       Subjects per exam (used by the subject dropdown filter,
+       the subject label under the exam title, and search)
+       exam_id -> Map(subject_id -> subject_name)
+    ------------------------------------------------------ */
+    const subjectsByExam = new Map<number, Map<number, string>>();
+    const addSubject = (examId: number, id: number, name: string) => {
+      if (!subjectsByExam.has(examId)) subjectsByExam.set(examId, new Map());
+      subjectsByExam.get(examId)!.set(id, name);
+    };
+
+    if (examIds.length > 0) {
+      // 1) Auto-mode exams: subjects come from exam_subject_configs
+      const configs = await prisma.exam_subject_configs.findMany({
+        where: { exam_id: { in: examIds } },
+        select: {
+          exam_id: true,
+          subject: { select: { subject_id: true, subject_name: true } },
+        },
       });
+      configs.forEach((c) =>
+        addSubject(c.exam_id, c.subject.subject_id, c.subject.subject_name),
+      );
+
+      // 2) Exams with no configs (e.g. manual mode): derive from their questions
+      const examsWithoutSubjects = examIds.filter(
+        (id) => !subjectsByExam.has(id),
+      );
+      if (examsWithoutSubjects.length > 0) {
+        const examQuestions = await prisma.exam_questions.findMany({
+          where: { exam_id: { in: examsWithoutSubjects } },
+          select: {
+            exam_id: true,
+            question: {
+              select: {
+                subject: { select: { subject_id: true, subject_name: true } },
+              },
+            },
+          },
+        });
+        examQuestions.forEach((eq) =>
+          addSubject(
+            eq.exam_id,
+            eq.question.subject.subject_id,
+            eq.question.subject.subject_name,
+          ),
+        );
+      }
+    }
+
+    const exams = visibleAssignments.map((a) => {
+      const exam = a.assignment.exam;
+      const subjectMap = subjectsByExam.get(exam.exam_id);
+
+      return {
+        id: exam.exam_id,
+        title: exam.exam_title,
+        duration: exam.time_limit_minutes,
+        questions: exam.question_count,
+        examType: exam.exam_type,
+        state: getExamState(exam),
+        startDate: exam.scheduled_start,
+        endDate: exam.scheduled_end,
+        points: String(exam.total_marks ?? 0),
+        isLocked: !isPaidUser,
+        subjects: subjectMap
+          ? Array.from(subjectMap, ([id, name]) => ({ id, name }))
+          : [],
+      };
+    });
 
     return NextResponse.json({ success: true, data: exams });
   } catch (error) {
