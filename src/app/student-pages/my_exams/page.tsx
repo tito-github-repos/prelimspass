@@ -12,6 +12,8 @@ import {
   InputBase,
   Chip,
   Pagination,
+  MenuItem,
+  Select,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import AssignmentIcon from "@mui/icons-material/Assignment";
@@ -23,8 +25,8 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import PublicIcon from "@mui/icons-material/Public";
-import LockIcon from "@mui/icons-material/Lock";
 import { useStudentAuth } from "@/context/StudentAuthContext";
+import UpgradeDialog from "@/app/components/Upgradedialog";
 
 /* ---------------------------------- */
 /* Design tokens                       */
@@ -35,7 +37,6 @@ const CARD_BORDER = "#e6e9ee";
 const TEXT_PRIMARY = "#1e293b";
 const TEXT_SECONDARY = "#7f8c8d";
 const PRIMARY_GREEN = "#1a7a3c";
-const PRIMARY_GREEN_DARK = "#146130";
 const BUTTON_GRADIENT = "linear-gradient(90deg, #1fa84c 0%, #0f7a35 100%)";
 const BUTTON_GRADIENT_HOVER =
   "linear-gradient(90deg, #189544 0%, #0c6a2d 100%)";
@@ -214,6 +215,19 @@ const getActionLabel = (
   }
 };
 
+// Subject text shown under the exam title.
+// 1-2 subjects: list them. More than 2: "Multiple Subjects".
+const getSubjectLabel = (exam: any) => {
+  const list: { id: number; name: string }[] = exam.subjects ?? [];
+  if (list.length === 0) return "";
+  if (list.length <= 2) return list.map((s) => s.name).join(", ");
+  return "Multiple Subjects";
+};
+
+// PYQ subjects are handled in their own module, so keep them out of this dropdown.
+const isPyqSubject = (s: any) =>
+  !!s.is_pyq || /^pyq\s*-/i.test(String(s.subject_name ?? "").trim());
+
 const ROWS_PER_PAGE = 8;
 
 /* ---------------------------------- */
@@ -223,13 +237,21 @@ export default function MyExamsPage() {
   const router = useRouter();
   const { isPaidUser } = useStudentAuth();
   const [availableExams, setAvailableExams] = useState<any[]>([]);
+  const [subjects, setSubjects] = useState<
+    { subject_id: number; subject_name: string }[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [startingExamId, setStartingExamId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<
     "all" | "practice" | "mock" | "live"
   >("all");
   const [search, setSearch] = useState("");
+  const [subject, setSubject] = useState("all"); // selected subject_id, or "all"
   const [page, setPage] = useState(1);
+
+  // Upgrade popup (shown when a free user clicks Upgrade on a locked exam)
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [upgradeExamTitle, setUpgradeExamTitle] = useState("");
 
   useEffect(() => {
     const token =
@@ -257,7 +279,28 @@ export default function MyExamsPage() {
       }
     };
 
+    // Subject list for the dropdown, straight from the subjects table
+    const fetchSubjects = async () => {
+      try {
+        const response = await fetch("/api/subjects");
+        const data = await response.json();
+        if (data.success) {
+          setSubjects(
+            data.data
+              .filter((s: any) => !isPyqSubject(s))
+              .map((s: any) => ({
+                subject_id: s.subject_id,
+                subject_name: s.subject_name,
+              })),
+          );
+        }
+      } catch (error) {
+        console.error("Failed to fetch subjects:", error);
+      }
+    };
+
     fetchExams();
+    fetchSubjects();
   }, [router]);
 
   const startExam = async (examId: number, examType: string) => {
@@ -332,21 +375,27 @@ export default function MyExamsPage() {
   const mockExams = availableExams.filter((exam) => exam.examType === "mock");
   const liveExams = availableExams.filter((exam) => exam.examType === "live");
 
-  // Filter by active tab + search text
+  // Filter by active tab + subject + search text
   const filteredExams = useMemo(() => {
     let list = availableExams;
     if (activeTab !== "all")
       list = list.filter((e) => e.examType === activeTab);
+    if (subject !== "all")
+      list = list.filter((e) =>
+        (e.subjects ?? []).some((s: any) => String(s.id) === subject),
+      );
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       list = list.filter(
         (e) =>
           e.title?.toLowerCase().includes(q) ||
-          e.subject?.toLowerCase().includes(q),
+          (e.subjects ?? []).some((s: any) =>
+            s.name?.toLowerCase().includes(q),
+          ),
       );
     }
     return list;
-  }, [availableExams, activeTab, search]);
+  }, [availableExams, activeTab, subject, search]);
 
   const pageCount = Math.max(
     1,
@@ -357,9 +406,10 @@ export default function MyExamsPage() {
     page * ROWS_PER_PAGE,
   );
 
+  // Back to page 1 whenever a filter changes
   useEffect(() => {
     setPage(1);
-  }, [activeTab, search]);
+  }, [activeTab, subject, search]);
 
   return (
     <Box
@@ -562,27 +612,59 @@ export default function MyExamsPage() {
             All Exams
           </Typography>
 
+          {/* Subject filter + search */}
           <Box
             sx={{
               display: "flex",
-              alignItems: "center",
-              gap: 1,
-              border: `1px solid ${CARD_BORDER}`,
-              borderRadius: 1,
-              px: 1.5,
-              py: 0.75,
+              flexDirection: { xs: "column", sm: "row" },
+              alignItems: { xs: "stretch", sm: "center" },
+              gap: 1.5,
               width: { xs: "100%", sm: "auto" },
-              minWidth: { sm: 240 },
-              bgcolor: "#fafbfc",
             }}
           >
-            <SearchIcon fontSize="small" sx={{ color: TEXT_SECONDARY }} />
-            <InputBase
-              placeholder="Search exams..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              sx={{ fontSize: 14, flex: 1 }}
-            />
+            <Select
+              value={subject}
+              onChange={(e) => setSubject(e.target.value as string)}
+              size="small"
+              MenuProps={{ PaperProps: { sx: { maxHeight: 320 } } }}
+              sx={{
+                minWidth: { sm: 200 },
+                fontSize: 14,
+                borderRadius: 1,
+                bgcolor: "#fafbfc",
+                "& fieldset": { borderColor: CARD_BORDER },
+              }}
+            >
+              <MenuItem value="all">All Subjects</MenuItem>
+              {subjects.map((s) => (
+                <MenuItem key={s.subject_id} value={String(s.subject_id)}>
+                  {s.subject_name}
+                </MenuItem>
+              ))}
+            </Select>
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                border: `1px solid ${CARD_BORDER}`,
+                borderRadius: 1,
+                px: 1.5,
+                py: 0.75,
+                width: { xs: "100%", sm: "auto" },
+                minWidth: { sm: 240 },
+                bgcolor: "#fafbfc",
+              }}
+            >
+              <SearchIcon fontSize="small" sx={{ color: TEXT_SECONDARY }} />
+              <InputBase
+                placeholder="Search exams..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                sx={{ fontSize: 14, flex: 1 }}
+              />
+            </Box>
           </Box>
         </Box>
 
@@ -639,6 +721,7 @@ export default function MyExamsPage() {
               !locked &&
               status !== "Ended" &&
               isStartEnabled(exam.startDate, exam.endDate, exam.examType);
+            const subjectLabel = getSubjectLabel(exam);
 
             return (
               <Box
@@ -698,17 +781,22 @@ export default function MyExamsPage() {
                     >
                       {exam.title}
                     </Typography>
-                    <Typography
-                      sx={{
-                        fontSize: 12.5,
-                        color: TEXT_SECONDARY,
-                        whiteSpace: "normal",
-                        wordBreak: "break-word",
-                        overflowWrap: "break-word",
-                      }}
-                    >
-                      {exam.subject}
-                    </Typography>
+                    {subjectLabel && (
+                      <Typography
+                        title={(exam.subjects ?? [])
+                          .map((s: any) => s.name)
+                          .join(", ")}
+                        sx={{
+                          fontSize: 12.5,
+                          color: TEXT_SECONDARY,
+                          whiteSpace: "normal",
+                          wordBreak: "break-word",
+                          overflowWrap: "break-word",
+                        }}
+                      >
+                        {subjectLabel}
+                      </Typography>
+                    )}
                     {exam.examType === "live" && exam.startDate && (
                       <Box
                         sx={{
@@ -790,11 +878,15 @@ export default function MyExamsPage() {
                     variant="contained"
                     fullWidth
                     disabled={startingExamId === exam.id}
-                    onClick={() =>
-                      locked
-                        ? router.push("/pricing")
-                        : startExam(exam.id, exam.examType)
-                    }
+                    onClick={() => {
+                      if (locked) {
+                        // Free user: show the upgrade popup instead of redirecting
+                        setUpgradeExamTitle(exam.title);
+                        setUpgradeOpen(true);
+                      } else {
+                        startExam(exam.id, exam.examType);
+                      }
+                    }}
                     startIcon={
                       startingExamId === exam.id ? null : locked ? (
                         <WorkspacePremiumIcon sx={{ fontSize: 16 }} />
@@ -811,7 +903,9 @@ export default function MyExamsPage() {
                       borderRadius: 1,
                       fontWeight: 700,
                       fontSize: 13.5,
-                      boxShadow: locked ? "0 2px 6px rgba(217, 154, 27, 0.3)" : "none",
+                      boxShadow: locked
+                        ? "0 2px 6px rgba(217, 154, 27, 0.3)"
+                        : "none",
                       background: locked
                         ? "linear-gradient(90deg, #f2b73f 0%, #d99a1b 100%)"
                         : enabled
@@ -866,6 +960,13 @@ export default function MyExamsPage() {
           </Box>
         )}
       </Card>
+
+      {/* Upgrade popup (rendered once, outside the table loop) */}
+      <UpgradeDialog
+        open={upgradeOpen}
+        onClose={() => setUpgradeOpen(false)}
+        examTitle={upgradeExamTitle}
+      />
     </Box>
   );
 }
