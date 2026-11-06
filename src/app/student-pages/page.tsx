@@ -25,6 +25,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import LockIcon from "@mui/icons-material/Lock";
 import { useStudentAuth } from "@/context/StudentAuthContext";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
+import UpgradeDialog from "../components/Upgradedialog";
 
 const CARD_BG = "#ffffff";
 const TEXT_SECONDARY = "#64748b";
@@ -289,9 +290,7 @@ const ExamListRow = ({
           onClick={locked ? onUpgrade : onStart}
           disabled={isStarting}
           startIcon={
-            locked ? (
-              <WorkspacePremiumIcon sx={{ fontSize: 16 }} />
-            ) : undefined
+            locked ? <WorkspacePremiumIcon sx={{ fontSize: 16 }} /> : undefined
           }
           sx={{
             textTransform: "none",
@@ -465,7 +464,8 @@ export default function StudentDashboard() {
   const [startingExamId, setStartingExamId] = useState<number | string | null>(
     null,
   );
-
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [upgradeExamTitle, setUpgradeExamTitle] = useState("");
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -577,7 +577,8 @@ export default function StudentDashboard() {
   // Creates a new attempt for this exam via the same endpoint the PYQ and
   // My Exams pages use, then redirects to the actual exam-taking flow.
   const startExam = async (examId: number, examType: string) => {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
     if (!token) {
       router.push("/");
       return;
@@ -606,8 +607,14 @@ export default function StudentDashboard() {
       try {
         data = raw ? JSON.parse(raw) : null;
       } catch {
-        console.error("Start-exam response was not JSON:", response.status, raw);
-        alert(`Could not start the exam (server returned status ${response.status}).`);
+        console.error(
+          "Start-exam response was not JSON:",
+          response.status,
+          raw,
+        );
+        alert(
+          `Could not start the exam (server returned status ${response.status}).`,
+        );
         setStartingExamId(null);
         return;
       }
@@ -622,9 +629,12 @@ export default function StudentDashboard() {
         try {
           const elem = document.documentElement;
           if (elem.requestFullscreen) await elem.requestFullscreen();
-          else if ((elem as any).webkitRequestFullscreen) await (elem as any).webkitRequestFullscreen();
-          else if ((elem as any).mozRequestFullScreen) await (elem as any).mozRequestFullScreen();
-          else if ((elem as any).msRequestFullscreen) await (elem as any).msRequestFullscreen();
+          else if ((elem as any).webkitRequestFullscreen)
+            await (elem as any).webkitRequestFullscreen();
+          else if ((elem as any).mozRequestFullScreen)
+            await (elem as any).mozRequestFullScreen();
+          else if ((elem as any).msRequestFullscreen)
+            await (elem as any).msRequestFullscreen();
         } catch (error) {
           console.error("Fullscreen error:", error);
         }
@@ -635,7 +645,9 @@ export default function StudentDashboard() {
       );
     } catch (error) {
       console.error("Failed to start exam:", error);
-      alert("Failed to start exam. Please check your connection and try again.");
+      alert(
+        "Failed to start exam. Please check your connection and try again.",
+      );
       setStartingExamId(null);
     }
   };
@@ -969,9 +981,10 @@ export default function StudentDashboard() {
                       locked={exam.isLocked ?? !isPaidUser}
                       isStarting={startingExamId === exam.id}
                       onStart={() => startExam(exam.id, exam.examType)}
-                      onUpgrade={() => router.push("/pricing")
-                        // alert("Please upgrade to premium to access this exam.")
-                      }
+                      onUpgrade={() => {
+                        setUpgradeExamTitle(exam.title);
+                        setUpgradeOpen(true);
+                      }}
                     />
                   ))}
                   <ViewAllLink
@@ -1090,6 +1103,11 @@ export default function StudentDashboard() {
           </Card>
         </Box>
       </Box>
+      <UpgradeDialog
+        open={upgradeOpen}
+        onClose={() => setUpgradeOpen(false)}
+        examTitle={upgradeExamTitle}
+      />
     </Box>
   );
 }
