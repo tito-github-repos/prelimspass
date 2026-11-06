@@ -4,6 +4,7 @@ import PromoPopup from "./PromoPopup";
 import "./website.css";
 import Link from "next/link";
 import { Box, Typography, Button } from "@mui/material";
+import ForFactsDemos from "./ForFactsDemos";
 
 function Tick({ color }: { color: string }) {
   return (
@@ -796,7 +797,7 @@ export default function HomepageSections() {
                     >
                       {p.icon}
                     </Box>
-                    <Box>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
                       <Typography
                         sx={{
                           fontWeight: 800,
@@ -821,7 +822,9 @@ export default function HomepageSections() {
                         {p.sub}
                       </Typography>
                     </Box>
+                    <ForFactsDemos group={p.title === "For Facts - FF" ? "ff" : "rr"} />
                   </Box>
+                   
                 </Box>
 
                 {/* Body */}
@@ -930,6 +933,7 @@ export default function HomepageSections() {
                   {/* Pushes the button to the bottom so both cards align */}
                   <Box sx={{ flex: 1 }} />
 
+                  
                   {/* Highlight line (only EzeeExams has this) */}
                   {p.highlight && (
                     <Box
@@ -956,6 +960,7 @@ export default function HomepageSections() {
                     </Box>
                   )}
 
+                  
                   <Button
                     component={Link}
                     href={p.href}
