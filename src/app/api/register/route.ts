@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
+import { sendWelcomeEmail, sendAdminNewRegistrationEmail } from "@/lib/email"; // use the real path of the file that has sendOtpEmail
 
 export async function POST(req: Request) {
   try {
@@ -94,6 +95,19 @@ export async function POST(req: Request) {
         },
       },
     });
+
+    // Send welcome email to the student + notification to admin.
+    // Both run together and neither throws, so an email failure
+    // will never fail the registration.
+    await Promise.all([
+      sendWelcomeEmail(trimmedEmail, newUser.first_name),
+      sendAdminNewRegistrationEmail({
+        name: `${newUser.first_name} ${newUser.last_name}`,
+        email: newUser.email,
+        username: newUser.username,
+        mobile: newUser.mobile_number ?? "",
+      }),
+    ]);
 
     return NextResponse.json(
       { message: "Registration successful!", userId: newUser.user_id },
