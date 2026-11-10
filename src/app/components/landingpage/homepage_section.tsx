@@ -182,7 +182,7 @@ const products = [
         }}
       />
     ),
-    title: "For Facts - FF",
+    title: "For-Facts Apps",
     sub: "Eases GS Prelims",
     intro:
       "Two applications, Mobile App and Web App, eases GS prelims preparation.",
@@ -265,17 +265,17 @@ const products = [
         </Box>
       </Box>
     ),
-    title: "wRite Right - RR",
+    title: "Write-Right App",
     sub: "Eases GS Mains",
     intro:
-      "RR is a mobile application addresses mains answer writing practice, by providing pyqs and mock questions in an answer booklet format- paper wise ,syllabus wise, subject wise and topic wise.",
+      "Write-Right is a mobile application addresses mains answer writing practice, by providing pyqs and mock questions in an answer booklet format- paper wise ,syllabus wise, subject wise and topic wise.",
     points: [
       { text: "Aspirants can download the answer booklets." },
       {
-        text: "Write answers and share it with wRite Right team for evaluation and one to one feedback.",
+        text: "Write answers and share it with Write-Right team for evaluation and one to one feedback.",
       },
       {
-        text: "After registration, the wRite Right mobile app link is sent to your registered email.",
+        text: "After registration, the Write-Right mobile app link is sent to your registered email.",
       },
       {
         text: "All Registered users can access and  view  PYQs  Paperwise,syllabuswise and topicwise in RR Mobile App.",
@@ -410,7 +410,7 @@ const wFeats = [
 const steps = [
   {
     n: "1",
-    title: "Register in For Facts",
+    title: "Register in For-Facts",
     desc: "To access the mobile app",
     // Phone with a user (register)
     icon: (
@@ -532,7 +532,7 @@ const mmSteps = [
   {
     ...steps[0],
     n: "1",
-    title: "Register in wRite Right",
+    title: "Register in Write-Right App",
     desc: "To access the mobile app",
   },
   {
@@ -732,7 +732,7 @@ export default function HomepageSections() {
                 mb: 0.5,
               }}
             >
-              PP Offerings
+              Our Offerings
             </Typography>
             {/* <Typography
               sx={{ fontSize: "0.88rem", color: "#64748b", fontFamily: W }}
@@ -822,7 +822,7 @@ export default function HomepageSections() {
                         {p.sub}
                       </Typography>
                     </Box>
-                    <ForFactsDemos group={p.title === "For Facts - FF" ? "ff" : "rr"} />
+                    <ForFactsDemos group={p.title === "For-Facts - FF" ? "ff" : "rr"} />
                   </Box>
                    
                 </Box>
@@ -1463,7 +1463,7 @@ export default function HomepageSections() {
                 fontFamily: W,
               }}
             >
-              How For Facts Works?
+              How For-Facts Works?
             </Typography>
             <Typography
               sx={{
@@ -1500,7 +1500,7 @@ export default function HomepageSections() {
                 fontFamily: W,
               }}
             >
-              How wRite Right Works?
+              How ite Right Works?
             </Typography>
             <Typography
               sx={{
