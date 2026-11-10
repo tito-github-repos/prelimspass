@@ -519,7 +519,7 @@ export default function PricingPage() {
                               color: "#374151",
                             }}
                           >
-                            For Facts Mobile App users
+                            For-Facts Mobile App users
                           </Box>{" "}
                           who use the app daily for 7, 14, or 21 consecutive
                           days. Achievers receive these additional benefits from
