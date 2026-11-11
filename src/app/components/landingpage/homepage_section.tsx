@@ -822,7 +822,7 @@ export default function HomepageSections() {
                         {p.sub}
                       </Typography>
                     </Box>
-                    <ForFactsDemos group={p.title === "For-Facts - FF" ? "ff" : "rr"} />
+                    <ForFactsDemos group={p.title === "For-Facts Apps" ? "ff" : "rr"} />
                   </Box>
                    
                 </Box>

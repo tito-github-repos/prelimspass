@@ -107,7 +107,7 @@ export default function PromoPopup() {
           <Box
             component="img"
             src="/Images/study_planner_2.png"
-            alt="PrelimsPass - Practice Today, Crack Tomorrow"
+            alt="PrelimsPass - Practice Today, achieve Tomorrow"
             onClick={handleGoToLogin}
             sx={{
               display: "block",
