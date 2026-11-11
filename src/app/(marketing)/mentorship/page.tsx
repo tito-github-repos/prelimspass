@@ -103,17 +103,26 @@ const whatYouGet = [
   "Doubt clarification & expert insights",
 ];
 
-const streakTiers = [
-  { code: "SS-7", reward: "CSAT Online Classes" },
-  { code: "SS-14", reward: "Prelims One-to-One Consulting" },
-  { code: "SS-21", reward: "Mains One-to-One Consulting" },
-];
+// Single SS-7 container: all three rewards live inside it
+const streakTier = {
+  code: "SS-7",
+  rewards: [
+    { label: "CSAT Online Classes", icon: <QuizOutlinedIcon /> },
+    { label: "Prelims One-to-One Consulting", icon: <MenuBookOutlinedIcon /> },
+    { label: "Mains One-to-One Consulting", icon: <SchoolOutlinedIcon /> },
+  ],
+};
 
-const streakSchedule = [
+const streakSchedule: { days: string; note: string; items?: string[] }[] = [
   { days: "Mondays – Fridays", note: "CSAT classes for SS-7 achievers" },
   {
     days: "Saturdays & Sundays",
-    note: "Sessions for SS-14 and SS-21 achievers",
+    note: "Sessions for SS-7 achievers",
+    items: [
+      "Prelims One-to-One Consulting",
+      "Mains One-to-One Consulting",
+      "One-time session — 1 Hour",
+    ],
   },
 ];
 
@@ -521,65 +530,135 @@ export default function PricingPage() {
                           >
                             For-Facts Mobile App users
                           </Box>{" "}
-                          who use the app daily for 7, 14, or 21 consecutive
-                          days. Achievers receive these additional benefits from
+                          who use the app for 7 days. Achievers receive these additional benefits from
                           PP.
                         </Typography>
 
-                        {/* Tiers */}
+                        {/* SS-7: single container with all three rewards */}
                         <Box
                           sx={{
                             mt: { xs: 2, md: 3 },
-                            display: "grid",
-                            gridTemplateColumns: {
-                              xs: "1fr",
-                              md: "repeat(3, 1fr)",
-                            },
-                            gap: { xs: 1.5, md: 2 },
+                            borderRadius: "18px",
+                            background:
+                              "linear-gradient(180deg, #f0fdf4 0%, #f7fbf8 100%)",
+                            border: "1px solid #dcfce7",
+                            p: { xs: 2, md: 2.5 },
                           }}
                         >
-                          {streakTiers.map((t) => (
+                          <Stack
+                            direction="row"
+                            spacing={1.2}
+                            alignItems="center"
+                          >
                             <Box
-                              key={t.code}
                               sx={{
-                                borderRadius: "16px",
-                                bgcolor: "#f3f8f4",
-                                p: { xs: 2, md: 2.5 },
+                                px: 1.6,
+                                py: 0.4,
+                                borderRadius: "999px",
+                                bgcolor: "#0a3d2e",
+                                color: "#fff",
+                                fontWeight: 800,
+                                letterSpacing: "0.06em",
+                                fontSize: { xs: "0.85rem", md: "0.95rem" },
                               }}
                             >
-                              <Typography
-                                fontWeight={800}
-                                sx={{
-                                  color: "#15803d",
-                                  fontSize: { xs: "0.95rem", md: "1.1rem" },
-                                }}
-                              >
-                                {t.code}
-                              </Typography>
-                              <Typography
-                                fontWeight={600}
-                                sx={{
-                                  mt: 0.3,
-                                  color: "#0b1b2b",
-                                  fontSize: { xs: "0.9rem", md: "1.02rem" },
-                                }}
-                              >
-                                {t.reward}
-                              </Typography>
-                              <Chip
-                                label="FREE"
-                                size="small"
-                                sx={{
-                                  mt: 1.5,
-                                  bgcolor: "#16a34a",
-                                  color: "#fff",
-                                  fontWeight: 800,
-                                  letterSpacing: "0.04em",
-                                  height: 26,
-                                }}
-                              />
+                              {streakTier.code}
                             </Box>
-                          ))}
+                            <Typography
+                              sx={{
+                                color: "#6b7280",
+                                fontSize: { xs: "0.8rem", md: "0.9rem" },
+                                fontWeight: 600,
+                              }}
+                            >
+                              Free benefits for achievers
+                            </Typography>
+                          </Stack>
+
+                          <Box
+                            sx={{
+                              mt: { xs: 1.5, md: 2 },
+                              display: "grid",
+                              gridTemplateColumns: {
+                                xs: "1fr",
+                                md: "repeat(3, 1fr)",
+                              },
+                              gap: { xs: 1.5, md: 2 },
+                              alignItems: "stretch",
+                            }}
+                          >
+                            {streakTier.rewards.map((r) => (
+                              <Box
+                                key={r.label}
+                                sx={{
+                                  bgcolor: "#fff",
+                                  border: "1px solid #e1efe5",
+                                  borderRadius: "14px",
+                                  p: { xs: 1.6, md: 2 },
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "space-between",
+                                  gap: 1.5,
+                                  transition: "all 0.2s ease",
+                                  "&:hover": {
+                                    borderColor: "#16a34a",
+                                    boxShadow:
+                                      "0 6px 18px rgba(22,163,74,0.12)",
+                                  },
+                                }}
+                              >
+                                <Stack
+                                  direction="row"
+                                  spacing={1.2}
+                                  alignItems="flex-start"
+                                >
+                                  <Box
+                                    sx={{
+                                      width: 36,
+                                      height: 36,
+                                      borderRadius: "10px",
+                                      bgcolor: "#dcfce7",
+                                      color: "#16a34a",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      flexShrink: 0,
+                                      "& svg": { fontSize: 20 },
+                                    }}
+                                  >
+                                    {r.icon}
+                                  </Box>
+                                  <Typography
+                                    fontWeight={700}
+                                    sx={{
+                                      color: "#0b1b2b",
+                                      lineHeight: 1.35,
+                                      fontSize: {
+                                        xs: "0.9rem",
+                                        md: "0.98rem",
+                                      },
+                                    }}
+                                  >
+                                    {r.label}
+                                  </Typography>
+                                </Stack>
+
+                                <Box>
+                                  <Chip
+                                    label="FREE"
+                                    size="small"
+                                    sx={{
+                                      bgcolor: "#16a34a",
+                                      color: "#fff",
+                                      fontWeight: 800,
+                                      letterSpacing: "0.04em",
+                                      height: 24,
+                                    }}
+                                  />
+                                </Box>
+                              </Box>
+                            ))}
+                          </Box>
                         </Box>
                       </Box>
                     </Grid>
@@ -619,6 +698,9 @@ export default function PricingPage() {
                             color: "#fff",
                             px: { xs: 2, md: 2.5 },
                             py: { xs: 1.8, md: 2 },
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
                           }}
                         >
                           <Typography
@@ -657,6 +739,9 @@ export default function PricingPage() {
                               bgcolor: "#fff",
                               px: { xs: 2, md: 2.5 },
                               py: { xs: 1.8, md: 2 },
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "center",
                             }}
                           >
                             <Typography
@@ -677,66 +762,41 @@ export default function PricingPage() {
                             >
                               {s.note}
                             </Typography>
+
+                            {s.items && (
+                              <Stack spacing={0.6} sx={{ mt: 1.2 }}>
+                                {s.items.map((item) => (
+                                  <Stack
+                                    key={item}
+                                    direction="row"
+                                    spacing={1}
+                                    alignItems="center"
+                                  >
+                                    <CheckCircleRoundedIcon
+                                      sx={{
+                                        color: "#16a34a",
+                                        fontSize: { xs: 15, md: 17 },
+                                        flexShrink: 0,
+                                      }}
+                                    />
+                                    <Typography
+                                      fontWeight={600}
+                                      sx={{
+                                        color: "#374151",
+                                        fontSize: {
+                                          xs: "0.82rem",
+                                          md: "0.92rem",
+                                        },
+                                      }}
+                                    >
+                                      {item}
+                                    </Typography>
+                                  </Stack>
+                                ))}
+                              </Stack>
+                            )}
                           </Box>
                         ))}
-                      </Box>
-                    </Grid>
-
-                    {/* ── SESSION + CTA BAR ── */}
-                    <Grid size={{ xs: 12 }} sx={{ order: { xs: 6, md: 0 } }}>
-                      <Box
-                        sx={{
-                          borderRadius: "18px",
-                          bgcolor: "#ecfdf3",
-                          border: "1px solid #d1fae5",
-                          px: { xs: 2, md: 3 },
-                          py: { xs: 2, md: 2.2 },
-                          display: "flex",
-                          flexDirection: { xs: "column", sm: "row" },
-                          alignItems: { xs: "stretch", sm: "center" },
-                          justifyContent: "space-between",
-                          gap: { xs: 1.5, sm: 2 },
-                        }}
-                      >
-                        <Box>
-                          <Typography
-                            fontWeight={700}
-                            sx={{
-                              color: "#166534",
-                              fontSize: { xs: "1rem", md: "1.3rem" },
-                              lineHeight: 1.3,
-                            }}
-                          >
-                            One-time session — 1 Hour
-                          </Typography>
-                          <Typography
-                            sx={{
-                              color: "#6b7280",
-                              fontSize: { xs: "0.8rem", md: "0.95rem" },
-                            }}
-                          >
-                            Available to Silver Streak achievers
-                          </Typography>
-                        </Box>
-
-                        {/* TODO: add link / onClick for booking */}
-                        {/* <Button
-                          endIcon={<ArrowForwardRoundedIcon />}
-                          sx={{
-                            px: { xs: 3, md: 4 },
-                            py: { xs: 1.3, md: 1.5 },
-                            borderRadius: "12px",
-                            background: "#16a34a",
-                            color: "#fff",
-                            fontWeight: 700,
-                            textTransform: "none",
-                            fontSize: { xs: "0.9rem", md: "1.05rem" },
-                            whiteSpace: "nowrap",
-                            "&:hover": { background: "#15803d" },
-                          }}
-                        >
-                          Book Consultation
-                        </Button> */}
                       </Box>
                     </Grid>
                   </Grid>

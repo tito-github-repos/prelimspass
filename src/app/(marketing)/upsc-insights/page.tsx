@@ -663,7 +663,7 @@ export default function UPSCInsightsSection() {
             </Typography>
 
             <Typography className="smart-analysis-description">
-              Data-driven insights to help you crack UPSC with confidence.
+              Data-driven insights to help you clear UPSC with confidence.
             </Typography>
 
             <Box className="feature-strip">
