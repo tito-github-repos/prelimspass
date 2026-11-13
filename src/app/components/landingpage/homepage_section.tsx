@@ -1500,7 +1500,7 @@ export default function HomepageSections() {
                 fontFamily: W,
               }}
             >
-              How ite Right Works?
+              How Write-Right Works?
             </Typography>
             <Typography
               sx={{
