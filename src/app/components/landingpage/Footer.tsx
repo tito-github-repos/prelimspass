@@ -248,7 +248,7 @@ const Footer: React.FC = () => {
                 }}
               >
                 India's focused UPSC Prelims platform for serious aspirants
-                aiming to it in first attempt.
+                aiming to make it in the first attempt.
               </Typography>
 
               <Stack direction="row" spacing={1.2} sx={{ mt: 2.5 }}>
