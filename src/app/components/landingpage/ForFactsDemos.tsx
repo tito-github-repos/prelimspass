@@ -55,12 +55,12 @@ const demos = [
   },
 
   // ---- Mobile app demo: disabled until the video is available ----
-  /*
+  
   {
     group: "ff" as Group,
     bare: true,
     title: "Mobile app demo",
-    src: "/videos/for-facts-mobile.mp4.mp4",
+    src: "/videos/For-Facts.mp4",
     ring: GREEN_RING,
     glow: GREEN_GLOW,
     icon: (
@@ -85,7 +85,7 @@ const demos = [
       </svg>
     ),
   },
-  */
+  
 
   // ---- wRite Right demo: disabled until the video is available ----
   /*
