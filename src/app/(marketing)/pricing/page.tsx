@@ -59,7 +59,7 @@ type Plan = {
 const plans: Plan[] = [
   {
     id: "ezeeexams",
-    title: "For Facts",
+    title: "For-Facts",
     subtitle: "Eases GS Prelims",
     stats: ["10,000 facts", "30 mock tests"],
     features: [
@@ -90,7 +90,7 @@ const plans: Plan[] = [
   },
   {
     id: "wRiteRight",
-    title: "wRite Right",
+    title: "Write-Right App",
     subtitle: "Eases GS Mains",
     stats: ["Answer Script Evaluation", "1-to-1 Feedback"],
     features: [],

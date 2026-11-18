@@ -232,7 +232,7 @@ export default function ForFactsDemos({ group = "ff" }: { group?: Group }) {
                 letterSpacing: "0.12em",
               }}
             >
-              {group === "rr" ? "WRITE RIGHT DEMO" : "FOR FACTS DEMO"}
+              {group === "rr" ? "WRITE-RIGHT DEMO" : "FOR-FACTS DEMO"}
             </Typography>
             <Typography sx={{ mt: 0.25, fontSize: "1rem", fontWeight: 700 }}>
               {activeVideo?.title}

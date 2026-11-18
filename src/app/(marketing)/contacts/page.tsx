@@ -52,7 +52,7 @@ const ContactPage = () => {
               <Typography className="contact-description">
                 Have questions or need guidance? Our team is ready to provide
                 expert mentorship, preparation strategy, and personalized
-                support to help you crack the UPSC Civil Services Examination
+                support to help you succeed in the UPSC Civil Services Examination
                 with confidence.
               </Typography>
 
