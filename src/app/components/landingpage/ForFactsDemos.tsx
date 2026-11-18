@@ -20,7 +20,7 @@ const demos = [
   {
     group: "ff" as Group,
     bare: true,
-    title: "Website demo",
+    title: "Webapp demo",
     src: "/videos/PrelimsPass_Walkthrough.mp4",
     ring: GREEN_RING,
     glow: GREEN_GLOW,
