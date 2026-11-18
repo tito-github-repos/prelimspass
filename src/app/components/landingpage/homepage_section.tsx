@@ -202,7 +202,7 @@ const products = [
         text: "After registration, the mobile app link is sent to your registered email.",
       },
       {
-        text: "All Registered users can access and practice PYQs FF Mobile App and FF Web App.",
+        text: "All Registered users can access and practice PYQs For-Facts Mobile App and For-Facts Web App.",
       },
     ],
     highlight: "30 mock tests practice before the 2027 prelims examination.",
@@ -278,7 +278,7 @@ const products = [
         text: "After registration, the Write-Right mobile app link is sent to your registered email.",
       },
       {
-        text: "All Registered users can access and  view  PYQs  Paperwise,syllabuswise and topicwise in RR Mobile App.",
+        text: "All Registered users can access and  view  PYQs  Paperwise,syllabuswise and topicwise in Write-Right Mobile App.",
       },
     ],
     highlight: "10 mock tests practice before the 2027 mains examination.",
