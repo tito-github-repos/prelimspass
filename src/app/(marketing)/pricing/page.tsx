@@ -33,11 +33,14 @@ const W = "var(--website-font)";
 
 /* ───────────────────────────── Plan data ───────────────────────────── */
 
-// A separately priced pack shown inside a card (used by wRiteRight)
+// A separately priced pack shown inside a card (used by For-Facts and wRiteRight)
 type Pack = {
   title: string;
+  badge?: string; // small highlight, e.g. "3,000 facts"
   features: string[];
   price: string;
+  originalPrice?: string; // struck-through price
+  offer?: string; // e.g. "Until Dec 31, 2026"
   href: string;
 };
 
@@ -62,10 +65,34 @@ const plans: Plan[] = [
     title: "For-Facts",
     subtitle: "Eases GS Prelims",
     stats: ["10,000 facts", "30 mock tests"],
-    features: [
-      "Detailed analysis & performance tracking",
-      "Attempt online from any device",
-      "Real UPSC pattern (+2 / -0.66)",
+    features: [], // moved into the packs below
+    packs: [
+      {
+        title: "For - Facts Mobile App",
+        // badge: "3,000 facts",
+        features: [
+          "Facts per subject added incrementally",
+          "New facts added every week",
+          "Revise more, in the shortest possible time",
+        ],
+        price: "₹999",
+        originalPrice: "₹9,999",
+        offer: "Until Dec 31, 2026",
+        href: "/register?plan=mobile",
+      },
+      {
+        title: "For - Facts Web App",
+        // badge: "30 mocks",
+        features: [
+          "UPSC pattern Questions",
+          "Detailed analysis & performance tracking",
+          "Attempt online from any device",
+        ],
+        price: "₹999",
+        originalPrice: "₹9,999",
+        offer: "Until Dec 31, 2026",
+        href: "/register?plan=web",
+      },
     ],
     price: "₹999",
     originalPrice: "₹9,999",
@@ -396,7 +423,7 @@ function PlanCard({ plan }: { plan: Plan }) {
         }}
       >
         {/* ── Header: icon + title ── */}
-        <Stack direction="row" spacing={2} alignItems="center" mb={2}>
+        <Stack direction="row" spacing={2} alignItems="center" mb={1.5}>
           <Box
             className="pp-hicon"
             sx={{
@@ -451,7 +478,7 @@ function PlanCard({ plan }: { plan: Plan }) {
           <Stack
             direction="row"
             flexWrap="wrap"
-            sx={{ gap: 1, mb: 2.5 }}
+            sx={{ gap: 1, mb: 2 }}
           >
             {plan.stats.map((s) => (
               <Box
@@ -516,13 +543,14 @@ function PlanCard({ plan }: { plan: Plan }) {
 
         {/* ── Price + button (pinned to the bottom so both cards line up) ── */}
         {plan.packs ? (
-          // Separate priced packs (wRiteRight)
+          // Separate priced packs (For-Facts and wRiteRight) — identical layout
           <Box
             sx={{
-              mt: "auto",
+              flexGrow: 1,
               display: "grid",
               gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-              gap: 2,
+              gridAutoRows: "1fr", // every pack is the same height
+              gap: 1.5,
             }}
           >
             {plan.packs.map((pack) => (
@@ -532,41 +560,71 @@ function PlanCard({ plan }: { plan: Plan }) {
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  borderRadius: "18px",
-                  p: { xs: 2, sm: 2.25 },
+                  borderRadius: "16px",
+                  p: { xs: 1.75, sm: 2 },
                   background: "rgba(236,253,243,0.9)",
                   border: "1px solid #dff3e5",
                   transition: COLOR_T,
                 }}
               >
-                <Typography
-                  className="pp-text"
-                  fontWeight={800}
-                  sx={{
-                    color: "#0b1b2b",
-                    fontSize: "1.05rem",
-                    mb: 1.25,
-                    transition: COLOR_T,
-                  }}
+                {/* Title + badge on one row */}
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  flexWrap="wrap"
+                  sx={{ gap: 0.75, mb: 1.25 }}
                 >
-                  {pack.title}
-                </Typography>
+                  <Typography
+                    className="pp-text"
+                    fontWeight={800}
+                    sx={{
+                      color: "#0b1b2b",
+                      fontSize: "1rem",
+                      lineHeight: 1.2,
+                      transition: COLOR_T,
+                    }}
+                  >
+                    {pack.title}
+                  </Typography>
+                  {pack.badge && (
+                    <Box
+                      className="pp-chip"
+                      sx={{
+                        px: 1,
+                        py: 0.2,
+                        borderRadius: "999px",
+                        background: "rgba(22,163,74,0.1)",
+                        border: "1px solid rgba(22,163,74,0.25)",
+                        color: GREEN_DARK,
+                        fontWeight: 700,
+                        fontSize: "0.72rem",
+                        lineHeight: 1.4,
+                        whiteSpace: "nowrap",
+                        transition: COLOR_T,
+                      }}
+                    >
+                      {pack.badge}
+                    </Box>
+                  )}
+                </Stack>
 
-                <Stack spacing={1} sx={{ flexGrow: 1, mb: 1.75 }}>
+                {/* Features */}
+                <Stack spacing={0.75} sx={{ flexGrow: 1, mb: 1.5 }}>
                   {pack.features.map((f) => (
                     <Stack
                       key={f}
                       direction="row"
-                      spacing={1}
+                      spacing={0.75}
                       alignItems="flex-start"
                     >
                       <CheckCircleIcon
                         className="pp-check"
                         sx={{
                           color: GREEN,
-                          fontSize: 19,
+                          fontSize: 17,
                           flexShrink: 0,
-                          mt: "1px",
+                          mt: "2px",
                           transition: COLOR_T,
                         }}
                       />
@@ -574,8 +632,8 @@ function PlanCard({ plan }: { plan: Plan }) {
                         className="pp-text"
                         sx={{
                           color: "#374151",
-                          fontSize: "0.88rem",
-                          lineHeight: 1.4,
+                          fontSize: "0.82rem",
+                          lineHeight: 1.35,
                           transition: COLOR_T,
                         }}
                       >
@@ -585,19 +643,70 @@ function PlanCard({ plan }: { plan: Plan }) {
                   ))}
                 </Stack>
 
-                <Typography
-                  className="pp-price"
-                  fontWeight={800}
-                  sx={{
-                    color: GREEN_DARK,
-                    fontSize: { xs: "1.9rem", sm: "2.1rem" },
-                    lineHeight: 1.1,
-                    mb: 1.5,
-                    transition: COLOR_T,
-                  }}
-                >
-                  {pack.price}
-                </Typography>
+                {/* Price block: fixed height so both cards line up */}
+                <Box sx={{ minHeight: 76, mb: 1.25 }}>
+                  <Stack
+                    direction="row"
+                    alignItems="baseline"
+                    flexWrap="wrap"
+                    sx={{ columnGap: 1 }}
+                  >
+                    <Typography
+                      className="pp-price"
+                      fontWeight={800}
+                      sx={{
+                        color: GREEN_DARK,
+                        fontSize: { xs: "1.8rem", sm: "2rem" },
+                        lineHeight: 1.1,
+                        transition: COLOR_T,
+                      }}
+                    >
+                      {pack.price}
+                    </Typography>
+                    {pack.originalPrice && (
+                      <Typography
+                        className="pp-orig"
+                        fontWeight={700}
+                        sx={{
+                          color: "#6b7280",
+                          fontSize: "1rem",
+                          textDecoration: "line-through",
+                          textDecorationColor: "#ef4444",
+                          textDecorationThickness: "2px",
+                          lineHeight: 1.1,
+                          transition: COLOR_T,
+                        }}
+                      >
+                        {pack.originalPrice}
+                      </Typography>
+                    )}
+                  </Stack>
+
+                  {pack.offer && (
+                    <Stack
+                      className="pp-offer"
+                      direction="row"
+                      spacing={0.5}
+                      alignItems="center"
+                      sx={{
+                        display: "inline-flex",
+                        mt: 0.75,
+                        background: DARK_GREEN,
+                        color: "#fff",
+                        px: 1,
+                        py: 0.4,
+                        borderRadius: "8px",
+                        fontWeight: 700,
+                        fontSize: "0.72rem",
+                        whiteSpace: "nowrap",
+                        transition: COLOR_T,
+                      }}
+                    >
+                      <CalendarMonthRoundedIcon sx={{ fontSize: 14 }} />
+                      <span>{pack.offer}</span>
+                    </Stack>
+                  )}
+                </Box>
 
                 <Button
                   className="pp-btn"
@@ -615,10 +724,10 @@ function PlanCard({ plan }: { plan: Plan }) {
                     background: `linear-gradient(90deg, ${GREEN} 0%, ${GREEN_DARK} 100%)`,
                     color: "#fff",
                     fontWeight: 700,
-                    fontSize: "1rem",
+                    fontSize: "0.95rem",
                     textTransform: "none",
-                    borderRadius: "14px",
-                    py: 1.2,
+                    borderRadius: "12px",
+                    py: 1,
                     boxShadow: "none",
                     transition: `${COLOR_T}, transform 300ms ${EASE}`,
                     "&:hover": {
@@ -635,7 +744,7 @@ function PlanCard({ plan }: { plan: Plan }) {
             ))}
           </Box>
         ) : (
-          // Single price + button (For Facts)
+          // Single price + button (kept for plans without packs)
           <Box sx={{ mt: "auto" }}>
             <Box
               className="pp-pricebox"
