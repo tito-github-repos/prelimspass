@@ -958,6 +958,15 @@ const ExamContent: React.FC = () => {
               <div className={styles.checklistItem}>
                 <i className={`fas fa-check-circle ${styles.checkIcon}`}></i>
                 <p>
+                  Questions follow the real UPSC pattern: <strong>+2</strong>{" "}
+                  marks for each correct answer and <strong>-0.66</strong> marks
+                  for each wrong answer. Unanswered questions carry no marks.
+                </p>
+              </div>
+
+              <div className={styles.checklistItem}>
+                <i className={`fas fa-check-circle ${styles.checkIcon}`}></i>
+                <p>
                   Each question has a recommended cut-off time based on its
                   difficulty level. Finishing within the suggested time helps
                   improve speed and exam performance.
