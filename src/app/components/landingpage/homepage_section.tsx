@@ -6,6 +6,14 @@ import Link from "next/link";
 import { Box, Typography, Button } from "@mui/material";
 import ForFactsDemos from "./ForFactsDemos";
 
+/* ══ REGISTER LINKS ══ */
+const REGISTER_WEB_URL = "/register";
+const PLAY_STORE_URL =
+  "https://play.google.com/store/apps/details?id=com.tito.pp_app";
+const REGISTER_WRITE_RIGHT_URL = "/";
+
+const REGISTER_PROMPT = "Click here to register";
+
 function Tick({ color }: { color: string }) {
   return (
     <Box
@@ -57,6 +65,48 @@ function NumBadge({ n, color }: { n: number; color: string }) {
       }}
     >
       {n}
+    </Box>
+  );
+}
+
+/* Small web / phone icon used inside the register buttons */
+function ActionIcon({ kind }: { kind: "web" | "mobile" }) {
+  return (
+    <Box
+      sx={{
+        width: 34,
+        height: 34,
+        borderRadius: "10px",
+        background: "rgba(255,255,255,0.2)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+      }}
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#fff"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {kind === "web" ? (
+          <>
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <line x1="8" y1="21" x2="16" y2="21" />
+            <line x1="12" y1="17" x2="12" y2="21" />
+          </>
+        ) : (
+          <>
+            <rect x="6" y="2" width="12" height="20" rx="2.5" />
+            <line x1="11" y1="18.5" x2="13" y2="18.5" />
+          </>
+        )}
+      </svg>
     </Box>
   );
 }
@@ -206,8 +256,23 @@ const products = [
       },
     ],
     highlight: "30 mock tests practice before the 2027 prelims examination.",
-    btn: "Buy Now",
-    href: "/pricing",
+    prompt: REGISTER_PROMPT,
+    // For-Facts has TWO register buttons (web + mobile)
+    actions: [
+      {
+        top: "Register on",
+        label: "Web App",
+        href: REGISTER_WEB_URL,
+        kind: "web" as const,
+      },
+      {
+        top: "Register on",
+        label: "Mobile App",
+        href: PLAY_STORE_URL,
+        kind: "mobile" as const,
+        external: true,
+      },
+    ],
   },
   {
     color: "#ea580c",
@@ -282,8 +347,16 @@ const products = [
       },
     ],
     highlight: "10 mock tests practice before the 2027 mains examination.",
-    btn: "Buy Now",
-    href: "/pricing",
+    prompt: REGISTER_PROMPT,
+    // Write-Right is mobile-only, so it has ONE register button
+    actions: [
+      {
+        top: "Register on",
+        label: "Write-Right Mobile App",
+        href: REGISTER_WRITE_RIGHT_URL,
+        kind: "mobile" as const,
+      },
+    ],
   },
 ];
 
@@ -933,7 +1006,6 @@ export default function HomepageSections() {
                   {/* Pushes the button to the bottom so both cards align */}
                   <Box sx={{ flex: 1 }} />
 
-                  
                   {/* Highlight line (only EzeeExams has this) */}
                   {p.highlight && (
                     <Box
@@ -960,459 +1032,102 @@ export default function HomepageSections() {
                     </Box>
                   )}
 
-                  
-                  <Button
-                    component={Link}
-                    href={p.href}
-                    variant="outlined"
-                    endIcon={
-                      <svg
-                        width="13"
-                        height="13"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                        <polyline points="12 5 19 12 12 19" />
-                      </svg>
-                    }
-                    sx={{
-                      borderColor: p.color,
-                      color: p.color,
-                      borderRadius: "10px",
-                      fontWeight: 700,
-                      textTransform: "none",
-                      fontSize: "0.83rem",
-                      py: 0.9,
-                      fontFamily: W,
-                      "&:hover": {
-                        background: `${p.color}08`,
-                        borderColor: p.color,
-                      },
-                    }}
-                  >
-                    {p.btn}
-                  </Button>
-                </Box>
-              </Box>
-            ))}
-          </Box>
-
-          {/* ═══ OLD OFFERINGS — COMMENTED OUT ═══
-          <Box
-            sx={{
-              mb: { xs: 2.5, md: 3 },
-              borderRadius: "20px",
-              overflow: "hidden",
-              background: "linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%)",
-              border: "2px solid #0f766e",
-              position: "relative",
-            }}
-          >
-            <Box
-              sx={{
-                position: "absolute",
-                top: 14,
-                left: { xs: 20, md: 48 },
-                px: 1.4,
-                py: 0.5,
-                borderRadius: "999px",
-                background: "#e0f2f1",
-                border: "1px solid #a7dcd7",
-                zIndex: 1,
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: "0.62rem",
-                  fontWeight: 800,
-                  color: "#0f766e",
-                  fontFamily: W,
-                  letterSpacing: "0.03em",
-                }}
-              >
-                Best Value · Season 2027
-              </Typography>
-            </Box>
-
-            <Box
-              sx={{
-                p: {
-                  xs: "38px 20px 22px",
-                  md: "38px 48px 34px",
-                },
-                display: "grid",
-                gridTemplateColumns: { xs: "1fr", md: "1.3fr 1fr" },
-                gap: { xs: 2.5, md: 4 },
-                alignItems: "center",
-              }}
-            >
-              <Box>
-                <Typography
-                  sx={{
-                    fontWeight: 800,
-                    fontSize: { xs: "1.2rem", md: "1.5rem" },
-                    color: "#0f172a",
-                    fontFamily: W,
-                    mb: 0.6,
-                  }}
-                >
-                  {featuredOffering.title}
-                </Typography>
-
-                <Typography
-                  sx={{
-                    fontSize: "0.8rem",
-                    color: "#52749a",
-                    fontFamily: W,
-                    mb: 1.8,
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {featuredOffering.intro}
-                </Typography>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 1,
-                  }}
-                >
-                  {featuredOffering.feats.map((f, i) => (
-                    <Box
-                      key={i}
-                      sx={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        gap: 1,
-                      }}
-                    >
-                      <Tick color="#0f766e" />
-
-                      <Typography
-                        sx={{
-                          fontSize: "0.78rem",
-                          color: "#173b62",
-                          fontFamily: W,
-                          lineHeight: 1.55,
-                        }}
-                      >
-                        {f}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 1.6,
-                }}
-              >
-                <Box
-                  sx={{
-                    textAlign: "center",
-                    p: "18px 32px",
-                    borderRadius: "16px",
-                    background: "rgba(15,118,110,0.045)",
-                    border: "1.5px solid #b8deda",
-                    width: "100%",
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontWeight: 900,
-                      fontSize: "1.9rem",
-                      color: "#0f766e",
-                      fontFamily: W,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {featuredOffering.price}
-                  </Typography>
-
-                  <Typography
-                    sx={{
-                      fontSize: "0.7rem",
-                      color: "#52749a",
-                      fontFamily: W,
-                      mt: 0.5,
-                    }}
-                  >
-                    {featuredOffering.priceUnit}
-                  </Typography>
-                </Box>
-
-                <Button
-                  variant="contained"
-                  fullWidth
-                  endIcon={
-                    <svg
-                      width="13"
-                      height="13"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <line x1="5" y1="12" x2="19" y2="12" />
-                      <polyline points="12 5 19 12 12 19" />
-                    </svg>
-                  }
-                  sx={{
-                    background: "#0f766e",
-                    color: "#fff",
-                    borderRadius: "10px",
-                    fontWeight: 700,
-                    textTransform: "none",
-                    fontSize: "0.85rem",
-                    py: 1,
-                    fontFamily: W,
-                    boxShadow: "0 8px 24px rgba(15,118,110,0.22)",
-                    "&:hover": {
-                      background: "#115e59",
-                      boxShadow: "0 10px 30px rgba(15,118,110,0.28)",
-                    },
-                  }}
-                >
-                  {featuredOffering.btn}
-                </Button>
-              </Box>
-            </Box>
-          </Box>
-
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: {
-                xs: "1fr",
-                md: "repeat(2, minmax(0, 1fr))",
-              },
-              gap: { xs: 2, md: 2 },
-              alignItems: "stretch",
-            }}
-          >
-            {offerings.map((o, i) => (
-              <Box
-                key={i}
-                sx={{
-                  background: "#fff",
-                  border: "2px solid #e5e7eb",
-                  borderRadius: "18px",
-                  overflow: "hidden",
-                  display: "flex",
-                  flexDirection: "column",
-                  boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
-                  transition: "all 0.22s ease",
-                  "&:hover": {
-                    borderColor: o.color,
-                    transform: "translateY(-5px)",
-                    boxShadow: `0 20px 48px ${o.color}22`,
-                  },
-                }}
-              >
-                <Box
-                  sx={{
-                    background: o.lightBg,
-                    borderBottom: `1.5px solid ${o.borderCol}`,
-                    p: "16px 20px",
-                  }}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                    <Box
-                      sx={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: "13px",
-                        background: "#fff",
-                        border: `1.5px solid ${o.borderCol}`,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                        boxShadow: `0 2px 10px ${o.color}18`,
-                      }}
-                    >
-                      {o.icon}
-                    </Box>
-                    <Box>
-                      <Typography
-                        sx={{
-                          fontWeight: 800,
-                          fontSize: "1rem",
-                          color: o.color,
-                          fontFamily: W,
-                          lineHeight: 1.2,
-                        }}
-                      >
-                        {o.title}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: "0.73rem",
-                          color: "#6b7280",
-                          lineHeight: 1.5,
-                          fontFamily: W,
-                          mt: 0.2,
-                        }}
-                      >
-                        {o.sub}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Box>
-
-                <Box
-                  sx={{
-                    p: "16px 20px 20px",
-                    display: "flex",
-                    flexDirection: "column",
-                    flex: 1,
-                  }}
-                >
-                  {o.note && (
-                    <Box
-                      sx={{
-                        mb: 1.2,
-                        px: 1.2,
-                        py: 0.6,
-                        borderRadius: "8px",
-                        background: `${o.color}0d`,
-                        border: `1px dashed ${o.color}45`,
-                      }}
-                    >
-                      <Typography
-                        sx={{
-                          fontSize: "0.68rem",
-                          fontWeight: 600,
-                          color: o.color,
-                          fontFamily: W,
-                          lineHeight: 1.4,
-                        }}
-                      >
-                        {o.note}
-                      </Typography>
-                    </Box>
-                  )}
-
-                  <Box sx={{ display: "flex", gap: 1.5, mb: 1.8 }}>
-                    <Box
-                      sx={{
-                        flex: 1,
-                        p: "8px 10px",
-                        borderRadius: "11px",
-                        background: `${o.color}0a`,
-                        border: `1.5px solid ${o.color}25`,
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Typography
-                        sx={{
-                          fontWeight: 900,
-                          fontSize: "1.2rem",
-                          color: o.color,
-                          fontFamily: W,
-                          lineHeight: 1,
-                        }}
-                      >
-                        {o.price}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: "0.65rem",
-                          color: "#94a3b8",
-                          fontFamily: W,
-                          mt: 0.4,
-                          textAlign: "center",
-                          lineHeight: 1.4,
-                        }}
-                      >
-                        {o.priceUnit}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  <Box sx={{ height: "1px", background: "#f1f5f9", mb: 1.5 }} />
-
+                  {/* Register prompt: a divider line with the text in the middle */}
                   <Box
                     sx={{
                       display: "flex",
-                      flexDirection: "column",
-                      gap: 0.8,
-                      flex: 1,
-                      mb: 2,
+                      alignItems: "center",
+                      gap: 1.2,
+                      mb: 1.2,
                     }}
                   >
-                    {o.feats.map((feat, fi) => (
-                      <Box
-                        key={fi}
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
-                        <Tick color={o.color} />
-                        <Typography
-                          sx={{
-                            fontSize: "0.8rem",
-                            color: "#374151",
-                            fontFamily: W,
-                          }}
-                        >
-                          {feat}
-                        </Typography>
-                      </Box>
-                    ))}
+                    <Box sx={{ flex: 1, height: "1px", background: "#e5e7eb" }} />
+                    <Typography
+                      sx={{
+                        fontSize: "0.74rem",
+                        fontWeight: 700,
+                        color: "#374151",
+                        fontFamily: W,
+                        textAlign: "center",
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {p.prompt}
+                    </Typography>
+                    <Box sx={{ flex: 1, height: "1px", background: "#e5e7eb" }} />
                   </Box>
 
-                  <Button
-                    variant="outlined"
-                    endIcon={
-                      <svg
-                        width="13"
-                        height="13"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                        <polyline points="12 5 19 12 12 19" />
-                      </svg>
-                    }
+                  {/* Register buttons: same style, same height in both cards.
+                      For-Facts has 2 (web + mobile), Write-Right has 1. */}
+                  <Box
                     sx={{
-                      borderColor: o.color,
-                      color: o.color,
-                      borderRadius: "10px",
-                      fontWeight: 700,
-                      textTransform: "none",
-                      fontSize: "0.83rem",
-                      py: 0.9,
-                      fontFamily: W,
-                      "&:hover": {
-                        background: `${o.color}08`,
-                        borderColor: o.color,
-                      },
+                      display: "flex",
+                      flexDirection: { xs: "column", sm: "row" },
+                      gap: 1.2,
                     }}
                   >
-                    {o.btn}
-                  </Button>
+                    {p.actions.map((a, ai) => (
+                      <Button
+                        key={ai}
+                        component={Link}
+                        href={a.href}
+                        {...("external" in a && a.external
+                          ? { target: "_blank", rel: "noopener noreferrer" }
+                          : {})}
+                        variant="contained"
+                        sx={{
+                          flex: 1,
+                          justifyContent: "flex-start",
+                          gap: 1.2,
+                          background: p.color,
+                          color: "#fff",
+                          borderRadius: "12px",
+                          textTransform: "none",
+                          textAlign: "left",
+                          px: 1.4,
+                          py: 1,
+                          fontFamily: W,
+                          boxShadow: `0 6px 16px ${p.color}33`,
+                          transition: "all 0.2s ease",
+                          "&:hover": {
+                            background: p.color,
+                            opacity: 0.93,
+                            transform: "translateY(-2px)",
+                            boxShadow: `0 10px 22px ${p.color}44`,
+                          },
+                        }}
+                      >
+                        <ActionIcon kind={a.kind} />
+                        <Box sx={{ minWidth: 0 }}>
+                          <Typography
+                            sx={{
+                              fontSize: "0.66rem",
+                              fontWeight: 600,
+                              opacity: 0.9,
+                              lineHeight: 1.2,
+                              fontFamily: W,
+                            }}
+                          >
+                            {a.top}
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontSize: "0.88rem",
+                              fontWeight: 800,
+                              lineHeight: 1.25,
+                              fontFamily: W,
+                            }}
+                          >
+                            {a.label}
+                          </Typography>
+                        </Box>
+                      </Button>
+                    ))}
+                  </Box>
                 </Box>
               </Box>
             ))}
           </Box>
-          ═══ END OLD OFFERINGS ═══ */}
         </Box>
       </Box>
 
@@ -1515,49 +1230,6 @@ export default function HomepageSections() {
           </Box>
 
           <StepsRow items={mmSteps} cols={4} maxWidth={860} />
-
-          {/* <Box sx={{ textAlign: "center", mt: { xs: 4, md: 4 } }}>
-            <Button
-              component={Link}
-              href="#"
-              variant="contained"
-              endIcon={
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              }
-              sx={{
-                background: "linear-gradient(135deg,#16a34a,#15803d)",
-                color: "#fff",
-                px: 3.5,
-                py: 1.1,
-                borderRadius: "11px",
-                fontWeight: 700,
-                textTransform: "none",
-                fontSize: "0.88rem",
-                fontFamily: W,
-                boxShadow: "0 8px 28px rgba(22,163,74,0.4)",
-                "&:hover": {
-                  opacity: 0.9,
-                  transform: "translateY(-2px)",
-                  boxShadow: "0 12px 36px rgba(22,163,74,0.5)",
-                },
-                transition: "all 0.22s ease",
-              }}
-            >
-              Start Your Journey Today
-            </Button>
-          </Box> */}
         </Box>
       </Box>
     </>
