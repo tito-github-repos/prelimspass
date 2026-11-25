@@ -718,7 +718,7 @@ export default function PricingPage() {
                               lineHeight: 1.2,
                             }}
                           >
-                            5 AM – 6 AM
+                            6 AM – 7 AM
                           </Typography>
                           <Typography
                             sx={{
