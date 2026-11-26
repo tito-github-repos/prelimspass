@@ -28,12 +28,19 @@ import {
   TableCell,
   TableContainer,
   Paper,
+  Pagination,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useState, useMemo, useEffect } from "react";
+import UploadIcon from "@mui/icons-material/Upload";
+import DownloadIcon from "@mui/icons-material/Download";
+import { useState, useMemo, useEffect, useRef } from "react";
 import * as Yup from "yup";
+import * as XLSX from "xlsx";
 
 type ExamType = "practice" | "mock" | "live";
+type SelectionMode = "auto" | "manual" | "excel";
+const SUBJECTS_PAGE_URL = "/admin-pages/subject_details"; // change to your Manage Subject / Topic page URL
+const EXCEL_PAGE_SIZE = 10;
 
 interface Topic {
   topic_id: number;
@@ -127,7 +134,18 @@ export default function CreateExamModal({ open, onClose, onSuccess }: Props) {
     return localDate.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
   };
 
+  const resetExcel = () => {
+    setExcelFile(null);
+    setExcelQuestions([]);
+    setExcelErrors([]);
+    setMissingSubjects([]);
+    setMissingTopics([]);
+    setExcelPage(1);
+    if (excelInputRef.current) excelInputRef.current.value = "";
+  };
+
   const resetForm = () => {
+    resetExcel();
     setActiveStep(0);
     setExamTitle("");
     setDescription("");
@@ -159,7 +177,27 @@ export default function CreateExamModal({ open, onClose, onSuccess }: Props) {
   const [endTime, setEndTime] = useState("");
 
   // STEP 3: Questions
-  const [selectionMode, setSelectionMode] = useState<"auto" | "manual">("auto");
+  const [selectionMode, setSelectionMode] = useState<SelectionMode>("auto");
+  const excelInputRef = useRef<HTMLInputElement>(null);
+  const [excelFile, setExcelFile] = useState<File | null>(null);
+  const [excelQuestions, setExcelQuestions] = useState<any[]>([]);
+  const [excelErrors, setExcelErrors] = useState<string[]>([]);
+  const [missingSubjects, setMissingSubjects] = useState<string[]>([]);
+  const [missingTopics, setMissingTopics] = useState<string[]>([]);
+  const [masterSubjects, setMasterSubjects] = useState<any[]>([]);
+  const [excelPage, setExcelPage] = useState(1);
+  const [rechecking, setRechecking] = useState(false);
+  const loadMasterSubjects = async () => {
+    const res = await fetch("/api/subjects", { cache: "no-store" });
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : data.data || [];
+    setMasterSubjects(list);
+    return list as any[];
+  };
+
+  useEffect(() => {
+    if (open) loadMasterSubjects().catch(console.error);
+  }, [open]);
   const [questionsByTopic, setQuestionsByTopic] = useState<
     Record<number, any[]>
   >({});
@@ -211,13 +249,22 @@ export default function CreateExamModal({ open, onClose, onSuccess }: Props) {
 
   const isPractice = examType === "practice";
 
+  const totalExcelPages = Math.max(
+    1,
+    Math.ceil(excelQuestions.length / EXCEL_PAGE_SIZE),
+  );
+  const safeExcelPage = Math.min(excelPage, totalExcelPages);
+  const excelFrom = (safeExcelPage - 1) * EXCEL_PAGE_SIZE;
+  const excelTo = Math.min(excelFrom + EXCEL_PAGE_SIZE, excelQuestions.length);
   const totalQuestions =
-    selectionMode === "manual"
-      ? selectedQuestions.length
-      : Object.values(topicCounts).reduce(
-          (sum, v) => sum + (Number(v) || 0),
-          0,
-        );
+    selectionMode === "excel"
+      ? excelQuestions.length
+      : selectionMode === "manual"
+        ? selectedQuestions.length
+        : Object.values(topicCounts).reduce(
+            (sum, v) => sum + (Number(v) || 0),
+            0,
+          );
 
   const validateField = async (name: string, value: any) => {
     try {
@@ -535,6 +582,18 @@ export default function CreateExamModal({ open, onClose, onSuccess }: Props) {
   };
 
   const validateQuestionsStep = () => {
+    if (selectionMode === "excel") {
+      const errors: Record<string, string> = {};
+      if (!excelFile || excelQuestions.length === 0)
+        errors.totalQuestions = "Upload a valid Excel file";
+      else if (excelErrors.length > 0)
+        errors.totalQuestions = "Fix the Excel errors and upload again";
+      else if (excelQuestions.length !== 100)
+        errors.totalQuestions = "Exam must contain exactly 100 questions";
+      setFormErrors(errors);
+      return Object.keys(errors).length === 0;
+    }
+
     let isValid = true;
     const errors: Record<string, string> = {};
 
@@ -669,19 +728,28 @@ export default function CreateExamModal({ open, onClose, onSuccess }: Props) {
       duration,
       startTime: startTime ? new Date(startTime).toISOString() : null,
       endTime: endTime ? new Date(endTime).toISOString() : null,
-      selectionMode,
-      ...(selectionMode === "auto" ? { topicCounts } : { selectedQuestions }),
+            ...(selectionMode === "excel"
+        ? { questions: excelQuestions }
+        : {
+            selectionMode,
+            ...(selectionMode === "auto"
+              ? { topicCounts }
+              : { selectedQuestions }),
+          }),
     };
 
     try {
-      const res = await fetch("/api/exams", {
+      const res = await fetch(
+        selectionMode === "excel" ? "/api/exams/excel" : "/api/exams",
+        {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload),
-      });
+                body: JSON.stringify(payload),
+        },
+      );
       const data = await res.json();
       if (data.success) {
         showSnackbar("Exam created successfully!", "success");
@@ -815,6 +883,226 @@ export default function CreateExamModal({ open, onClose, onSuccess }: Props) {
     }
   };
 
+  const norm = (v: any) => String(v ?? "").trim().replace(/\s+/g, " ");
+
+  const diffMap: Record<string, string> = {
+    easy: "Easy",
+    medium: "Medium",
+    hard: "Hard",
+    e: "Easy",
+    m: "Medium",
+    h: "Hard",
+    "1": "Easy",
+    "2": "Medium",
+    "3": "Hard",
+  };
+
+  const handleExcelUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    if (!/\.(xlsx|xls)$/i.test(file.name)) {
+      showSnackbar("Please upload an Excel file (.xlsx or .xls)", "error");
+      return;
+    }
+    setExcelFile(file);
+    const master = await loadMasterSubjects(); // always check against fresh data
+    parseExcelFile(file, master);
+  };
+
+  const parseExcelFile = (file: File, master: any[], notify = false) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const wb = XLSX.read(e.target?.result, { type: "array" });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][];
+
+        if (rows.length === 0) {
+          setExcelErrors(["File is empty"]);
+          setExcelQuestions([]);
+          return;
+        }
+
+        const headers = rows[0].map((h) => String(h).toLowerCase().trim());
+        const required = [
+          "question_text",
+          "option_a",
+          "option_b",
+          "option_c",
+          "option_d",
+          "correct_answer",
+          "subject",
+          "topic",
+        ];
+        const missing = required.filter((f) => !headers.includes(f));
+        if (missing.length) {
+          setExcelErrors([`Missing required columns: ${missing.join(", ")}`]);
+          setExcelQuestions([]);
+          return;
+        }
+
+        // normal (non-PYQ) subjects only
+        const subjMap = new Map(
+          master
+            .filter((s) => !s.is_pyq)
+            .map((s) => [norm(s.subject_name).toLowerCase(), s]),
+        );
+        const pyqNames = new Set(
+          master
+            .filter((s) => s.is_pyq)
+            .map((s) => norm(s.subject_name).toLowerCase()),
+        );
+
+        const parsed: any[] = [];
+        const errors: string[] = [];
+        const mSubjects = new Set<string>();
+        const mTopics = new Set<string>();
+
+        for (let i = 1; i < rows.length; i++) {
+          const values = rows[i];
+          if (!values || !Array.isArray(values)) continue;
+
+          const r: Record<string, string> = {};
+          headers.forEach((h, idx) => {
+            r[h] = values[idx] !== undefined ? String(values[idx]).trim() : "";
+          });
+          if (!Object.values(r).some((v) => v !== "")) continue; // blank row
+
+          const subject = norm(r.subject);
+          const topic = norm(r.topic);
+          const correct = r.correct_answer.toUpperCase();
+
+          if (
+            !r.question_text ||
+            !r.option_a ||
+            !r.option_b ||
+            !r.option_c ||
+            !r.option_d
+          ) {
+            errors.push(`Row ${i + 1}: question and all 4 options are required`);
+            continue;
+          }
+          if (!subject || !topic) {
+            errors.push(`Row ${i + 1}: subject and topic are required`);
+            continue;
+          }
+          if (!["A", "B", "C", "D"].includes(correct)) {
+            errors.push(`Row ${i + 1}: correct_answer must be A, B, C or D`);
+            continue;
+          }
+
+          const s = subjMap.get(subject.toLowerCase());
+          if (!s) {
+            if (pyqNames.has(subject.toLowerCase())) {
+              errors.push(
+                `Row ${i + 1}: "${subject}" is a PYQ subject and can't be used in a normal exam`,
+              );
+            } else {
+              mSubjects.add(subject);
+              errors.push(`Row ${i + 1}: Subject "${subject}" does not exist`);
+            }
+            continue;
+          }
+
+          const t = (s.topics || []).find(
+            (t: any) => norm(t.topic_name).toLowerCase() === topic.toLowerCase(),
+          );
+          if (!t) {
+            mTopics.add(`${s.subject_name} → ${topic}`);
+            errors.push(
+              `Row ${i + 1}: Topic "${topic}" does not exist under "${s.subject_name}"`,
+            );
+            continue;
+          }
+
+          parsed.push({
+            question_text: r.question_text,
+            option_a: r.option_a,
+            option_b: r.option_b,
+            option_c: r.option_c,
+            option_d: r.option_d,
+            correct_answer: correct,
+            points: Number(r.points) || 2,
+            difficulty:
+              diffMap[(r.difficulty || "medium").toLowerCase()] || "Medium",
+            explanation: r.explanation || "",
+            subject: s.subject_name, // exact DB spelling
+            topic: t.topic_name,
+          });
+        }
+
+        setExcelQuestions(parsed);
+        setExcelPage(1);
+        setExcelErrors(errors);
+        setMissingSubjects([...mSubjects]);
+        setMissingTopics([...mTopics]);
+                setFormErrors((prev) => ({ ...prev, totalQuestions: "" }));
+        if (notify) {
+          if (errors.length === 0) {
+            showSnackbar(
+              `All subjects and topics matched (${parsed.length} questions)`,
+              "success",
+            );
+          } else {
+            showSnackbar(
+              `Still ${errors.length} issue(s) found. Check the list below.`,
+              "warning",
+            );
+          }
+        }
+      } catch {
+        setExcelErrors(["Error parsing file. Please check the format."]);
+        setExcelQuestions([]);
+      }
+    };
+    reader.onerror = () => {
+      showSnackbar(
+        "Couldn't read the file. If you edited it, choose the file again.",
+        "error",
+      );
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  // after the admin adds
+  const handleRecheck = async () => {
+    if (!excelFile || rechecking) return;
+    setRechecking(true);
+    try {
+      const master = await loadMasterSubjects();
+      parseExcelFile(excelFile, master, true);
+    } catch (err) {
+      console.error(err);
+      showSnackbar("Couldn't reload subjects. Please try again.", "error");
+    } finally {
+      setRechecking(false);
+    }
+  };
+
+  const downloadExcelTemplate = () => {
+    const ws = XLSX.utils.json_to_sheet([
+      {
+        question_text: "Sample question?",
+        option_a: "Option A",
+        option_b: "Option B",
+        option_c: "Option C",
+        option_d: "Option D",
+        correct_answer: "A",
+        points: 2,
+        difficulty: "Medium",
+        explanation: "Why A is correct",
+        subject: "Economics",
+        topic: "Inflation",
+      },
+    ]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Questions");
+    XLSX.writeFile(wb, "exam_questions_template.xlsx");
+  };
+
   const renderStepContent = () => {
     switch (steps[activeStep]) {
       case "General Info":
@@ -865,6 +1153,12 @@ export default function CreateExamModal({ open, onClose, onSuccess }: Props) {
 
                 if (type === "mock" || type === "live") {
                   setDuration(120);
+                }
+
+                // Excel upload is only for mock/live
+                if (type === "practice" && selectionMode === "excel") {
+                  setSelectionMode("auto");
+                  resetExcel();
                 }
               }}
             >
@@ -970,8 +1264,9 @@ export default function CreateExamModal({ open, onClose, onSuccess }: Props) {
                 row
                 value={selectionMode}
                 onChange={(e) => {
-                  const mode = e.target.value as "auto" | "manual";
+                  const mode = e.target.value as SelectionMode;
                   setSelectionMode(mode);
+                  resetExcel();
 
                   // Reset topic selection when switching mode
                   setTopicCounts({});
@@ -993,6 +1288,13 @@ export default function CreateExamModal({ open, onClose, onSuccess }: Props) {
                   control={<Radio />}
                   label="Manual Selection"
                 />
+                {!isPractice && (
+                  <FormControlLabel
+                    value="excel"
+                    control={<Radio />}
+                    label="Upload Excel"
+                  />
+                )}
               </RadioGroup>
             </Box>
 
@@ -1002,7 +1304,180 @@ export default function CreateExamModal({ open, onClose, onSuccess }: Props) {
               </Typography>
             )}
 
-            {loadingSubjects ? (
+            {selectionMode === "excel" ? (
+              <Box border="1px solid #ddd" borderRadius={2} p={2}>
+                <Typography fontWeight={600} mb={1}>
+                  Upload Questions (Excel)
+                </Typography>
+                <Typography variant="body2" color="text.secondary" mb={2}>
+                  Exactly 100 questions. Each row needs the name of an existing
+                  subject and topic. If something is missing, add it in
+                  Subjects & Topics, then click Re-check file.
+                </Typography>
+
+                <Box display="flex" gap={2} mb={2}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<DownloadIcon />}
+                    onClick={downloadExcelTemplate}
+                  >
+                    Download Template
+                  </Button>
+                  <input
+                    ref={excelInputRef}
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={handleExcelUpload}
+                    style={{ display: "none" }}
+                    id="exam-excel-input"
+                  />
+                  <label htmlFor="exam-excel-input">
+                    <Button
+                      variant="contained"
+                      component="span"
+                      startIcon={<UploadIcon />}
+                    >
+                      Choose File
+                    </Button>
+                  </label>
+                </Box>
+
+                {excelFile && (
+                  <Typography variant="body2" mb={2}>
+                    Selected file: {excelFile.name}
+                  </Typography>
+                )}
+
+                {excelErrors.length > 0 && (
+                  <Alert severity="error" sx={{ mb: 2 }}>
+                    {excelErrors.slice(0, 10).map((er, i) => (
+                      <Typography key={i} variant="body2">
+                        • {er}
+                      </Typography>
+                    ))}
+                    {excelErrors.length > 10 && (
+                      <Typography variant="body2">
+                        …and {excelErrors.length - 10} more
+                      </Typography>
+                    )}
+                  </Alert>
+                )}
+                {excelQuestions.length > 0 && excelErrors.length === 0 && (
+                  <Alert severity="success" sx={{ mb: 2 }}>
+                    {excelQuestions.length} valid questions found
+                  </Alert>
+                )}
+                                {(missingSubjects.length > 0 || missingTopics.length > 0) && (
+                  <Alert
+                    severity="warning"
+                    sx={{ mb: 2 }}
+                    action={
+                      <Box display="flex" gap={1}>
+                        <Button
+                          color="inherit"
+                          size="small"
+                          onClick={() => window.open(SUBJECTS_PAGE_URL, "_blank")}
+                        >
+                          Open Subjects & Topics
+                        </Button>
+                        <Button
+                          color="inherit"
+                          size="small"
+                          onClick={handleRecheck}
+                          disabled={rechecking}
+                        >
+                          {rechecking ? "Checking..." : "Re-check file"}
+                        </Button>
+                      </Box>
+                    }
+                  >
+                    <Typography variant="body2" fontWeight={600} mb={0.5}>
+                      These don't exist yet. Add them in Subjects & Topics, then
+                      click Re-check file:
+                    </Typography>
+                    {missingSubjects.map((s) => (
+                      <Typography key={s} variant="body2">
+                        • Subject: {s}
+                      </Typography>
+                    ))}
+                    {missingTopics.map((t) => (
+                      <Typography key={t} variant="body2">
+                        • Topic: {t}
+                      </Typography>
+                    ))}
+                  </Alert>
+                )}
+
+                                {excelQuestions.length > 0 && (
+                  <>
+                    <TableContainer component={Paper} sx={{ maxHeight: 420 }}>
+                      <Table size="small" stickyHeader>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell sx={{ fontWeight: "bold" }}>S.No</TableCell>
+                            <TableCell sx={{ fontWeight: "bold" }}>
+                              Question
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: "bold" }}>
+                              Subject
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: "bold" }}>Topic</TableCell>
+                            <TableCell sx={{ fontWeight: "bold" }}>
+                              Correct
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {excelQuestions.slice(excelFrom, excelTo).map((q, i) => {
+                            const serial = excelFrom + i + 1;
+                            return (
+                              <TableRow key={serial} hover>
+                                <TableCell>{serial}</TableCell>
+                                <TableCell>
+                                  <span title={q.question_text}>
+                                    {q.question_text.slice(0, 100)}
+                                    {q.question_text.length > 100 ? "..." : ""}
+                                  </span>
+                                </TableCell>
+                                <TableCell>{q.subject}</TableCell>
+                                <TableCell>{q.topic}</TableCell>
+                                <TableCell>{q.correct_answer}</TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+
+                    <Box
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      flexWrap="wrap"
+                      gap={1}
+                      mt={2}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        Showing {excelFrom + 1}–{excelTo} of{" "}
+                        {excelQuestions.length} questions
+                      </Typography>
+
+                      {excelQuestions.length > EXCEL_PAGE_SIZE && (
+                        <Pagination
+                          count={totalExcelPages}
+                          page={safeExcelPage}
+                          onChange={(_, page) => setExcelPage(page)}
+                          color="primary"
+                          size="small"
+                          showFirstButton
+                          showLastButton
+                        />
+                      )}
+                    </Box>
+                  </>
+                )}
+              </Box>
+            ) : loadingSubjects ? (
               <Box display="flex" justifyContent="center" mt={3}>
                 <CircularProgress />
               </Box>
