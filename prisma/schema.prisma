@@ -65,6 +65,8 @@ model exams {
   scheduled_end           DateTime?
   is_active               Boolean                 @default(true)
   is_pyq                  Boolean                 @default(false)
+  is_free                 Boolean                 @default(false)
+  auto_assign_all         Boolean                 @default(false)
   created_by              Int?
   created_at              DateTime                @default(now())
   allow_multiple_attempts Boolean                 @default(true)

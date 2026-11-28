@@ -62,8 +62,8 @@ export async function GET(
       scheduled_start: exam.scheduled_start?.toISOString() || null,
       scheduled_end: exam.scheduled_end?.toISOString() || null,
       description: exam.description,
-      is_pyq: exam.is_pyq, // NEW - lets the view modal / edit button know what it's looking at
-      canEdit: exam._count.exam_assignments === 0 && !exam.is_pyq, // NEW - PYQ exams are never editable through this route
+      is_pyq: exam.is_pyq, // lets the view modal / edit button know what it's looking at
+      canEdit: exam._count.exam_assignments === 0 && !exam.is_pyq, // PYQ exams are never editable through this route
       canDelete: exam._count.exam_assignments === 0,
       selection_mode: exam.selection_mode || "auto",
       subjects: exam.exam_subject_configs.map((cfg) => ({
@@ -81,6 +81,117 @@ export async function GET(
     console.error("Error fetching exam:", error);
     return NextResponse.json(
       { success: false, message: "Failed to fetch exam" },
+      { status: 500 },
+    );
+  }
+}
+
+/* ===========================
+    PATCH: Turn "free for all students" on/off
+    Allowed only for active, non-PYQ MOCK exams.
+=========================== */
+export async function PATCH(
+  req: Request,
+  { params }: { params: { examId: string } },
+) {
+  try {
+    const authHeader = req.headers.get("Authorization");
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    } catch {
+      return NextResponse.json(
+        { success: false, message: "Invalid token" },
+        { status: 401 },
+      );
+    }
+
+    if (decoded.role !== "admin") {
+      return NextResponse.json(
+        { success: false, message: "Only admins can change this" },
+        { status: 403 },
+      );
+    }
+
+    const examId = parseInt(params.examId);
+    const { isFree } = await req.json();
+
+    if (typeof isFree !== "boolean") {
+      return NextResponse.json(
+        { success: false, message: "isFree must be true or false" },
+        { status: 400 },
+      );
+    }
+
+    const exam = await prisma.exams.findUnique({
+      where: { exam_id: examId },
+      select: {
+        is_pyq: true,
+        is_active: true,
+        exam_type: true,
+      },
+    });
+
+    if (!exam) {
+      return NextResponse.json(
+        { success: false, message: "Exam not found" },
+        { status: 404 },
+      );
+    }
+
+    // PYQ exams are always free, nothing to toggle
+    if (exam.is_pyq) {
+      return NextResponse.json(
+        { success: false, message: "PYQ exams are always free" },
+        { status: 400 },
+      );
+    }
+
+    // Only mock exams can be made free
+    if (exam.exam_type !== "mock") {
+      return NextResponse.json(
+        { success: false, message: "Only mock exams can be made free." },
+        { status: 400 },
+      );
+    }
+
+    // Inactive exams can't be changed
+    if (!exam.is_active) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Cannot change free/paid. Exam is inactive.",
+        },
+        { status: 409 },
+      );
+    }
+
+    // Save, and read back what is really stored in the database
+    const updated = await prisma.exams.update({
+      where: { exam_id: examId },
+      data: { is_free: isFree, updated_by: decoded.userId },
+      select: { exam_id: true, is_free: true },
+    });
+
+    console.log(
+      `[PATCH free] exam ${updated.exam_id} | requested: ${isFree} | saved in DB: ${updated.is_free}`,
+    );
+
+    return NextResponse.json({ success: true, isFree: updated.is_free });
+  } catch (error) {
+    console.error("PATCH /api/exams/[examId] error:", error);
+    return NextResponse.json(
+      { success: false, message: "Failed to update exam" },
       { status: 500 },
     );
   }
@@ -249,7 +360,7 @@ export async function PUT(
         const topics = await tx.topics.findMany({
           where: {
             topic_id: { in: topicIds },
-            is_pyq: false, // NEW - only normal topics can back a normal exam
+            is_pyq: false, // only normal topics can back a normal exam
           },
         });
 
@@ -270,7 +381,7 @@ export async function PUT(
           const allQuestions = await tx.questions.findMany({
             where: {
               topic_id: topicId,
-              is_pyq: false, // NEW - the critical fix, same as the create route
+              is_pyq: false, // the critical fix, same as the create route
             },
           });
 
@@ -299,7 +410,7 @@ export async function PUT(
         const questions = await tx.questions.findMany({
           where: {
             question_id: { in: selectedQuestions },
-            is_pyq: false, // NEW
+            is_pyq: false,
           },
           select: {
             question_id: true,

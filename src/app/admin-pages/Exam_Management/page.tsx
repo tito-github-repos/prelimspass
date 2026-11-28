@@ -29,6 +29,7 @@ import {
   CircularProgress,
   Tooltip,
   Snackbar,
+  Switch, // NEW
 } from "@mui/material";
 import { Grid } from "@mui/material";
 import {
@@ -79,7 +80,9 @@ interface Exam {
   subject_id: number;
   topic_id: number;
   exam_type: "practice" | "mock" | "live";
-  is_pyq: boolean; // NEW - true = PYQ exam, false = normal exam
+  is_pyq: boolean; // true = PYQ exam, false = normal exam
+  is_free: boolean; // NEW - true = free for all students
+  has_attempts: boolean; // NEW - true = a student has attempted this exam
   status: "active" | "draft" | "completed" | "inactive";
   questions_count: number;
   duration_minutes: number;
@@ -105,6 +108,7 @@ const ExamManagement: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [togglingFreeId, setTogglingFreeId] = useState<number | null>(null); // NEW
 
   // Modal states
   const [createExamModalOpen, setCreateExamModalOpen] = useState(false);
@@ -471,6 +475,77 @@ const ExamManagement: React.FC = () => {
     setDeleting(false);
   };
 
+  // NEW - turn "free for all students" on/off for one exam
+  const handleFreeToggle = async (exam: Exam) => {
+    if (exam.is_pyq || exam.status === "inactive") return;
+
+    const newValue = !exam.is_free;
+    setTogglingFreeId(exam.id);
+
+    // update the switch immediately, undo if the server says no
+    setAllExams((prev) =>
+      prev.map((e) => (e.id === exam.id ? { ...e, is_free: newValue } : e)),
+    );
+
+    try {
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+
+      const res = await fetch(`/api/exams/${exam.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isFree: newValue }),
+      });
+
+      const raw = await res.text();
+      let data: any = null;
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch {
+        console.error(
+          "Free toggle: non-JSON response",
+          res.status,
+          raw.slice(0, 300),
+        );
+        throw new Error(
+          `Server returned status ${res.status}. Check the terminal and browser console.`,
+        );
+      }
+
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.message || "Failed to update");
+      }
+
+      setSnackbar({
+        open: true,
+        message: newValue
+          ? `"${exam.exam_name}" is now free for all students`
+          : `"${exam.exam_name}" is now paid`,
+        severity: "success",
+      });
+
+      // NEW - reload the list quietly so the switch shows what is really stored
+      const check = await fetch("/api/exams");
+      const list = await check.json();
+      if (Array.isArray(list)) setAllExams(list);
+    } catch (err: any) {
+      setAllExams((prev) =>
+        prev.map((e) => (e.id === exam.id ? { ...e, is_free: !newValue } : e)),
+      );
+      setSnackbar({
+        open: true,
+        message: err.message || "Failed to update exam",
+        severity: "error",
+      });
+      fetchExams();
+    } finally {
+      setTogglingFreeId(null);
+    }
+  };
+
   const paginatedExams = filteredExams.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
@@ -694,6 +769,8 @@ const ExamManagement: React.FC = () => {
                       <TableCell sx={{ fontWeight: "bold" }}>
                         Duration (mins)
                       </TableCell>
+                      {/* NEW */}
+                      <TableCell sx={{ fontWeight: "bold" }}>Free</TableCell>
                       <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
                     </TableRow>
                   </TableHead>
@@ -766,6 +843,36 @@ const ExamManagement: React.FC = () => {
                                     : "-No Timer-"}
                                 </Typography>
                               </Box>
+                            </TableCell>
+
+                            {/* NEW - Free switch */}
+                            <TableCell>
+                              <Tooltip
+                                title={
+                                  exam.is_pyq
+                                    ? "PYQ exams are always free"
+                                    : exam.has_attempts
+                                      ? "Locked: students have already attempted this exam"
+                                      : exam.is_free
+                                        ? "Free for all students (click to make paid)"
+                                        : "Paid (click to make free)"
+                                }
+                                arrow
+                              >
+                                <span>
+                                  <Switch
+                                    size="small"
+                                    color="success"
+                                    checked={exam.is_pyq || !!exam.is_free}
+                                    disabled={
+                                      exam.is_pyq ||
+                                      exam.has_attempts ||
+                                      togglingFreeId === exam.id
+                                    }
+                                    onChange={() => handleFreeToggle(exam)}
+                                  />
+                                </span>
+                              </Tooltip>
                             </TableCell>
 
                             <TableCell>
@@ -884,7 +991,8 @@ const ExamManagement: React.FC = () => {
                       })
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} align="center" sx={{ py: 5 }}>
+                        {/* colSpan 6 -> 7 because of the new Free column */}
+                        <TableCell colSpan={7} align="center" sx={{ py: 5 }}>
                           <Typography variant="body1" color="text.secondary">
                             No exams found
                           </Typography>

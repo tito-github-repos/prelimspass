@@ -3,16 +3,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { shuffleArray } from "@/utils/shuffle";
 import jwt from "jsonwebtoken";
+import { expireLiveExams } from "@/utils/expireLiveExams";
 
 /* ===========================
    GET: Fetch exams list
 =========================== */
 export async function GET() {
   try {
+    await expireLiveExams(); // NEW
+
     const exams = await prisma.exams.findMany({
-      // Now returns BOTH normal and PYQ exams. Category is exposed via
-      // is_pyq in the transformed response so the UI can distinguish them
-      // (e.g. an "Exam Category" column showing Normal / PYQ).
       orderBy: { created_at: "desc" },
       include: {
         exam_subject_configs: {
@@ -24,6 +24,7 @@ export async function GET() {
         _count: {
           select: {
             exam_assignments: true,
+            student_exam_attempts: true,
           },
         },
         exam_assignments: {
@@ -55,7 +56,9 @@ export async function GET() {
         id: exam.exam_id,
         exam_name: exam.exam_title,
         exam_type: exam.exam_type,
-        is_pyq: exam.is_pyq, // NEW - lets the list UI show Normal / PYQ
+        is_pyq: exam.is_pyq,
+        is_free: exam.is_free,
+        has_attempts: exam._count.student_exam_attempts > 0,
         selection_mode: exam.selection_mode || "auto",
         status,
         questions_count: exam.question_count,
@@ -65,8 +68,6 @@ export async function GET() {
         scheduled_start: exam.scheduled_start?.toISOString() || null,
         scheduled_end: exam.scheduled_end?.toISOString() || null,
 
-        // PYQ exams are never editable through the normal edit flow
-        // (matches the guard already enforced in PUT /api/exams/[examId]).
         canEdit: !hasAssignedStudents && !exam.is_pyq,
         canDelete: !hasAssignedStudents,
 
