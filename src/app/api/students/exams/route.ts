@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyToken } from "@/utils/auth";
+import { expireLiveExams } from "@/utils/expireLiveExams"; // NEW
 
 // Helper to determine exam state
 function getExamState(exam: any) {
@@ -44,6 +45,8 @@ export async function GET(req: Request) {
       );
     }
 
+    await expireLiveExams(); // NEW
+
     const studentId = decoded.userId;
     const { searchParams } = new URL(req.url);
     const examId = searchParams.get("id");
@@ -56,8 +59,6 @@ export async function GET(req: Request) {
 
     /* ======================================================
        SINGLE EXAM META (START EXAM)
-       Handles both normal exams (must be assigned) and PYQ exams
-       (globally available to every student, no assignment row needed).
     ====================================================== */
     if (examId) {
       const examIdNum = Number(examId);
@@ -73,8 +74,6 @@ export async function GET(req: Request) {
         );
       }
 
-      // PYQ exams are available to every student by design - no
-      // exam_assignment_students row exists or is needed for them.
       if (exam.is_pyq) {
         return NextResponse.json({
           success: true,
@@ -94,69 +93,50 @@ export async function GET(req: Request) {
         });
       }
 
-      // Normal exam - must be explicitly assigned to this student
-      const assignment = await prisma.exam_assignment_students.findFirst({
-        where: {
-          student_id: studentId,
-          assignment: { exam_id: examIdNum },
-        },
-        include: {
-          assignment: {
-            include: {
-              exam: true,
-            },
-          },
-        },
-      });
-
-      if (!assignment) {
+      if (!exam.is_active) {
         return NextResponse.json(
-          { success: false, message: "Exam not assigned or not found" },
+          { success: false, message: "Exam not found" },
           { status: 404 },
         );
       }
 
-      const assignedExam = assignment.assignment.exam;
+      const legacyAssignment = await prisma.exam_assignment_students.findFirst({
+        where: {
+          student_id: studentId,
+          assignment: { exam_id: examIdNum },
+        },
+        select: {
+          assignment: { select: { shuffle_questions: true } },
+        },
+      });
 
       return NextResponse.json({
         success: true,
         data: {
-          id: assignedExam.exam_id,
-          title: assignedExam.exam_title,
-          duration: assignedExam.time_limit_minutes,
-          questions: assignedExam.question_count,
-          examType: assignedExam.exam_type,
-          shuffleQuestions: assignment.assignment.shuffle_questions,
-          state: getExamState(assignedExam),
-          startDate: assignedExam.scheduled_start,
-          endDate: assignedExam.scheduled_end,
-          points: String(assignedExam.total_marks ?? 0),
-          isLocked: !isPaidUser,
+          id: exam.exam_id,
+          title: exam.exam_title,
+          duration: exam.time_limit_minutes,
+          questions: exam.question_count,
+          examType: exam.exam_type,
+          shuffleQuestions:
+            legacyAssignment?.assignment.shuffle_questions ?? false,
+          state: getExamState(exam),
+          startDate: exam.scheduled_start,
+          endDate: exam.scheduled_end,
+          points: String(exam.total_marks ?? 0),
+          isLocked: !(exam.is_free || isPaidUser),
         },
       });
     }
 
     /* ======================================================
-       AVAILABLE EXAMS LIST (My Exams page)
-       Normal exams ONLY - PYQ exams live in their own dedicated module
-       (Previous Year Questions page / /api/students/exams/pyq) and are
-       never auto-assigned or listed here. There is no more PYQ
-       auto-assignment step in this route: PYQ availability is driven
-       entirely by the is_pyq flag + pyq_exam_meta, not by
-       exam_assignment_students rows.
+       AVAILABLE EXAMS LIST (My Exams page + dashboard)
     ====================================================== */
-    const assignedExams = await prisma.exam_assignment_students.findMany({
-      where: { student_id: studentId },
-      include: {
-        assignment: {
-          include: {
-            exam: true,
-          },
-        },
-      },
+    const allExams = await prisma.exams.findMany({
+      where: { is_active: true, is_pyq: false },
+      orderBy: { created_at: "desc" },
     });
 
-    // Get all completed attempts for the student
     const completedAttempts = await prisma.student_exam_attempts.findMany({
       where: {
         student_id: studentId,
@@ -169,32 +149,16 @@ export async function GET(req: Request) {
       completedAttempts.map((attempt) => attempt.exam_id),
     );
 
-    // Exams the student should actually see in the table
-    const visibleAssignments = assignedExams.filter((a) => {
-      const exam = a.assignment.exam;
-
-      // Explicit guard: My Exams must never show PYQ exams, even
-      // if a stale assignment row somehow exists for one from before
-      // this route was cleaned up.
-      if (exam.is_pyq) return false;
-
+    const visibleExams = allExams.filter((exam) => {
       const state = getExamState(exam);
-
-      // Only show upcoming or available exams that haven't been completed
       const isUpcomingOrAvailable =
         state === "upcoming" || state === "available";
       const notCompleted = !completedExamIds.has(exam.exam_id);
-
       return isUpcomingOrAvailable && notCompleted;
     });
 
-    const examIds = visibleAssignments.map((a) => a.assignment.exam.exam_id);
+    const examIds = visibleExams.map((exam) => exam.exam_id);
 
-    /* ------------------------------------------------------
-       Subjects per exam (used by the subject dropdown filter,
-       the subject label under the exam title, and search)
-       exam_id -> Map(subject_id -> subject_name)
-    ------------------------------------------------------ */
     const subjectsByExam = new Map<number, Map<number, string>>();
     const addSubject = (examId: number, id: number, name: string) => {
       if (!subjectsByExam.has(examId)) subjectsByExam.set(examId, new Map());
@@ -202,7 +166,6 @@ export async function GET(req: Request) {
     };
 
     if (examIds.length > 0) {
-      // 1) Auto-mode exams: subjects come from exam_subject_configs
       const configs = await prisma.exam_subject_configs.findMany({
         where: { exam_id: { in: examIds } },
         select: {
@@ -214,7 +177,6 @@ export async function GET(req: Request) {
         addSubject(c.exam_id, c.subject.subject_id, c.subject.subject_name),
       );
 
-      // 2) Exams with no configs (e.g. manual mode): derive from their questions
       const examsWithoutSubjects = examIds.filter(
         (id) => !subjectsByExam.has(id),
       );
@@ -240,8 +202,7 @@ export async function GET(req: Request) {
       }
     }
 
-    const exams = visibleAssignments.map((a) => {
-      const exam = a.assignment.exam;
+    const exams = visibleExams.map((exam) => {
       const subjectMap = subjectsByExam.get(exam.exam_id);
 
       return {
@@ -254,7 +215,7 @@ export async function GET(req: Request) {
         startDate: exam.scheduled_start,
         endDate: exam.scheduled_end,
         points: String(exam.total_marks ?? 0),
-        isLocked: !isPaidUser,
+        isLocked: !(exam.is_free || isPaidUser),
         subjects: subjectMap
           ? Array.from(subjectMap, ([id, name]) => ({ id, name }))
           : [],
